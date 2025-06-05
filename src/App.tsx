@@ -1,4 +1,6 @@
+import React, { useEffect } from 'react';
 import { Sidebar } from './Style/Components/Sidebar/index';
+import { Axios } from './Services/Api/Api';
 
 function App() {
   const menuItems = [
@@ -14,10 +16,15 @@ function App() {
     }
   ];
 
+  useEffect(() => {
+    Axios()
+      .then(response => console.log('Conexão deu certo', response))
+      .catch(error => console.error('Erro Axios:', error));
+  }, []);
+
   return (
     <div>
       <Sidebar items={menuItems} />
-      {/* Resto do seu conteúdo */}
     </div>
   );
 }
