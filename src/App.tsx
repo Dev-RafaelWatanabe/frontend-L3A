@@ -9,13 +9,8 @@ function App() {
     },
     {
       id: 2,
-      label: 'Profile',
+      label: 'Automações',
       onClick: () => console.log('Profile clicked')
-    },
-    {
-      id: 3,
-      label: 'Settings',
-      onClick: () => console.log('Settings clicked')
     }
   ];
 

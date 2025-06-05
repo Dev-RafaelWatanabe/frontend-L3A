@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const SidebarContainer = styled.div`
   width: 250px;
   height: 100vh;
-  background-color:rgb(25, 13, 194);
+  background-color:rgba(8, 1, 104, 0.94);
   position: fixed;
   left: 0;
   top: 0;
@@ -34,4 +34,33 @@ export const SidebarMenuItem = styled.li`
   &:hover {
     color: #007bff;
   }
+
+  
+`;
+
+export const UserContainer = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+export const UserIcon = styled.div`
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+`;
+
+export const UserName = styled.span`
+  font-size: 14px;
 `;

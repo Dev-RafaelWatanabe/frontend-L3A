@@ -1,9 +1,13 @@
 import React from 'react';
+import { FaUserCircle } from 'react-icons/fa';
 import { 
   SidebarContainer, 
   SidebarLogo, 
   SidebarMenu, 
-  SidebarMenuItem 
+  SidebarMenuItem,
+  UserContainer,
+  UserIcon,
+  UserName
 } from './Siderbar';
 
 interface SidebarProps {
@@ -16,9 +20,13 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ items = [] }) => {
+  const handleUserClick = () => {
+    console.log('Navegando para a página de perfil');
+  };
+
   return (
     <SidebarContainer>
-      <SidebarLogo>Logo</SidebarLogo>
+      <SidebarLogo>L3A</SidebarLogo>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.id} onClick={item.onClick}>
@@ -27,6 +35,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ items = [] }) => {
           </SidebarMenuItem>
         ))}
       </SidebarMenu>
+
+      <UserContainer onClick={handleUserClick}>
+        <UserIcon>
+          <FaUserCircle />
+        </UserIcon>
+        <UserName>Meu Perfil</UserName>
+      </UserContainer>
     </SidebarContainer>
   );
 };
