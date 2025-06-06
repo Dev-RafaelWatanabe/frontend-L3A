@@ -1,29 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../Components/DataTable';
-
-interface Lancamento {
-  id: number;
-  data: string;
-  tipo: string;
-  valor: number;
-  descricao: string;
-  categoria: string;
-  forma_pagamento: string;
-  status: string;
-}
+import type { Lancamento } from '../../../Services/Api/Types';
 
 export const Lancamentos: React.FC = () => {
   const [data, setData] = useState<Lancamento[]>([]);
 
   const columns = [
-    { key: 'id', label: 'ID' },
     { key: 'data', label: 'Data' },
-    { key: 'tipo', label: 'Tipo' },
-    { key: 'valor', label: 'Valor' },
     { key: 'descricao', label: 'Descrição' },
-    { key: 'categoria', label: 'Categoria' },
+    { key: 'valor', label: 'Valor' },
+    { key: 'tipo', label: 'Tipo' },
     { key: 'forma_pagamento', label: 'Forma de Pagamento' },
+    { key: 'categoria', label: 'Categoria' },
     { key: 'status', label: 'Status' }
   ];
 
