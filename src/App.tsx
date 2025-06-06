@@ -33,7 +33,7 @@ function App() {
       subItems: [
         { id: 'db1', label: 'Restaurantes', path: '/database/restaurants' },
         { id: 'db2', label: 'Obras', path: '/database/obras' },
-        { id: 'db3', label: 'Funcionários', path: '/database/funcionarios' },
+        { id: 'db3', label: 'Funcionários', path: '/database/funcionario' },
         { id: 'db4', label: 'Lançamentos', path: '/database/lancamentos' }
       ]
     }
@@ -50,7 +50,7 @@ function App() {
           <Route path="/automations/history" element={<Automations />} />
           <Route path="/database/restaurants" element={<Restaurantes />} />
           <Route path="/database/obras" element={<Obras />} />
-          <Route path="/database/funcionarios" element={<Funcionarios />} />
+          <Route path="/database/funcionario" element={<Funcionarios />} />
           <Route path="/database/lancamentos" element={<Lancamentos />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>

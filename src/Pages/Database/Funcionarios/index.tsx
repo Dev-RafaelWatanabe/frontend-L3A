@@ -7,20 +7,26 @@ export const Funcionarios: React.FC = () => {
   const [data, setData] = useState<Funcionario[]>([]);
 
   const columns = [
+    { key: 'id', label: 'id' },
     { key: 'nome', label: 'Nome' },
-    { key: 'data_nascimento', label: 'Data Nascimento' },
-    { key: 'cpf', label: 'CPF' },
-    { key: 'telefone', label: 'Telefone' },
-    { key: 'email', label: 'E-mail' },
-    { key: 'cargo', label: 'Cargo' },
-    { key: 'salario', label: 'Salário' },
-    { key: 'data_contratacao', label: 'Data Contratação' }
+    { 
+      key: 'tipos_empregabilidade', 
+      label: 'Contratação',
+      render: (value: any[]) => Array.isArray(value) ? value.join(', ') : value
+    },
+    { key: 'ativo', label: 'Ativo?' }
   ];
 
   useEffect(() => {
     Api.getFuncionarios()
       .then(response => setData(response.data))
-      .catch(error => console.error('Erro ao buscar funcionários:', error));
+      .catch(error => {
+        console.error('Erro ao buscar funcionários:', {
+          status: error.response?.status,
+          message: error.response?.data,
+          details: error.response?.data?.detail
+        });
+      });
   }, []);
 
   return (

@@ -22,36 +22,25 @@ export interface Restaurante {
 export interface Funcionario {
   id: number;
   nome: string;
-  data_nascimento: string;
-  cpf: string;
-  rg: string;
-  telefone: string;
-  email: string;
-  endereco: string;
-  cargo: string;
-  salario: number;
-  data_contratacao: string;
+  tipos_empregabilidade: string[];
+  ativo: boolean;
 }
 
 export interface Obra {
   id: number;
-  nome_obra: string;
-  endereco: string;
-  responsavel: string;
-  prazo: string;
-  valor: number;
-  status: string;
+  codigo_obra: number;
+  nome: string;
+  data_inicio: Date;
+  data_fim: Date;
+  atividade: string;
+  orcamento_previsto: number;
+  ativo: boolean;
+  tipo_unidade: string;
 }
 
 export interface Lancamento {
   id: number;
-  data: string;
-  descricao: string;
-  valor: number;
-  tipo: TipoLancamento;
-  forma_pagamento: string;
-  categoria: string;
-  status: string;
+  
 }
 
 

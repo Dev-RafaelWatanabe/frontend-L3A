@@ -7,13 +7,7 @@ export const Lancamentos: React.FC = () => {
   const [data, setData] = useState<Lancamento[]>([]);
 
   const columns = [
-    { key: 'data', label: 'Data' },
-    { key: 'descricao', label: 'Descrição' },
-    { key: 'valor', label: 'Valor' },
-    { key: 'tipo', label: 'Tipo' },
-    { key: 'forma_pagamento', label: 'Forma de Pagamento' },
-    { key: 'categoria', label: 'Categoria' },
-    { key: 'status', label: 'Status' }
+    { key: 'id', label: 'id' },
   ];
 
   useEffect(() => {

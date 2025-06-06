@@ -7,12 +7,15 @@ export const Obras: React.FC = () => {
   const [data, setData] = useState<Obra[]>([]);
 
   const columns = [
-    { key: 'nome_obra', label: 'Nome da Obra' },
-    { key: 'endereco', label: 'Endereço' },
-    { key: 'responsavel', label: 'Responsável' },
-    { key: 'prazo', label: 'Prazo' },
-    { key: 'valor', label: 'Valor' },
-    { key: 'status', label: 'Status' }
+    { key: 'id', label: 'id' },
+    { key: 'codigo_obra', label: 'Código da obra' },
+    { key: 'nome', label: 'Nome da Obra' },
+    { key: 'data_inicio', label: 'Data Iníco' },
+    { key: 'data_fim', label: 'Data Final' },
+    { key: 'atividade', label: 'Atividade' },
+    { key: 'orcamento_previsto', label: 'Orça. Previsto' },
+    { key: 'ativo', label: 'Status' },
+    { key: 'tipo_unidade', label: 'Unidade' }
   ];
 
   useEffect(() => {
