@@ -5,10 +5,10 @@ const api = axios.create({
 });
 
 export const Api = {
-  getRestaurantes: () => api.get('/restaurantes/obter-restaurante'),
-  getFuncionarios: () => api.get('/funcionario/obter-funcionario'),
-  getObras: () => api.get('/obras/listar-obras'),
-  getLancamentos: () => api.get('/lancamento/listar-lancamentos')
+  getRestaurantes: () => api.get('/restaurantes/buscar_restaurantes'),
+  getFuncionarios: () => api.get('/funcionario/buscar_funcionarios'),
+  getObras: () => api.get('/obras/listar_obras'),
+  getLancamentos: () => api.get('/lancamento/listar_lancamentos')
 };
 
 export default Api;
