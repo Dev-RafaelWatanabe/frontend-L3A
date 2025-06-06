@@ -64,3 +64,8 @@ export const UserIcon = styled.div`
 export const UserName = styled.span`
   font-size: 14px;
 `;
+
+export const SubMenu = styled.div`
+  padding-left: 20px;
+  background-color: rgba(255, 255, 255, 0.05);
+`;

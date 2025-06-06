@@ -1,7 +1,14 @@
 import axios from 'axios';
 
-export function Axios() {
-  return axios.get('http://192.168.1.112:8000/obras')
-    };
+const api = axios.create({
+  baseURL: 'http://192.168.1.112:8000'
+});
 
-export default Axios;
+export const Api = {
+  getRestaurantes: () => api.get('/restaurantes/obter-restaurante'),
+  getFuncionarios: () => api.get('/funcionario/obter-funcionario'),
+  getObras: () => api.get('/obras/listar-obras'),
+  getLancamentos: () => api.get('/lancamento/listar-lancamentos')
+};
+
+export default Api;

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaUserCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { 
   SidebarContainer, 
   SidebarLogo, 
@@ -7,21 +8,37 @@ import {
   SidebarMenuItem,
   UserContainer,
   UserIcon,
-  UserName
+  UserName,
+  SubMenu
 } from './Siderbar';
 
-interface SidebarProps {
-  items?: Array<{
-    id: number;
-    label: string;
-    icon?: React.ReactNode;
-    onClick?: () => void;
-  }>;
+interface SubItem {
+  id: string;
+  label: string;
+  path: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ items = [] }) => {
-  const handleUserClick = () => {
-    console.log('Navegando para a página de perfil');
+interface MenuItem {
+  id: number;
+  label: string;
+  path?: string;
+  subItems?: SubItem[];
+}
+
+interface SidebarProps {
+  items: MenuItem[];
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
+  const [openSubmenu, setOpenSubmenu] = useState<number | null>(null);
+  const navigate = useNavigate();
+
+  const handleItemClick = (item: MenuItem) => {
+    if (item.subItems) {
+      setOpenSubmenu(openSubmenu === item.id ? null : item.id);
+    } else if (item.path) {
+      navigate(item.path);
+    }
   };
 
   return (
@@ -29,14 +46,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ items = [] }) => {
       <SidebarLogo>L3A</SidebarLogo>
       <SidebarMenu>
         {items.map((item) => (
-          <SidebarMenuItem key={item.id} onClick={item.onClick}>
-            {item.icon}
-            {item.label}
-          </SidebarMenuItem>
+          <React.Fragment key={item.id}>
+            <SidebarMenuItem onClick={() => handleItemClick(item)}>
+              {item.label}
+            </SidebarMenuItem>
+            {item.subItems && openSubmenu === item.id && (
+              <SubMenu>
+                {item.subItems.map((subItem) => (
+                  <SidebarMenuItem 
+                    key={subItem.id}
+                    onClick={() => navigate(subItem.path)}
+                  >
+                    {subItem.label}
+                  </SidebarMenuItem>
+                ))}
+              </SubMenu>
+            )}
+          </React.Fragment>
         ))}
       </SidebarMenu>
 
-      <UserContainer onClick={handleUserClick}>
+      <UserContainer onClick={() => navigate('/profile')}>
         <UserIcon>
           <FaUserCircle />
         </UserIcon>
