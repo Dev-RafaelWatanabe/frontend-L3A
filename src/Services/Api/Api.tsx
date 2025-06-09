@@ -23,7 +23,7 @@ api.interceptors.response.use(
 
 export const Api = {
   getRestaurantes: () => api.get('/restaurantes/'),
-  getFuncionarios: () => api.get('/funcionarios/'),
+  getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
   getLancamentos: () => api.get('/lancamentos/')
 };
