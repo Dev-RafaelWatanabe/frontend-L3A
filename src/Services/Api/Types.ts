@@ -22,7 +22,7 @@ export interface Restaurante {
 export interface Funcionario {
   id: number;
   nome: string;
-  tipos_empregabilidade: string[];
+  tipos_empregabilidade: [];
   ativo: boolean;
 }
 

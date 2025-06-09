@@ -9,12 +9,15 @@ export const Funcionarios: React.FC = () => {
   const columns = [
     { key: 'id', label: 'id' },
     { key: 'nome', label: 'Nome' },
-    { 
-      key: 'tipos_empregabilidade', 
+    {
+      key: 'tipos_empregabilidade',
       label: 'Contratação',
-      render: (value: any[]) => Array.isArray(value) ? value.join(', ') : value
-    },
-    { key: 'ativo', label: 'Ativo?' }
+      render: (value: any[]) =>
+        Array.isArray(value)
+          ? value.map(item => item.nome).join(', ')
+          : value
+    },  
+    { key: 'ativo', label: 'ativo' }
   ];
 
   useEffect(() => {
