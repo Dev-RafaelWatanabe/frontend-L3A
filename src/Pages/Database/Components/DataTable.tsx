@@ -37,6 +37,17 @@ interface DataTableProps {
 }
 
 export const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
+  console.log('DataTable recebeu:', { data, columns });
+
+  if (!data || !Array.isArray(data)) {
+    console.error('Dados inválidos recebidos:', data);
+    return <div>Erro: Dados inválidos</div>;
+  }
+
+  if (data.length === 0) {
+    return <div>Nenhum dado encontrado</div>;
+  }
+
   return (
     <Table>
       <thead>

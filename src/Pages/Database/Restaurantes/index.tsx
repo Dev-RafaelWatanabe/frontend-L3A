@@ -9,7 +9,22 @@ export const Restaurantes: React.FC = () => {
   const columns = [
     { key: 'id', label: 'ID' },
     { key: 'nome', label: 'Nome' },
-    { key: 'valor', label: 'Valor' }
+    { 
+      key: 'valor', 
+      label: 'Valor',
+      render: (value: any) => {
+        // Verifica se o valor é válido e converte para número se necessário
+        const numValue = Number(value);
+        if (isNaN(numValue)) {
+          return 'R$ 0,00';
+        }
+        // Formata o número usando Intl.NumberFormat para garantir formato brasileiro
+        return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(numValue);
+      }
+    }
   ];
 
   useEffect(() => {

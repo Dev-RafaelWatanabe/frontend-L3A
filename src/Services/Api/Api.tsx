@@ -25,7 +25,16 @@ export const Api = {
   getRestaurantes: () => api.get('/restaurantes/'),
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
-  getLancamentos: () => api.get('/lancamentos/')
+  getLancamentos: () => {
+    console.log('Chamando getLancamentos');
+    return api.get('/lancamento/').then(response => {
+      console.log('Resposta getLancamentos:', response);
+      return response;
+    }).catch(error => {
+      console.error('Erro getLancamentos:', error);
+      throw error;
+    });
+  }
 };
 
 export default Api;

@@ -40,7 +40,22 @@ export interface Obra {
 
 export interface Lancamento {
   id: number;
-  
+  data_trabalho: string;
+  funcionario: {
+    id: number;
+    nome: string;
+  };
+  obra: {
+    id: number;
+    nome: string;
+  };
+  turno: {
+    nome: string;
+  };
+  restaurante: {
+    id: number;
+    nome: string;
+  };
 }
 
 
