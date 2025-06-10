@@ -23,8 +23,17 @@ api.interceptors.response.use(
 
 export const Api = {
   getRestaurantes: () => api.get('/restaurantes/'),
+  createRestaurante: (data: { nome: string; valor: number }) => 
+    api.post('/restaurantes/', data),
+  updateRestaurante: (id: number, data: { nome: string; valor: number }) => 
+    api.put(`/restaurantes/${id}/`, data).then(response => {
+      console.log('Update response:', response);
+      return response;
+    }),
+
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
+
   getLancamentos: () => {
     console.log('Chamando getLancamentos');
     return api.get('/lancamento/').then(response => {
