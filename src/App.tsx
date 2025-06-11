@@ -6,6 +6,8 @@ import { Restaurantes } from './Pages/Database/Restaurantes';
 import { Obras } from './Pages/Database/Obras';
 import { Funcionarios } from './Pages/Database/Funcionarios';
 import { Lancamentos } from './Pages/Database/Lancamentos';
+import { CronogramaLancamento } from './Pages/Cronograma/Lancamento';
+import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 
 function App() {
   const navigate = useNavigate();
@@ -36,6 +38,14 @@ function App() {
         { id: 'db3', label: 'Funcionários', path: '/database/funcionario' },
         { id: 'db4', label: 'Lançamentos', path: '/database/lancamentos' }
       ]
+    },
+    {
+      id: 4,
+      label: 'Cronograma',
+      subItems: [
+        { id: 'crono1', label: 'Lançamento', path: '/cronograma/lancamento' },
+        { id: 'crono2', label: 'Planejamento', path: '/cronograma/planejamento' }
+      ]
     }
   ];
 
@@ -52,6 +62,8 @@ function App() {
           <Route path="/database/obras" element={<Obras />} />
           <Route path="/database/funcionario" element={<Funcionarios />} />
           <Route path="/database/lancamentos" element={<Lancamentos />} />
+          <Route path="/cronograma/lancamento" element={<CronogramaLancamento />} />
+          <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>

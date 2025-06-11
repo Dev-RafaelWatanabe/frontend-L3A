@@ -43,7 +43,14 @@ export const Api = {
       console.error('Erro getLancamentos:', error);
       throw error;
     });
-  }
+  },
+
+  createLancamento: (data: {
+    funcionario_id: number;
+    obra_id: number;
+    data_trabalho: string;
+    is_planejamento?: boolean;
+  }) => api.post('/lancamento/', data),
 };
 
 export default Api;
