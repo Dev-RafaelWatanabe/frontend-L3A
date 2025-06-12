@@ -99,11 +99,22 @@ const CheckboxOption = styled.div`
   }
 `;
 
+interface PlanejamentoDiario {
+  id: number;
+  data: string;
+  planejamentos: Array<{
+    obra: Obra;
+    funcionarios: Funcionario[];
+  }>;
+}
+
 const PlanningCardContainer = styled.div`
   margin-top: 30px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); // Creates responsive grid
   gap: 20px;
+  padding: 0 20px;
+  width: 100%;
 `;
 
 const PlanningCard = styled.div`
@@ -111,31 +122,43 @@ const PlanningCard = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 300px;
+  max-width: 350px; // Limits maximum width
+  height: fit-content;
 
   h3 {
     color: rgba(8, 1, 104, 0.94);
     margin-bottom: 15px;
-    font-size: 18px;
+    font-size: 16px; // Slightly smaller font
+    border-bottom: 2px solid rgba(8, 1, 104, 0.1);
+    padding-bottom: 10px;
+  }
+
+  .planejamento-grupo {
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   .obra {
     font-weight: 500;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+    color: rgba(8, 1, 104, 0.94);
+    font-size: 14px;
   }
 
   .funcionarios {
     list-style: none;
-    padding: 0;
+    padding-left: 15px;
     
     li {
-      padding: 8px 0;
-      border-bottom: 1px solid #f5f5f5;
-      
-      &:last-child {
-        border-bottom: none;
-      }
+      padding: 3px 0;
+      font-size: 14px;
     }
   }
 `;
@@ -146,12 +169,7 @@ export const CronogramaPlanejamento: React.FC = () => {
   const [selectedFuncionarios, setSelectedFuncionarios] = useState<number[]>([]);
   const [selectedObra, setSelectedObra] = useState('');
   const [selectedDate, setSelectedDate] = useState<string>('');
-  const [planejamentos, setPlanejamentos] = useState<Array<{
-    id: number;
-    data: string;
-    obra: Obra;
-    funcionarios: Funcionario[];
-  }>>([]);
+  const [planejamentosPorDia, setPlanejamentosPorDia] = useState<PlanejamentoDiario[]>([]);
   const [futureDates, setFutureDates] = useState<Date[]>([]); // Adicionar este estado
 
   useEffect(() => {
@@ -195,10 +213,23 @@ export const CronogramaPlanejamento: React.FC = () => {
   };
 
   const formatarData = (dataString: string) => {
-    const data = new Date(dataString);
-    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    const dia = data.getDate().toString().padStart(2, '0');
-    const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+    // Parse the date string in ISO format (YYYY-MM-DD)
+    const [year, month, day] = dataString.split('-').map(Number);
+    const data = new Date(year, month - 1, day); // month is 0-based in JavaScript
+
+    const diasSemana = [
+      'Domingo', 
+      'Segunda-feira', 
+      'Terça-feira', 
+      'Quarta-feira', 
+      'Quinta-feira', 
+      'Sexta-feira', 
+      'Sábado'
+    ];
+    
+    const dia = day.toString().padStart(2, '0');
+    const mes = month.toString().padStart(2, '0');
+    
     return `${diasSemana[data.getDay()]}, ${dia}/${mes}`;
   };
 
@@ -211,18 +242,70 @@ export const CronogramaPlanejamento: React.FC = () => {
     }
 
     try {
-      // Adicionar novo planejamento à lista local
       const obraSelecionada = obras.find(o => o.id.toString() === selectedObra);
       const funcionariosSelecionados = funcionarios.filter(f => 
         selectedFuncionarios.includes(f.id)
       );
 
-      setPlanejamentos(prev => [{
-        id: Date.now(),
-        data: selectedDate,
-        obra: obraSelecionada!,
-        funcionarios: funcionariosSelecionados
-      }, ...prev]);
+      if (!obraSelecionada) return;
+
+      setPlanejamentosPorDia(prev => {
+        const diaExistente = prev.find(p => p.data === selectedDate);
+        
+        if (diaExistente) {
+          // Verifica se já existe planejamento para esta obra neste dia
+          return prev.map(dia => {
+            if (dia.data === selectedDate) {
+              const planejamentoObraExistente = dia.planejamentos.find(
+                p => p.obra.id === obraSelecionada.id
+              );
+
+              if (planejamentoObraExistente) {
+                // Se a obra já existe, apenas adiciona os novos funcionários
+                return {
+                  ...dia,
+                  planejamentos: dia.planejamentos.map(p => {
+                    if (p.obra.id === obraSelecionada.id) {
+                      // Combina os funcionários existentes com os novos, removendo duplicatas
+                      const funcionariosCombinados = [...p.funcionarios];
+                      funcionariosSelecionados.forEach(novoFunc => {
+                        if (!funcionariosCombinados.some(f => f.id === novoFunc.id)) {
+                          funcionariosCombinados.push(novoFunc);
+                        }
+                      });
+                      return {
+                        ...p,
+                        funcionarios: funcionariosCombinados
+                      };
+                    }
+                    return p;
+                  })
+                };
+              } else {
+                // Se a obra não existe neste dia, adiciona novo planejamento
+                return {
+                  ...dia,
+                  planejamentos: [...dia.planejamentos, {
+                    obra: obraSelecionada,
+                    funcionarios: funcionariosSelecionados
+                  }]
+                };
+              }
+            }
+            return dia;
+          });
+        } else {
+          // Cria um novo dia com o planejamento
+          return [...prev, {
+            id: Date.now(),
+            data: selectedDate,
+            planejamentos: [{
+              obra: obraSelecionada,
+              funcionarios: funcionariosSelecionados
+            }]
+          }].sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+        }
+      });
 
       // Limpar formulário
       setSelectedFuncionarios([]);
@@ -232,7 +315,7 @@ export const CronogramaPlanejamento: React.FC = () => {
       alert('Planejamento registrado com sucesso!');
     } catch (error) {
       console.error('Erro ao registrar planejamento:', error);
-      alert('Erro ao registrar planejamento. Verifique o console para mais detalhes.');
+      alert('Erro ao registrar planejamento.');
     }
   };
 
@@ -303,19 +386,23 @@ export const CronogramaPlanejamento: React.FC = () => {
       </FormContainer>
 
       <PlanningCardContainer>
-        {planejamentos.map((planejamento) => (
-          <PlanningCard key={planejamento.id}>
-            <h3>Planejamento diário - {formatarData(planejamento.data)}</h3>
-            <div className="obra">
-              {planejamento.obra.codigo_obra && `${planejamento.obra.codigo_obra} - `}
-              {planejamento.obra.nome} 
-              {planejamento.obra.atividade && ` - ${planejamento.obra.atividade}`}
-            </div>
-            <ul className="funcionarios">
-              {planejamento.funcionarios.map(func => (
-                <li key={func.id}>- {func.nome}</li>
-              ))}
-            </ul>
+        {planejamentosPorDia.map((dia) => (
+          <PlanningCard key={dia.id}>
+            <h3>Planejamento diário - {formatarData(dia.data)}</h3>
+            {dia.planejamentos.map((planejamento, index) => (
+              <div key={index} className="planejamento-grupo">
+                <div className="obra">
+                  {planejamento.obra.codigo_obra && `${planejamento.obra.codigo_obra} - `}
+                  {planejamento.obra.nome}
+                  {planejamento.obra.atividade && ` - ${planejamento.obra.atividade}`}
+                </div>
+                <ul className="funcionarios">
+                  {planejamento.funcionarios.map(func => (
+                    <li key={func.id}>- {func.nome}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </PlanningCard>
         ))}
       </PlanningCardContainer>
