@@ -77,13 +77,82 @@ const DayCell = styled.div<{ isSelected?: boolean }>`
   }
 `;
 
+const MultiSelectContainer = styled.div`
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+`;
+
+const CheckboxOption = styled.div`
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
+  &:hover {
+    background-color: rgba(8, 1, 104, 0.05);
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+`;
+
+const PlanningCardContainer = styled.div`
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const PlanningCard = styled.div`
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  h3 {
+    color: rgba(8, 1, 104, 0.94);
+    margin-bottom: 15px;
+    font-size: 18px;
+  }
+
+  .obra {
+    font-weight: 500;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+
+  .funcionarios {
+    list-style: none;
+    padding: 0;
+    
+    li {
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+`;
+
 export const CronogramaPlanejamento: React.FC = () => {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [obras, setObras] = useState<Obra[]>([]);
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedFuncionario, setSelectedFuncionario] = useState('');
+  const [selectedFuncionarios, setSelectedFuncionarios] = useState<number[]>([]);
   const [selectedObra, setSelectedObra] = useState('');
-  const [futureDates, setFutureDates] = useState<Date[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [planejamentos, setPlanejamentos] = useState<Array<{
+    id: number;
+    data: string;
+    obra: Obra;
+    funcionarios: Funcionario[];
+  }>>([]);
+  const [futureDates, setFutureDates] = useState<Date[]>([]); // Adicionar este estado
 
   useEffect(() => {
     const fetchData = async () => {
@@ -116,34 +185,54 @@ export const CronogramaPlanejamento: React.FC = () => {
     setFutureDates(dates);
   };
 
+  const handleFuncionarioToggle = (funcionarioId: number) => {
+    setSelectedFuncionarios(prev => {
+      if (prev.includes(funcionarioId)) {
+        return prev.filter(id => id !== funcionarioId);
+      }
+      return [...prev, funcionarioId];
+    });
+  };
+
+  const formatarData = (dataString: string) => {
+    const data = new Date(dataString);
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    const dia = data.getDate().toString().padStart(2, '0');
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0');
+    return `${diasSemana[data.getDay()]}, ${dia}/${mes}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedFuncionario || !selectedObra || !selectedDate) {
-      alert('Por favor, preencha todos os campos');
+    if (selectedFuncionarios.length === 0 || !selectedObra || !selectedDate) {
+      alert('Por favor, selecione pelo menos um funcionário, uma obra e uma data');
       return;
     }
 
     try {
-      // Usando o mesmo endpoint de lançamentos, mas com data futura
-      const response = await Api.createLancamento({
-        funcionario_id: Number(selectedFuncionario),
-        obra_id: Number(selectedObra),
-        data_trabalho: selectedDate,
-        is_planejamento: true // Flag para identificar que é um planejamento
-      });
+      // Adicionar novo planejamento à lista local
+      const obraSelecionada = obras.find(o => o.id.toString() === selectedObra);
+      const funcionariosSelecionados = funcionarios.filter(f => 
+        selectedFuncionarios.includes(f.id)
+      );
 
-      console.log('Planejamento registrado:', response);
-      
-      // Limpa o formulário
-      setSelectedFuncionario('');
+      setPlanejamentos(prev => [{
+        id: Date.now(),
+        data: selectedDate,
+        obra: obraSelecionada!,
+        funcionarios: funcionariosSelecionados
+      }, ...prev]);
+
+      // Limpar formulário
+      setSelectedFuncionarios([]);
       setSelectedObra('');
       setSelectedDate('');
       
       alert('Planejamento registrado com sucesso!');
     } catch (error) {
       console.error('Erro ao registrar planejamento:', error);
-      alert('Erro ao registrar planejamento');
+      alert('Erro ao registrar planejamento. Verifique o console para mais detalhes.');
     }
   };
 
@@ -155,19 +244,22 @@ export const CronogramaPlanejamento: React.FC = () => {
         <form onSubmit={handleSubmit}>
           <SelectGroup>
             <FormField>
-              <label>Funcionário:</label>
-              <select
-                value={selectedFuncionario}
-                onChange={(e) => setSelectedFuncionario(e.target.value)}
-                required
-              >
-                <option value="">Selecione um funcionário</option>
+              <label>Funcionários:</label>
+              <MultiSelectContainer>
                 {funcionarios.map(func => (
-                  <option key={func.id} value={func.id}>
-                    {func.nome}
-                  </option>
+                  <CheckboxOption key={func.id}>
+                    <input
+                      type="checkbox"
+                      checked={selectedFuncionarios.includes(func.id)}
+                      onChange={() => handleFuncionarioToggle(func.id)}
+                    />
+                    <label>{func.nome}</label>
+                  </CheckboxOption>
                 ))}
-              </select>
+              </MultiSelectContainer>
+              <small>
+                {selectedFuncionarios.length} funcionário(s) selecionado(s)
+              </small>
             </FormField>
 
             <FormField>
@@ -204,11 +296,29 @@ export const CronogramaPlanejamento: React.FC = () => {
 
           <ButtonGroup>
             <Button type="submit">
-              Registrar Planejamento
+              Registrar Planejamento ({selectedFuncionarios.length} funcionário{selectedFuncionarios.length !== 1 ? 's' : ''})
             </Button>
           </ButtonGroup>
         </form>
       </FormContainer>
+
+      <PlanningCardContainer>
+        {planejamentos.map((planejamento) => (
+          <PlanningCard key={planejamento.id}>
+            <h3>Planejamento diário - {formatarData(planejamento.data)}</h3>
+            <div className="obra">
+              {planejamento.obra.codigo_obra && `${planejamento.obra.codigo_obra} - `}
+              {planejamento.obra.nome} 
+              {planejamento.obra.atividade && ` - ${planejamento.obra.atividade}`}
+            </div>
+            <ul className="funcionarios">
+              {planejamento.funcionarios.map(func => (
+                <li key={func.id}>- {func.nome}</li>
+              ))}
+            </ul>
+          </PlanningCard>
+        ))}
+      </PlanningCardContainer>
     </Container>
   );
 };

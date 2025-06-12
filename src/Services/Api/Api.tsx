@@ -50,7 +50,32 @@ export const Api = {
     obra_id: number;
     data_trabalho: string;
     is_planejamento?: boolean;
-  }) => api.post('/lancamento/', data),
+  }) => {
+    // Formata os dados antes de enviar
+    const formattedData = {
+      funcionario: data.funcionario_id,  // Mudando para 'funcionario'
+      obra: data.obra_id,                // Mudando para 'obra'
+      data_trabalho: data.data_trabalho,
+      is_planejamento: data.is_planejamento || false
+    };
+
+    console.log('Enviando dados formatados para API:', formattedData);
+    
+    return api.post('/lancamento/', formattedData)
+      .then(response => {
+        console.log('Resposta createLancamento:', response);
+        return response;
+      })
+      .catch(error => {
+        console.error('Erro detalhado:', {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+          sentData: formattedData
+        });
+        throw error;
+      });
+  }
 };
 
 export default Api;

@@ -43,8 +43,8 @@ function App() {
       id: 4,
       label: 'Cronograma',
       subItems: [
-        { id: 'crono1', label: 'Lançamento', path: '/cronograma/lancamento' },
-        { id: 'crono2', label: 'Planejamento', path: '/cronograma/planejamento' }
+        { id: 'crono2', label: 'Planejamento', path: '/cronograma/planejamento' },
+        { id: 'crono1', label: 'Lançamento', path: '/cronograma/lancamento' }
       ]
     }
   ];
