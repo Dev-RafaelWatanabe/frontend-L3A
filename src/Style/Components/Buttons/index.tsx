@@ -57,6 +57,17 @@ export const DeleteButton = styled(Button)`
   }
 `;
 
+export const ClearButton = styled(Button)`
+  background-color: #6c757d;
+  margin: 0;
+  white-space: nowrap; // Prevents text from wrapping
+  min-width: fit-content; // Ensures button doesn't shrink too much
+
+  &:hover {
+    background-color: #5a6268;
+  }
+`;
+
 export const ActionButtonGroup = styled.div`
   display: flex;
   gap: 8px;

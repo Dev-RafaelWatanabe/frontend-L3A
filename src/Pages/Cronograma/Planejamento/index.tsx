@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Api } from '../../../Services/Api/Api';
-import { Button, EditButton, DeleteButton, ActionButtonGroup } from '../../../Style/Components/Buttons';
+import { 
+  Button, 
+  EditButton, 
+  DeleteButton, 
+  ActionButtonGroup,
+  ClearButton 
+} from '../../../Style/Components/Buttons';
 import type { Funcionario, Obra } from '../../../Services/Api/Types';
 
 const Container = styled.div`
@@ -50,6 +56,17 @@ const ButtonGroup = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 20px;
+
+  button {
+    width: 250px;
+    height: 48px; // Increased from 40px to 48px
+    margin: 0;
+    font-size: 14px; // Optional: adjust font size for better proportion
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const Calendar = styled.div`
@@ -479,6 +496,13 @@ export const CronogramaPlanejamento: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleClearFuncionarios = () => {
+    if (window.confirm('Tem certeza que deseja desmarcar os funcionários selecionados?')) {
+      setSelectedFuncionarios([]);
+      setFuncionarioSearch('');
+    }
+  };
+
   return (
     <Container>
       <h1>Planejamento de Cronograma</h1>
@@ -602,9 +626,16 @@ export const CronogramaPlanejamento: React.FC = () => {
 
           <ButtonGroup>
             <Button type="submit">
-              Registrar Planejamento ({selectedFuncionarios.length} funcionário{selectedFuncionarios.length !== 1 ? 's ' : ''} 
+              Registrar Planejamento ({selectedFuncionarios.length} funcionário{selectedFuncionarios.length !== 1 ? 's' : ''} 
               em {selectedDates.length} dia{selectedDates.length !== 1 ? 's' : ''})
             </Button>
+            <ClearButton 
+              type="button" 
+              onClick={handleClearFuncionarios}
+              disabled={selectedFuncionarios.length === 0}
+            >
+              Desmarcar Funcionários
+            </ClearButton>
           </ButtonGroup>
         </form>
       </FormContainer>
