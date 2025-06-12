@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Api } from '../../../Services/Api/Api';
-import { Button } from '../../../Style/Components/Buttons';
+import { Button, EditButton, DeleteButton, ActionButtonGroup } from '../../../Style/Components/Buttons';
 import type { Funcionario, Obra } from '../../../Services/Api/Types';
 
 const Container = styled.div`
@@ -458,6 +458,27 @@ export const CronogramaPlanejamento: React.FC = () => {
     setShowObraOptions(false);
   };
 
+  const handleDelete = (diaId: number) => {
+    if (window.confirm('Tem certeza que deseja excluir este planejamento?')) {
+      setPlanejamentosPorDia(prev => prev.filter(dia => dia.id !== diaId));
+    }
+  };
+
+  const handleEdit = (dia: PlanejamentoDiario) => {
+    // Set form values for editing
+    const firstPlanejamento = dia.planejamentos[0];
+    setSelectedObra(firstPlanejamento.obra.id.toString());
+    setObraSearch(`${firstPlanejamento.obra.codigo_obra || ''} - ${firstPlanejamento.obra.nome}`);
+    setSelectedFuncionarios(firstPlanejamento.funcionarios.map(f => f.id));
+    setSelectedDates([dia.data]);
+
+    // Remove the old planning
+    setPlanejamentosPorDia(prev => prev.filter(p => p.id !== dia.id));
+
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <Container>
       <h1>Planejamento de Cronograma</h1>
@@ -606,6 +627,20 @@ export const CronogramaPlanejamento: React.FC = () => {
                 </ul>
               </div>
             ))}
+            <ActionButtonGroup>
+              <EditButton 
+                onClick={() => handleEdit(dia)}
+                title="Editar planejamento"
+              >
+                Editar
+              </EditButton>
+              <DeleteButton 
+                onClick={() => handleDelete(dia.id)}
+                title="Excluir planejamento"
+              >
+                Excluir
+              </DeleteButton>
+            </ActionButtonGroup>
           </PlanningCard>
         ))}
       </PlanningCardContainer>

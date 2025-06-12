@@ -34,3 +34,32 @@ export const Button = styled.button`
     }
   }
 `;
+
+export const EditButton = styled(Button)`
+  background-color: #ffc107;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 0;
+
+  &:hover {
+    background-color: #e0a800;
+  }
+`;
+
+export const DeleteButton = styled(Button)`
+  background-color: #dc3545;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 0;
+
+  &:hover {
+    background-color: #c82333;
+  }
+`;
+
+export const ActionButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: flex-end;
+`;
