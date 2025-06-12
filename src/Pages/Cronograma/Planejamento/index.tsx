@@ -6,7 +6,8 @@ import {
   EditButton, 
   DeleteButton, 
   ActionButtonGroup,
-  ClearButton 
+  ClearButton,
+  WhatsAppButton 
 } from '../../../Style/Components/Buttons';
 import type { Funcionario, Obra } from '../../../Services/Api/Types';
 
@@ -503,6 +504,33 @@ export const CronogramaPlanejamento: React.FC = () => {
     }
   };
 
+  const handleSendToWhatsApp = async (dia: PlanejamentoDiario) => {
+    try {
+      const message = `*Planejamento diário - ${formatarData(dia.data)}*\n\n${
+        dia.planejamentos.map(p => 
+          `*${p.obra.codigo_obra ? `${p.obra.codigo_obra} - ` : ''}${p.obra.nome}*\n${
+            p.funcionarios.map(f => `- ${f.nome}`).join('\n')
+          }`
+        ).join('\n\n')
+      }`;
+
+      const response = await fetch('http://localhost:5000/send-whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message })
+      });
+
+      if (!response.ok) throw new Error('Failed to send message');
+
+      alert('Mensagem enviada com sucesso para o WhatsApp!');
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      alert('Erro ao enviar mensagem para o WhatsApp.');
+    }
+  };
+
   return (
     <Container>
       <h1>Planejamento de Cronograma</h1>
@@ -671,6 +699,12 @@ export const CronogramaPlanejamento: React.FC = () => {
               >
                 Excluir
               </DeleteButton>
+              <WhatsAppButton
+                onClick={() => handleSendToWhatsApp(dia)}
+                title="Enviar no WhatsApp"
+              >
+                Enviar no grupo
+              </WhatsAppButton>
             </ActionButtonGroup>
           </PlanningCard>
         ))}

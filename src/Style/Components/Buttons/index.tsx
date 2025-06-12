@@ -74,3 +74,15 @@ export const ActionButtonGroup = styled.div`
   margin-top: 10px;
   justify-content: flex-end;
 `;
+
+export const WhatsAppButton = styled(Button)`
+  background-color: #25d366;
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 0;
+
+  &:hover {
+    background-color: #128c7e;
+  }
+`;
