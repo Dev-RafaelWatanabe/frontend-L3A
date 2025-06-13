@@ -16,7 +16,7 @@ def send_whatsapp():
         # Get current time + 2 minutes (pywhatkit needs future time)
         now = datetime.now()
         hour = now.hour
-        minute = now.minute + 2
+        minute = now.minute + 1
 
         # Send message
         kt.sendwhatmsg_to_group(group_id, message, hour, minute)

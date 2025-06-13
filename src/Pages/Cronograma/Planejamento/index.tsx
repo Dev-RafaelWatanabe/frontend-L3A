@@ -504,15 +504,18 @@ export const CronogramaPlanejamento: React.FC = () => {
     }
   };
 
-  const handleSendToWhatsApp = async (dia: PlanejamentoDiario) => {
+  const handleSendToWhatsApp = async () => {
     try {
-      const message = `*Planejamento diário - ${formatarData(dia.data)}*\n\n${
-        dia.planejamentos.map(p => 
-          `*${p.obra.codigo_obra ? `${p.obra.codigo_obra} - ` : ''}${p.obra.nome}*\n${
-            p.funcionarios.map(f => `- ${f.nome}`).join('\n')
-          }`
-        ).join('\n\n')
-      }`;
+      const message = "esta funcionando";
+      
+      
+      // const message = `*Planejamento diário - ${formatarData(dia.data)}*\n\n${
+      //   dia.planejamentos.map(p => 
+      //     `*${p.obra.codigo_obra ? `${p.obra.codigo_obra} - ` : ''}${p.obra.nome}*\n${
+      //       p.funcionarios.map(f => `- ${f.nome}`).join('\n')
+      //     }`
+      //   ).join('\n\n')
+      // }`;
 
       const response = await fetch('http://localhost:5000/send-whatsapp', {
         method: 'POST',
@@ -700,7 +703,7 @@ export const CronogramaPlanejamento: React.FC = () => {
                 Excluir
               </DeleteButton>
               <WhatsAppButton
-                onClick={() => handleSendToWhatsApp(dia)}
+                onClick={() => handleSendToWhatsApp()}
                 title="Enviar no WhatsApp"
               >
                 Enviar no grupo
