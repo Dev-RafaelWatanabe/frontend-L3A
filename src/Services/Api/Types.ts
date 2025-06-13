@@ -58,4 +58,18 @@ export interface Lancamento {
   };
 }
 
+export interface PlanejamentoDiario {
+  id: number;
+  data: string;
+  planejamentos: Array<{
+    obra: Obra;
+    funcionarios: Funcionario[];
+  }>;
+}
+
+export interface Planejamento {
+  obra: Obra;
+  funcionarios: Funcionario[];
+}
+
 
