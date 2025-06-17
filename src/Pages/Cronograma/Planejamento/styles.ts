@@ -175,6 +175,12 @@ export const PlanningCard = styled.div`
     margin-bottom: 8px;
     color: rgba(8, 1, 104, 0.94);
     font-size: 14px;
+
+    .turnos {
+      color: rgba(0, 0, 0, 0.66);
+      font-style: italic;
+      margin-left: 4px;
+    }
   }
 
   .funcionarios {
@@ -185,6 +191,13 @@ export const PlanningCard = styled.div`
       padding: 3px 0;
       font-size: 14px;
     }
+  }
+
+  .turno {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 8px;
+    font-style: italic;
   }
 `;
 

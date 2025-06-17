@@ -58,12 +58,18 @@ export interface Lancamento {
   };
 }
 
+export interface Turno {
+  id: number;
+  nome: string;
+}
+
 export interface PlanejamentoDiario {
   id: number;
   data: string;
   planejamentos: Array<{
     obra: Obra;
     funcionarios: Funcionario[];
+    turnos: string[];
   }>;
 }
 

@@ -26,7 +26,8 @@ import {
   SelectedFuncionariosDisplay,
   PlanningCardContainer,
   PlanningCard,
-  CheckboxOption
+  CheckboxOption,
+  MultiSelectContainer
 } from './styles';
 
 export const CronogramaPlanejamento: React.FC = () => {
@@ -41,6 +42,14 @@ export const CronogramaPlanejamento: React.FC = () => {
   const [obraSearch, setObraSearch] = useState('');
   const [showObraOptions, setShowObraOptions] = useState(false);
   const [showFuncionariosOptions, setShowFuncionariosOptions] = useState(false); // Novo estado para controle de exibição
+  const [selectedTurnos, setSelectedTurnos] = useState<string[]>([]);
+  
+  // Add turnos options
+  const turnos = [
+    { id: 1, nome: 'Manhã' },
+    { id: 2, nome: 'Tarde' },
+    { id: 3, nome: 'Noite' }
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -129,11 +138,20 @@ export const CronogramaPlanejamento: React.FC = () => {
     });
   };
 
+  const handleTurnoToggle = (turnoNome: string) => {
+    setSelectedTurnos(prev => {
+      if (prev.includes(turnoNome)) {
+        return prev.filter(t => t !== turnoNome);
+      }
+      return [...prev, turnoNome];
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (selectedFuncionarios.length === 0 || !selectedObra || selectedDates.length === 0) {
-      alert('Por favor, selecione pelo menos um funcionário, uma obra e uma ou mais datas');
+    if (selectedFuncionarios.length === 0 || !selectedObra || selectedDates.length === 0 || selectedTurnos.length === 0) {
+      alert('Por favor, selecione pelo menos um funcionário, uma obra, um turno e uma ou mais datas');
       return;
     }
 
@@ -145,13 +163,12 @@ export const CronogramaPlanejamento: React.FC = () => {
 
       if (!obraSelecionada) return;
 
-      // Process each selected date
       selectedDates.forEach(selectedDate => {
         setPlanejamentosPorDia(prev => {
+          // Verifica se já existe planejamento para esta obra neste dia
           const diaExistente = prev.find(p => p.data === selectedDate);
           
           if (diaExistente) {
-            // Verifica se já existe planejamento para esta obra neste dia
             return prev.map(dia => {
               if (dia.data === selectedDate) {
                 const planejamentoObraExistente = dia.planejamentos.find(
@@ -185,7 +202,8 @@ export const CronogramaPlanejamento: React.FC = () => {
                     ...dia,
                     planejamentos: [...dia.planejamentos, {
                       obra: obraSelecionada,
-                      funcionarios: funcionariosSelecionados
+                      funcionarios: funcionariosSelecionados,
+                      turnos: selectedTurnos // Updated to array
                     }]
                   };
                 }
@@ -199,17 +217,19 @@ export const CronogramaPlanejamento: React.FC = () => {
               data: selectedDate,
               planejamentos: [{
                 obra: obraSelecionada,
-                funcionarios: funcionariosSelecionados
+                funcionarios: funcionariosSelecionados,
+                turnos: selectedTurnos // Updated to array
               }]
             }].sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
           }
         });
       });
 
-      // Limpar formulário
+      // Clear form
       setSelectedFuncionarios([]);
       setSelectedObra('');
       setSelectedDates([]);
+      setSelectedTurnos([]); // Clear turnos
       
       alert('Planejamentos registrados com sucesso!');
     } catch (error) {
@@ -364,6 +384,23 @@ export const CronogramaPlanejamento: React.FC = () => {
                 )}
               </ComboboxContainer>
             </FormField>
+
+            <FormField>
+              <label>Turnos:</label>
+              <MultiSelectContainer>
+                {turnos.map(turno => (
+                  <CheckboxOption key={turno.id}>
+                    <input
+                      type="checkbox"
+                      id={`turno-${turno.id}`}
+                      checked={selectedTurnos.includes(turno.nome)}
+                      onChange={() => handleTurnoToggle(turno.nome)}
+                    />
+                    <label htmlFor={`turno-${turno.id}`}>{turno.nome}</label>
+                  </CheckboxOption>
+                ))}
+              </MultiSelectContainer>
+            </FormField>
           </SelectGroup>
 
           <CalendarContainer>
@@ -409,9 +446,11 @@ export const CronogramaPlanejamento: React.FC = () => {
             {dia.planejamentos.map((planejamento, index) => (
               <div key={index} className="planejamento-grupo">
                 <div className="obra">
-                  {planejamento.obra.codigo_obra && `${planejamento.obra.codigo_obra} - `}
-                  {planejamento.obra.nome}
-                  {planejamento.obra.atividade && ` - ${planejamento.obra.atividade}`}
+                  {`CC `}
+                  {planejamento.obra.nome && `${planejamento.obra.nome} - `}
+                  <span className="turnos">
+                    {planejamento.turnos ? `(${planejamento.turnos.join(' / ')})` : ''}
+                  </span>
                 </div>
                 <ul className="funcionarios">
                   {planejamento.funcionarios.map(func => (
