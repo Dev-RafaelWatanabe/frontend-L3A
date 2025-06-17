@@ -75,7 +75,7 @@ export const Restaurantes: React.FC = () => {
   const [selectedRestaurante, setSelectedRestaurante] = useState<Restaurante | null>(null);
   const [newRestaurante, setNewRestaurante] = useState({
     nome: '',
-    valor: ''
+    valor: ''  // Keep as string for input handling
   });
 
   const columns = [
@@ -137,7 +137,8 @@ export const Restaurantes: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const valorNumerico = Number(newRestaurante.valor);
+      // Convert string to number with 2 decimal places
+      const valorNumerico = Number(parseFloat(newRestaurante.valor).toFixed(2));
       
       if (isNaN(valorNumerico)) {
         throw new Error('Valor inválido');
@@ -149,24 +150,21 @@ export const Restaurantes: React.FC = () => {
           valor: valorNumerico
         });
         
-        // Use the refresh function
         await refreshData();
       } else {
-        // Se estiver criando um novo restaurante
         await Api.createRestaurante({
           nome: newRestaurante.nome,
           valor: valorNumerico
         });
-        console.log('Novo restaurante criado');
       }
       
-      // Limpa o formulário e fecha o modal
       setIsModalOpen(false);
       setNewRestaurante({ nome: '', valor: '' });
       setSelectedRestaurante(null);
       
     } catch (error) {
       console.error('Erro ao salvar restaurante:', error);
+      alert('Erro ao salvar restaurante. Verifique se o valor está correto.');
     }
   };
 
@@ -215,7 +213,7 @@ export const Restaurantes: React.FC = () => {
                     valor: e.target.value
                   })}
                   required
-                  step="0.00"
+                  step="0.01" // Changed from "0.00" to "0.01" for decimal precision
                   min="0"
                   placeholder="Coloque o valor da refeição (R$)"
                 />

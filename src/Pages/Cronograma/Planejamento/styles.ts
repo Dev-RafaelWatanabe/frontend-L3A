@@ -181,40 +181,64 @@ export const PlanningCard = styled.div`
     padding: 12px;
     background-color: #f8f9fa;
     border-radius: 6px;
+    position: relative;
 
-    &:last-child {
-      margin-bottom: 0;
+    .obra-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
     }
-  }
 
-  .obra {
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: rgba(8, 1, 104, 0.94);
-    font-size: 14px;
-
-    .turnos {
-      color: rgba(0, 0, 0, 0.66);
-      font-style: italic;
-      margin-left: 4px;
+    .obra-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
-  }
 
-  .funcionarios {
-    list-style: none;
-    padding-left: 15px;
-    
-    li {
-      padding: 3px 0;
+    .edit-icon {
+      font-size: 20px;
+      color: rgb(3, 3, 3);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      margin-left: 8px;
+
+      &:hover {
+        color:rgb(63, 63, 63);
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+
+    .obra {
+      font-weight: 500;
+      color: rgba(8, 1, 104, 0.94);
       font-size: 14px;
-    }
-  }
 
-  .turno {
-    color: #666;
-    font-size: 13px;
-    margin-bottom: 8px;
-    font-style: italic;
+      .turnos {
+        color: rgba(0, 0, 0, 0.66);
+        font-style: italic;
+        margin-left: 4px;
+      }
+    }
+
+    .funcionarios {
+      list-style: none;
+      padding-left: 15px;
+      
+      li {
+        padding: 3px 0;
+        font-size: 14px;
+      }
+    }
+
+    .turno {
+      color: #666;
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-style: italic;
+    }
   }
 `;
 

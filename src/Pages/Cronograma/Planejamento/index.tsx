@@ -29,6 +29,7 @@ import {
   CheckboxOption,
   MultiSelectContainer
 } from './styles';
+import { MdModeEdit } from "react-icons/md";
 
 export const CronogramaPlanejamento: React.FC = () => {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
@@ -295,6 +296,35 @@ export const CronogramaPlanejamento: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Add a new function to handle individual obra edit
+  const handleEditObra = (dia: PlanejamentoDiario, planejamentoIndex: number) => {
+    const planejamento = dia.planejamentos[planejamentoIndex];
+    
+    // Set form values for editing
+    setSelectedObra(planejamento.obra.id.toString());
+    setObraSearch(`${planejamento.obra.codigo_obra || ''} - ${planejamento.obra.nome}`);
+    setSelectedFuncionarios(planejamento.funcionarios.map(f => f.id));
+    setSelectedTurnos(planejamento.turnos || []);
+    setSelectedDates([dia.data]);
+
+    // Remove only this specific obra from the day's planejamentos
+    setPlanejamentosPorDia(prev => prev.map(p => {
+      if (p.id === dia.id) {
+        return {
+          ...p,
+          planejamentos: p.planejamentos.filter((_, index) => index !== planejamentoIndex)
+        };
+      }
+      return p;
+    }));
+
+    // If this was the only planejamento for this day, remove the day entirely
+    setPlanejamentosPorDia(prev => prev.filter(p => p.planejamentos.length > 0));
+
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleClearFuncionarios = () => {
     if (window.confirm('Tem certeza que deseja desmarcar os funcionários selecionados?')) {
       setSelectedFuncionarios([]);
@@ -469,12 +499,21 @@ export const CronogramaPlanejamento: React.FC = () => {
             <h3>Planejamento diário - {formatarData(dia.data)}</h3>
             {dia.planejamentos.map((planejamento, index) => (
               <div key={index} className="planejamento-grupo">
-                <div className="obra">
-                  {`CC `}
-                  {planejamento.obra.nome && `${planejamento.obra.nome} - `}
-                  <span className="turnos">
-                    {planejamento.turnos ? `(${planejamento.turnos.join(' / ')})` : ''}
-                  </span>
+                <div className="obra-header">
+                  <div className="obra-info">
+                    <span className="obra">
+                      {`CC `}
+                      {planejamento.obra.nome && `${planejamento.obra.nome} - `}
+                      <span className="turnos">
+                        {planejamento.turnos ? `(${planejamento.turnos.join(' / ')})` : ''}
+                      </span>
+                    </span>
+                  </div>
+                  <MdModeEdit 
+                    className="edit-icon"
+                    onClick={() => handleEditObra(dia, index)}
+                    title="Editar obra"
+                  />
                 </div>
                 <ul className="funcionarios">
                   {planejamento.funcionarios.map(func => (
@@ -486,9 +525,9 @@ export const CronogramaPlanejamento: React.FC = () => {
             <ActionButtonGroup>
               <EditButton 
                 onClick={() => handleEdit(dia)}
-                title="Editar planejamento"
+                title="Editar planejamento completo"
               >
-                Editar
+                Editar Tudo
               </EditButton>
               <DeleteButton 
                 onClick={() => handleDelete(dia.id)}
