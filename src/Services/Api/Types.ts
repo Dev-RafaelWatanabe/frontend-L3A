@@ -78,4 +78,11 @@ export interface Planejamento {
   funcionarios: Funcionario[];
 }
 
+export interface LancamentoPage {
+  funcionario_id: number;
+  obra_id: number;
+  data_trabalho: string;
+  turno: string[];
+}
+
 

@@ -6,7 +6,7 @@ import { Restaurantes } from './Pages/Database/Restaurantes';
 import { Obras } from './Pages/Database/Obras';
 import { Funcionarios } from './Pages/Database/Funcionarios';
 import { Lancamentos } from './Pages/Database/Lancamentos';
-import { CronogramaLancamento } from './Pages/Cronograma/Lancamento';
+import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 
 function App() {
