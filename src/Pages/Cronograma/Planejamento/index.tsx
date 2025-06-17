@@ -213,12 +213,12 @@ export const CronogramaPlanejamento: React.FC = () => {
           } else {
             // Cria um novo dia com o planejamento
             return [...prev, {
-              id: Date.now(),
+              id: Date.now() + Math.floor(Math.random() * 1000), // More unique ID
               data: selectedDate,
               planejamentos: [{
                 obra: obraSelecionada,
                 funcionarios: funcionariosSelecionados,
-                turnos: selectedTurnos // Updated to array
+                turnos: selectedTurnos
               }]
             }].sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
           }
@@ -259,7 +259,24 @@ export const CronogramaPlanejamento: React.FC = () => {
 
   const handleDelete = (diaId: number) => {
     if (window.confirm('Tem certeza que deseja excluir este planejamento?')) {
-      setPlanejamentosPorDia(prev => prev.filter(dia => dia.id !== diaId));
+      setPlanejamentosPorDia(prevDias => {
+        // Find the day to delete
+        const diaToDelete = prevDias.find(dia => dia.id === diaId);
+        if (!diaToDelete) {
+          console.error(`Dia com ID ${diaId} não encontrado`);
+          return prevDias;
+        }
+
+        // Create new array without the deleted day
+        const newDias = prevDias.filter(dia => dia.id !== diaId);
+        
+        console.log('Planejamento excluído:', {
+          deleted: diaToDelete,
+          remaining: newDias
+        });
+
+        return newDias;
+      });
     }
   };
 
@@ -407,16 +424,23 @@ export const CronogramaPlanejamento: React.FC = () => {
             <Calendar>
               {futureDates.map((date, index) => {
                 const dateStr = date.toISOString().split('T')[0];
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6; // 0 = Sunday, 6 = Saturday
+                const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
                 return (
                   <DayCell
                     key={index}
                     isSelected={selectedDates.includes(dateStr)}
+                    isWeekend={isWeekend}
                     onClick={() => handleDateToggle(dateStr)}
                   >
-                    {date.toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit'
-                    })}
+                    <span className="weekday">{weekdays[date.getDay()]}</span>
+                    <span className="date">
+                      {date.toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit'
+                      })}
+                    </span>
                   </DayCell>
                 );
               })}

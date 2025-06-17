@@ -74,16 +74,33 @@ export const CalendarContainer = styled.div`
   margin-bottom: 30px;
 `;
 
-export const DayCell = styled.div<{ isSelected?: boolean }>`
+export const DayCell = styled.div<{ isSelected?: boolean; isWeekend?: boolean }>`
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   cursor: pointer;
-  background-color: ${props => props.isSelected ? 'rgba(8, 1, 104, 0.1)' : 'white'};
+  background-color: ${props => {
+    if (props.isSelected) return 'rgba(8, 1, 104, 0.1)';
+    if (props.isWeekend) return '#f5f5f5';
+    return 'white';
+  }};
   text-align: center;
 
   &:hover {
-    background-color: rgba(8, 1, 104, 0.05);
+    background-color: ${props => 
+      props.isWeekend ? '#e9e9e9' : 'rgba(8, 1, 104, 0.05)'
+    };
+  }
+
+  .weekday {
+    font-size: 12px;
+    color: ${props => props.isWeekend ? '#666' : '#333'};
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .date {
+    font-weight: ${props => props.isWeekend ? '400' : '500'};
   }
 `;
 
