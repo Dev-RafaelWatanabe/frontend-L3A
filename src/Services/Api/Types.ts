@@ -97,4 +97,14 @@ export interface PatrimonioFormData {
   situacao: string;
 }
 
+export interface Ferramenta {
+  id: number;
+  nome: string;
+  marca: string;
+  situacao: string;
+  categoria: string;
+  obra: string;
+  valor: number;
+}
+
 

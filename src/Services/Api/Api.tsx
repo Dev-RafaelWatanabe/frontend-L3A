@@ -45,6 +45,8 @@ export const Api = {
     });
   },
 
+  getFerramentas: () => api.get('/ferramentas/'),
+
   createLancamento: (data: {
     funcionario_id: number;
     obra_id: number;
