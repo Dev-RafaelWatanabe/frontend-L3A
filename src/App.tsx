@@ -8,6 +8,7 @@ import { Funcionarios } from './Pages/Database/Funcionarios';
 import { Lancamentos } from './Pages/Database/Lancamentos';
 import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
+import { Patrimonio } from './Pages/Patrimonio/Cadastro/index';
 
 function App() {
   const navigate = useNavigate();
@@ -46,6 +47,13 @@ function App() {
         { id: 'crono2', label: 'Planejamento', path: '/cronograma/planejamento' },
         { id: 'crono1', label: 'Lançamento', path: '/cronograma/lancamento' }
       ]
+    },
+    {
+      id: 5,
+      label: 'Patrimônio',
+      subItems: [
+        { id: 'Patri1', label: 'Cadastrar Patrimônio', path: '/Patrimonio/Cadastro' },
+      ]
     }
   ];
 
@@ -64,6 +72,7 @@ function App() {
           <Route path="/database/lancamentos" element={<Lancamentos />} />
           <Route path="/cronograma/lancamento" element={<CronogramaLancamento />} />
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
+          <Route path="/Patrimonio/Cadastro" element={<Patrimonio />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>

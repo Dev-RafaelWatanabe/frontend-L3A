@@ -85,4 +85,16 @@ export interface LancamentoPage {
   turno: string[];
 }
 
+export interface PatrimonioFormData {
+  nome: string;
+  serie: number;
+  descricao: string;
+  marca: string;
+  categoria: string;
+  centro_custo: string;
+  valor: number;
+  nota_fiscal: FileList | null;
+  situacao: string;
+}
+
 
