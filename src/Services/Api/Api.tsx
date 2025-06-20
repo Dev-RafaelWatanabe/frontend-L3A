@@ -46,6 +46,9 @@ export const Api = {
   },
 
   getFerramentas: () => api.get('/ferramentas/'),
+  getMarcas: () => api.get('/marcas/'),
+  getCategorias: () => api.get('/categorias/'),
+  getSituacoes: () => api.get('/situacoes/'),
 
   createLancamento: (data: {
     funcionario_id: number;
@@ -56,7 +59,7 @@ export const Api = {
     // Formata os dados antes de enviar
     const formattedData = {
       funcionario: data.funcionario_id,  // Mudando para 'funcionario'
-      obra: data.obra_id,                // Mudando para 'obra'
+      obra: data.obra_id,        // Mudando para 'obra'
       data_trabalho: data.data_trabalho,
       is_planejamento: data.is_planejamento || false
     };

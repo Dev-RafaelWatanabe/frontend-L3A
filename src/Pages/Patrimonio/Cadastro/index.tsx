@@ -8,20 +8,21 @@ import {
   PatrimonioButton,
   PatrimonioDeleteButton
 } from './Styles';
-import type { PatrimonioFormData, Obra } from '../../../Services/Api/Types';
+import type { PatrimonioFormData, Obra, Categoria, Situacao, Marca } from '../../../Services/Api/Types';
 import { Api } from '../../../Services/Api/Api';
 
 export const Patrimonio: React.FC = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<PatrimonioFormData>();
-  const [categorias, setCategorias] = useState<string[]>([]);
-  const [centrosCusto, setCentrosCusto] = useState<string[]>([]);
-  const [situacoes, setSituacoes] = useState<string[]>([]);
-  const [marcas, setMarcas] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [situacoes, setSituacoes] = useState<Situacao[]>([]);
+  const [marcas, setMarcas] = useState<Marca[]>([]);
   const [obras, setObras] = useState<Obra[]>([]);
 
   useEffect(() => {
-    // Buscar obras do endpoint /obras/
     Api.getObras().then(res => setObras(res.data || []));
+    Api.getCategorias().then(res => setCategorias(res.data || []));
+    Api.getMarcas().then(res => setMarcas(res.data || []));
+    Api.getSituacoes().then(res => setSituacoes(res.data || []));
   }, []);
 
   const onSubmit = (data: PatrimonioFormData) => {
@@ -70,8 +71,8 @@ export const Patrimonio: React.FC = () => {
             <label htmlFor="marca">Marca</label>
             <select id="marca" {...register('marca', { required: 'Selecione uma marca' })}>
               <option value="">Selecione</option>
-              {marcas.map(marca => (
-                <option key={marca} value={marca}>{marca}</option>
+              {marcas.map((marca) => (
+                <option key={marca.id} value={marca.nome}>{marca.nome}</option>
               ))}
             </select>
             {errors.marca && <span style={{ color: 'red', fontSize: 12 }}>{errors.marca.message}</span>}
@@ -81,8 +82,10 @@ export const Patrimonio: React.FC = () => {
             <label htmlFor="categoria">Categoria</label>
             <select id="categoria" {...register('categoria', { required: 'Selecione uma categoria' })}>
               <option value="">Selecione</option>
-              {categorias.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categorias.map((cat: any) => (
+                <option key={cat.id || cat} value={cat.nome || cat}>
+                  {cat.nome || cat}
+                </option>
               ))}
             </select>
             {errors.categoria && <span style={{ color: 'red', fontSize: 12 }}>{errors.categoria.message}</span>}
@@ -126,8 +129,10 @@ export const Patrimonio: React.FC = () => {
             <label htmlFor="situacao">Situação</label>
             <select id="situacao" {...register('situacao', { required: 'Selecione a situação' })}>
               <option value="">Selecione</option>
-              {situacoes.map(sit => (
-                <option key={sit} value={sit}>{sit}</option>
+              {situacoes.map((sit: any) => (
+                <option key={sit.id || sit} value={sit.nome || sit}>
+                  {sit.nome || sit}
+                </option>
               ))}
             </select>
             {errors.situacao && <span style={{ color: 'red', fontSize: 12 }}>{errors.situacao.message}</span>}
