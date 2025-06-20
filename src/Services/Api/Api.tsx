@@ -50,6 +50,9 @@ export const Api = {
   getCategorias: () => api.get('/categorias/'),
   getSituacoes: () => api.get('/situacoes/'),
 
+
+  createFerramenta: (data: FormData) => api.post('/ferramentas/', data),
+  
   createLancamento: (data: {
     funcionario_id: number;
     obra_id: number;

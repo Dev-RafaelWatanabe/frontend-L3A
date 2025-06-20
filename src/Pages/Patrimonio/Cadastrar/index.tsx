@@ -25,12 +25,35 @@ export const Patrimonio: React.FC = () => {
     Api.getSituacoes().then(res => setSituacoes(res.data || []));
   }, []);
 
-  const onSubmit = (data: PatrimonioFormData) => {
-    alert('Patrimônio cadastrado com sucesso!\n' + JSON.stringify({
-      ...data,
-      nota_fiscal: data.nota_fiscal ? Array.from(data.nota_fiscal).map(f => f.name) : null
-    }, null, 2));
-    reset();
+  const onSubmit = async (data: PatrimonioFormData) => {
+    try {
+      // Monta o objeto para o backend
+      const formData = new FormData();
+      formData.append('nome', data.nome);
+      formData.append('serie', String(data.serie));
+      formData.append('descricao', data.descricao);
+      formData.append('marca', data.marca);
+      formData.append('categoria', data.categoria);
+      formData.append('centro_custo', data.centro_custo);
+      formData.append('valor', String(data.valor));
+      formData.append('situacao', data.situacao);
+
+      // Anexa arquivos, se houver
+      if (data.nota_fiscal && data.nota_fiscal.length > 0) {
+        Array.from(data.nota_fiscal).forEach((file) => {
+          formData.append('nota_fiscal', file);
+        });
+      }
+
+      // Faz o POST para /ferramentas/
+      await Api.createFerramenta(formData);
+
+      alert('Patrimônio cadastrado com sucesso!');
+      reset();
+    } catch (error) {
+      alert('Erro ao cadastrar patrimônio.');
+      console.error(error);
+    }
   };
 
   return (

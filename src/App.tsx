@@ -8,12 +8,10 @@ import { Funcionarios } from './Pages/Database/Funcionarios';
 import { Lancamentos } from './Pages/Database/Lancamentos';
 import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
-import { Patrimonio as PatrimonioCadastro } from './Pages/Patrimonio/Cadastro/index';
-import { PatrimonioDB } from './Pages/Database/Patrimonio/index';
+import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar';
+import { PatrimonioDB } from './Pages/Patrimonio/Cadastros';
 
 function App() {
-  const navigate = useNavigate();
-
   const menuItems = [
     {
       id: 1,
@@ -39,7 +37,6 @@ function App() {
         { id: 'db2', label: 'Obras', path: '/database/obras' },
         { id: 'db3', label: 'Funcionários', path: '/database/funcionario' },
         { id: 'db4', label: 'Lançamentos', path: '/database/lancamentos' },
-        { id: 'db5', label: 'Patrimônio', path: '/database/patrimonio' } // <-- Adicione esta linha
       ]
     },
     {
@@ -54,7 +51,8 @@ function App() {
       id: 5,
       label: 'Patrimônio',
       subItems: [
-        { id: 'Patri1', label: 'Cadastrar Patrimônio', path: '/Patrimonio/Cadastro' },
+        { id: 'Patri1', label: 'Cadastrar Patrimônio', path: '/Patrimonio/Cadastrar/' },
+        { id: 'Patri2', label: 'Cadastros', path: '/Patrimonio/Cadastros/' },
       ]
     }
   ];
@@ -72,10 +70,10 @@ function App() {
           <Route path="/database/obras" element={<Obras />} />
           <Route path="/database/funcionario" element={<Funcionarios />} />
           <Route path="/database/lancamentos" element={<Lancamentos />} />
-          <Route path="/database/patrimonio" element={<PatrimonioDB />} />
           <Route path="/cronograma/lancamento" element={<CronogramaLancamento />} />
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
-          <Route path="/Patrimonio/Cadastro" element={<PatrimonioCadastro />} />
+          <Route path="/Patrimonio/Cadastrar" element={<CadastrarPatrimonio />} />
+          <Route path="/Patrimonio/Cadastros" element={<PatrimonioDB />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>

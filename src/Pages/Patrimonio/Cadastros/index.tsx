@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Api } from '../../../Services/Api/Api';
-import { DataTable } from '../Components/DataTable';
+import { DataTable } from '../../Database/Components/DataTable';
 import type { Ferramenta } from '../../../Services/Api/Types';
 import { Container, TableContainer, Title } from './styles';
 
