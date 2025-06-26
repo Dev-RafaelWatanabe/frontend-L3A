@@ -27,32 +27,46 @@ export const Patrimonio: React.FC = () => {
 
   const onSubmit = async (data: PatrimonioFormData) => {
     try {
-      // Monta o objeto para o backend
       const formData = new FormData();
       formData.append('nome', data.nome);
-      formData.append('serie', String(data.serie));
-      formData.append('descricao', data.descricao);
-      formData.append('marca', data.marca);
-      formData.append('categoria', data.categoria);
-      formData.append('centro_custo', data.centro_custo);
-      formData.append('valor', String(data.valor));
-      formData.append('situacao', data.situacao);
+      formData.append('descricao', data.descricao || '');
+      
+      // Enviar apenas os IDs dos campos relacionais
+      formData.append('marca', String(data.marca)); // ID da marca
+      formData.append('categoria', String(data.categoria)); // ID da categoria
+      formData.append('obra', String(data.centro_custo)); // ID da obra
+      formData.append('situacao', String(data.situacao)); // ID da situação
+      
+      // Valor como string (como aparece no banco)
+      if (data.valor) {
+        formData.append('valor', String(data.valor));
+      }
+      
+      // Remove o campo serie se não existe no backend
+      // if (data.serie) {
+      //   formData.append('serie', String(data.serie));
+      // }
 
-      // Anexa arquivos, se houver
+      // Nota fiscal é opcional - só envie se houver arquivo
       if (data.nota_fiscal && data.nota_fiscal.length > 0) {
-        Array.from(data.nota_fiscal).forEach((file) => {
-          formData.append('nota_fiscal', file);
-        });
+        formData.append('nota_fiscal', data.nota_fiscal[0]);
       }
 
-      // Faz o POST para /ferramentas/
-      await Api.createFerramenta(formData);
+      console.log("Enviando dados:", Object.fromEntries(formData));
+      const response = await Api.createFerramenta(formData);
+      console.log("Resposta:", response);
 
       alert('Patrimônio cadastrado com sucesso!');
       reset();
-    } catch (error) {
-      alert('Erro ao cadastrar patrimônio.');
-      console.error(error);
+    } catch (error: any) {
+      console.error("Erro completo:", error);
+      console.error("Detalhes do erro:", error.response?.data);
+      
+      if (error.response?.data) {
+        alert(`Erro ao cadastrar patrimônio: ${JSON.stringify(error.response.data)}`);
+      } else {
+        alert('Erro ao cadastrar patrimônio. Verifique o console para mais detalhes.');
+      }
     }
   };
 
@@ -95,7 +109,7 @@ export const Patrimonio: React.FC = () => {
             <select id="marca" {...register('marca', { required: 'Selecione uma marca' })}>
               <option value="">Selecione</option>
               {marcas.map((marca) => (
-                <option key={marca.id} value={marca.nome}>{marca.nome}</option>
+                <option key={marca.id} value={marca.id}>{marca.nome}</option>
               ))}
             </select>
             {errors.marca && <span style={{ color: 'red', fontSize: 12 }}>{errors.marca.message}</span>}
@@ -105,10 +119,8 @@ export const Patrimonio: React.FC = () => {
             <label htmlFor="categoria">Categoria</label>
             <select id="categoria" {...register('categoria', { required: 'Selecione uma categoria' })}>
               <option value="">Selecione</option>
-              {categorias.map((cat: any) => (
-                <option key={cat.id || cat} value={cat.nome || cat}>
-                  {cat.nome || cat}
-                </option>
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.nome}</option>
               ))}
             </select>
             {errors.categoria && <span style={{ color: 'red', fontSize: 12 }}>{errors.categoria.message}</span>}
@@ -119,7 +131,7 @@ export const Patrimonio: React.FC = () => {
             <select id="centro_custo" {...register('centro_custo', { required: 'Selecione um centro de custo' })}>
               <option value="">Selecione</option>
               {obras.map(obra => (
-                <option key={obra.id} value={obra.nome}>{obra.nome}</option>
+                <option key={obra.id} value={obra.id}>{obra.nome}</option>
               ))}
             </select>
             {errors.centro_custo && <span style={{ color: 'red', fontSize: 12 }}>{errors.centro_custo.message}</span>}
@@ -152,10 +164,8 @@ export const Patrimonio: React.FC = () => {
             <label htmlFor="situacao">Situação</label>
             <select id="situacao" {...register('situacao', { required: 'Selecione a situação' })}>
               <option value="">Selecione</option>
-              {situacoes.map((sit: any) => (
-                <option key={sit.id || sit} value={sit.nome || sit}>
-                  {sit.nome || sit}
-                </option>
+              {situacoes.map((sit) => (
+                <option key={sit.id} value={sit.id}>{sit.nome}</option>
               ))}
             </select>
             {errors.situacao && <span style={{ color: 'red', fontSize: 12 }}>{errors.situacao.message}</span>}

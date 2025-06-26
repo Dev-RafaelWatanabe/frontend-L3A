@@ -87,14 +87,14 @@ export interface LancamentoPage {
 
 export interface PatrimonioFormData {
   nome: string;
-  serie: number;
+  serie?: string; // Opcional e como string
   descricao: string;
-  marca: string;
-  categoria: string;
-  centro_custo: string;
+  marca: string; // ID da marca
+  categoria: string; // ID da categoria
+  centro_custo: string; // ID da obra
   valor: number;
   nota_fiscal: FileList | null;
-  situacao: string;
+  situacao: string; // ID da situação
 }
 
 export interface Ferramenta {
@@ -105,6 +105,44 @@ export interface Ferramenta {
   categoria: string;
   obra: string;
   valor: number;
+}
+
+export interface Marca {
+  id: number;
+  nome: string;
+}
+export interface Categoria {
+  id: number;
+  nome: string;
+}
+export interface Situacao {
+  id: number;
+  nome: string;
+}
+
+// Interfaces de Paginação - ATUALIZADA
+export interface PaginacaoParams {
+  skip: number;
+  // Removido o limit - não vamos limitar a quantidade
+}
+
+export interface PaginacaoResponse<T> {
+  data: T[];
+  total: number;
+}
+
+export interface PaginacaoComponentProps<T> {
+  fetchData: (params: PaginacaoParams) => Promise<PaginacaoResponse<T>>;
+  itemsPerPage?: number;
+  onDataChange: (data: T[], loading: boolean) => void;
+}
+
+export interface PaginacaoRef {
+  reloadData: () => void;
+  resetToFirstPage: () => void;
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
 }
 
 

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import type { PaginacaoParams } from './Types';
 
 const api = axios.create({
-  baseURL: 'http://192.168.1.112:8000'
+  baseURL: '/api'
 });
 
 // Adicione isso antes das definições das funções
@@ -45,7 +46,20 @@ export const Api = {
     });
   },
 
-  getFerramentas: () => api.get('/ferramentas/'),
+  getFerramentas: (params?: PaginacaoParams) => {
+    const queryParams = new URLSearchParams();
+    
+    // Usar apenas o skip - sem limit
+    if (params?.skip !== undefined) {
+      queryParams.append('skip', params.skip.toString());
+    }
+    
+    const queryString = queryParams.toString();
+    const url = queryString ? `/ferramentas/?${queryString}` : '/ferramentas/';
+    
+    return api.get(url);
+  },
+  
   getMarcas: () => api.get('/marcas/'),
   getCategorias: () => api.get('/categorias/'),
   getSituacoes: () => api.get('/situacoes/'),
