@@ -11,11 +11,8 @@ import {
   Container, 
   TableContainer, 
   Title,
-  DebugInfo,
-  LoadingContainer,
   EmptyStateContainer,
   DataContainer,
-  FirstItemDebug
 } from './styles';
 import { PaginacaoComponent } from './Components/pagination';
 
@@ -26,6 +23,9 @@ export const PatrimonioDB: React.FC = () => {
   const [loading, setLoading] = useState(true);
   
   const paginacaoRef = useRef<PaginacaoRef>(null);
+  
+  // ✅ Ref para controlar se o componente já foi inicializado
+  const initializedRef = useRef(false);
 
   const columns = [
     { key: 'nome', label: 'Nome' },
@@ -64,62 +64,47 @@ export const PatrimonioDB: React.FC = () => {
     },
   ];
 
-  // Função para buscar dados (usada pelo componente de paginação)
+  // ✅ Função fetchData OTIMIZADA (sem logs excessivos)
   const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Ferramenta>> => {
     try {
-      console.log('🔍 Buscando ferramentas do backend...');
-      console.log('URL da requisição:', '/ferramentas/');
+      console.log('🔍 API: Buscando ferramentas...');
       
       const response = await Api.getFerramentas(params);
-      console.log('Resposta completa:', response);
+      
+      console.log(`✅ API: ${response.data?.length || 0} ferramentas recebidas`);
       
       return {
-        data: response.data,
-        total: response.data.length
+        data: response.data || [],
+        total: response.data?.length || 0
       };
     } catch (error) {
-      console.error('❌ Erro ao buscar dados:', error);
+      console.error('❌ API: Erro ao buscar dados:', error);
       throw error;
     }
   };
 
-  // Callback para receber dados do componente de paginação
+  // ✅ Callback otimizado para receber dados
   const handleDataChange = (newData: Ferramenta[], isLoading: boolean) => {
-    console.log(`📊 Dados da página: ${newData.length} itens, carregando: ${isLoading}`);
+    console.log(`📊 UI: ${newData.length} itens, loading: ${isLoading}`);
     setData(newData);
     setLoading(isLoading);
   };
 
-  // Debug: verificar se o componente foi montado
+  // ✅ useEffect ÚNICO para inicialização (sem testes redundantes)
   useEffect(() => {
-    console.log('🔍 PatrimonioDB useEffect executado');
+    if (!initializedRef.current) {
+      console.log('🔍 PatrimonioDB inicializado');
+      initializedRef.current = true;
+    }
   }, []);
-
-  // Teste direto da API
-  useEffect(() => {
-    console.log('🧪 Teste direto da API:');
-    Api.getFerramentas({ skip: 0 })
-      .then(res => console.log('✅ Teste API sucesso:', res))
-      .catch(err => console.log('❌ Teste API erro:', err));
-  }, []);
-
-  
 
   return (
     <Container>
       <Title>Patrimônio</Title>
-      <TableContainer>
-        <DebugInfo>
-          Debug: {data.length} itens carregados, loading: {loading.toString()}
-        </DebugInfo>
-        
+      <TableContainer>        
         {data.length > 0 ? (
           <DataContainer>
             <DataTable data={data} columns={columns} />
-            <FirstItemDebug>
-              <strong>Primeiro item:</strong>
-              <pre>{JSON.stringify(data[0], null, 2)}</pre>
-            </FirstItemDebug>
           </DataContainer>
         ) : (
           <EmptyStateContainer>
