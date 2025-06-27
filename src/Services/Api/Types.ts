@@ -99,10 +99,10 @@ export interface PatrimonioFormData {
 export interface Ferramenta {
   id: number;
   nome: string;
-  marca: { id: number; nome: string } | string;    // ✅ Aceita objeto ou string
-  situacao: { id: number; nome: string } | string; // ✅ Aceita objeto ou string
-  categoria: { id: number; nome: string } | string; // ✅ Aceita objeto ou string
-  obra: { id: number; nome: string } | string;     // ✅ Aceita objeto ou string
+  marca: { id: number; nome: string } | string;   
+  situacao: { id: number; nome: string } | string;
+  categoria: { id: number; nome: string } | string;
+  obra: { id: number; nome: string } | string;    
   valor: number;
   descricao?: string;
 }
