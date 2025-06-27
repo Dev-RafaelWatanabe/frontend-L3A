@@ -2,22 +2,22 @@ import axios from 'axios';
 import type { PaginacaoParams } from './Types';
 
 const api = axios.create({
-  baseURL: '/api'
+  baseURL: 'http://192.168.1.112:8000/'
 });
 
-// Adicione isso antes das definições das funções
+// Adicionar interceptors para debug
 api.interceptors.request.use(request => {
-  console.log('Request:', request);
+  console.log('🚀 Request:', request);
   return request;
 });
 
 api.interceptors.response.use(
   response => {
-    console.log('Response:', response);
+    console.log('✅ Response:', response);
     return response;
   },
   error => {
-    console.log('Error:', error.response);
+    console.error('❌ Error:', error);
     return Promise.reject(error);
   }
 );
@@ -47,17 +47,22 @@ export const Api = {
   },
 
   getFerramentas: (params?: PaginacaoParams) => {
-    const queryParams = new URLSearchParams();
+    console.log('📡 getFerramentas chamado com params:', params);
     
-    // Usar apenas o skip - sem limit
-    if (params?.skip !== undefined) {
-      queryParams.append('skip', params.skip.toString());
-    }
+    // URL completa para debug
+    const url = '/ferramentas/';
+    console.log('📍 URL completa:', api.defaults.baseURL + url);
     
-    const queryString = queryParams.toString();
-    const url = queryString ? `/ferramentas/?${queryString}` : '/ferramentas/';
-    
-    return api.get(url);
+    // Adicionar timestamp para evitar cache do navegador
+    return api.get(url, { 
+      params: { ...params, _t: Date.now() } 
+    }).then(response => {
+      console.log('📦 Resposta getFerramentas:', response);
+      return response;
+    }).catch(error => {
+      console.error('❌ Erro getFerramentas:', error);
+      throw error;
+    });
   },
   
   getMarcas: () => api.get('/marcas/'),

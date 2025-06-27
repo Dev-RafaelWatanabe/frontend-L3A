@@ -12,23 +12,41 @@ const Th = styled.th`
   color: white;
   padding: 12px;
   text-align: left;
+  font-weight: 500;
+  border-bottom: 2px solid rgba(8, 1, 104, 0.1);
 `;
 
 const Td = styled.td`
   padding: 12px;
   border-bottom: 1px solid #ddd;
+  vertical-align: top;
 `;
 
 const Tr = styled.tr`
   &:hover {
-    background-color: #f5f5f5;
+    background-color: #f8f9fa;
   }
+
+  &:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  &:nth-child(even):hover {
+    background-color: #f0f0f0;
+  }
+`;
+
+const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
 `;
 
 interface Column {
   key: string;
   label: string;
-  render?: (value: any, row?: any) => React.ReactNode;
+  render?: (value: any, row: any) => React.ReactNode;
 }
 
 interface DataTableProps {
@@ -45,7 +63,7 @@ export const DataTable: React.FC<DataTableProps> = ({ data, columns }) => {
   }
 
   if (data.length === 0) {
-    return <div>Nenhum dado encontrado</div>;
+    return <EmptyMessage>Nenhum dado encontrado</EmptyMessage>;
   }
 
   return (

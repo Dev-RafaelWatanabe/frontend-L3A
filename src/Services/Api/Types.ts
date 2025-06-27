@@ -1,4 +1,3 @@
-// Generic API types
 export interface ApiResponse<T> {
   data: T;
   status: number;
@@ -100,11 +99,12 @@ export interface PatrimonioFormData {
 export interface Ferramenta {
   id: number;
   nome: string;
-  marca: string;
-  situacao: string;
-  categoria: string;
-  obra: string;
+  marca: { id: number; nome: string } | string;    // ✅ Aceita objeto ou string
+  situacao: { id: number; nome: string } | string; // ✅ Aceita objeto ou string
+  categoria: { id: number; nome: string } | string; // ✅ Aceita objeto ou string
+  obra: { id: number; nome: string } | string;     // ✅ Aceita objeto ou string
   valor: number;
+  descricao?: string;
 }
 
 export interface Marca {
@@ -144,5 +144,3 @@ export interface PaginacaoRef {
   totalPages: number;
   totalItems: number;
 }
-
-
