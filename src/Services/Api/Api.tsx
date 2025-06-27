@@ -55,7 +55,12 @@ export const Api = {
     
     // Adicionar timestamp para evitar cache do navegador
     return api.get(url, { 
-      params: { ...params, _t: Date.now() } 
+    // esse é a "padronização de paramentros utilizados anteriormente, porém, isso fazia com a limitação de dados padrões fossem atendidas{ ...params, _t: Date.now() }
+      params: { 
+      skip: params?.skip || 0,
+      limit: 50000, // ✅ Limite muito alto para carregar tudo
+      _t: Date.now() 
+    }  
     }).then(response => {
       console.log('📦 Resposta getFerramentas:', response);
       return response;
