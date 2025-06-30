@@ -86,13 +86,13 @@ export interface LancamentoPage {
 
 export interface PatrimonioFormData {
   nome: string;
-  serie?: string; // Opcional e como string
-  descricao: string;
+  serie?: string; // ✅ Opcional
+  descricao?: string; // ✅ Opcional
   marca: string; // ID da marca
   categoria: string; // ID da categoria
   centro_custo: string; // ID da obra
-  valor: number;
-  nota_fiscal: FileList | null;
+  valor?: number; // ✅ Opcional
+  nota_fiscal?: FileList | null; // ✅ Opcional
   situacao: string; // ID da situação
 }
 

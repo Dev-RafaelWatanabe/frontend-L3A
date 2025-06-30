@@ -27,45 +27,104 @@ export const Patrimonio: React.FC = () => {
 
   const onSubmit = async (data: PatrimonioFormData) => {
     try {
+      console.log('📋 Dados do formulário recebidos:', data);
+      
+      // ✅ Validações básicas
+      if (!data.nome?.trim()) {
+        alert('Nome é obrigatório');
+        return;
+      }
+      
+      if (!data.marca) {
+        alert('Marca é obrigatória');
+        return;
+      }
+      
+      if (!data.categoria) {
+        alert('Categoria é obrigatória');
+        return;
+      }
+      
+      if (!data.centro_custo) {
+        alert('Centro de Custo (Obra) é obrigatório');
+        return;
+      }
+      
+      if (!data.situacao) {
+        alert('Situação é obrigatória');
+        return;
+      }
+
       const formData = new FormData();
-      formData.append('nome', data.nome);
-      formData.append('descricao', data.descricao || '');
       
-      // Enviar apenas os IDs dos campos relacionais
-      formData.append('marca', String(data.marca)); // ID da marca
-      formData.append('categoria', String(data.categoria)); // ID da categoria
-      formData.append('obra', String(data.centro_custo)); // ID da obra
-      formData.append('situacao', String(data.situacao)); // ID da situação
+      // ✅ Campos obrigatórios
+      formData.append('nome', data.nome.trim());
+      formData.append('descricao', data.descricao?.trim() || '');
+      formData.append('marca', String(data.marca));
+      formData.append('categoria', String(data.categoria));
+      formData.append('obra', String(data.centro_custo));
+      formData.append('situacao', String(data.situacao));
       
-      // Valor como string (como aparece no banco)
-      if (data.valor) {
-        formData.append('valor', String(data.valor));
+      // ✅ Valor - se não fornecido, enviar 0
+      const valorNumerico = data.valor ? Number(data.valor) : 0;
+      formData.append('valor', String(valorNumerico));
+      
+      // ✅ Série - opcional
+      if (data.serie?.trim()) {
+        formData.append('serie', data.serie.trim());
       }
-      
-      // Remove o campo serie se não existe no backend
-      // if (data.serie) {
-      //   formData.append('serie', String(data.serie));
-      // }
 
-      // Nota fiscal é opcional - só envie se houver arquivo
-      if (data.nota_fiscal && data.nota_fiscal.length > 0) {
+      // ✅ Nota fiscal - OPCIONAL (não obrigatória)
+      if (data.nota_fiscal && data.nota_fiscal.length > 0 && data.nota_fiscal[0]) {
         formData.append('nota_fiscal', data.nota_fiscal[0]);
+        console.log('📄 Nota fiscal incluída:', data.nota_fiscal[0].name);
+      } else {
+        console.log('📄 Nenhuma nota fiscal fornecida (opcional)');
       }
 
-      console.log("Enviando dados:", Object.fromEntries(formData));
+      // ✅ Debug final dos dados
+      console.log('📦 Dados finais sendo enviados:');
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  ${key}: [Arquivo] ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+
       const response = await Api.createFerramenta(formData);
-      console.log("Resposta:", response);
+      console.log("✅ Resposta do servidor:", response);
 
       alert('Patrimônio cadastrado com sucesso!');
       reset();
-    } catch (error: any) {
-      console.error("Erro completo:", error);
-      console.error("Detalhes do erro:", error.response?.data);
       
-      if (error.response?.data) {
-        alert(`Erro ao cadastrar patrimônio: ${JSON.stringify(error.response.data)}`);
+    } catch (error: any) {
+      console.error("❌ Erro completo:", error);
+      
+      if (error.response?.status === 500) {
+        console.error("🚨 Erro 500 - Detalhes:", {
+          status: error.response.status,
+          data: error.response.data,
+          message: error.message
+        });
+        
+        // Tentar mostrar erro específico do backend
+        const errorMessage = error.response?.data?.detail || 
+                            error.response?.data?.message || 
+                            'Erro interno do servidor';
+        
+        alert(`Erro no servidor: ${errorMessage}`);
+        
+      } else if (error.response?.status === 400) {
+        console.error("⚠️ Erro 400 - Dados inválidos:", error.response.data);
+        alert(`Dados inválidos: ${JSON.stringify(error.response.data)}`);
+        
+      } else if (error.response?.status === 422) {
+        console.error("📝 Erro 422 - Validação:", error.response.data);
+        alert(`Erro de validação: ${JSON.stringify(error.response.data)}`);
+        
       } else {
-        alert('Erro ao cadastrar patrimônio. Verifique o console para mais detalhes.');
+        alert('Erro ao cadastrar patrimônio. Verifique o console e os logs do backend.');
       }
     }
   };
