@@ -10,6 +10,7 @@ import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrarPatrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
+import { AlocarPatrimonio } from './Pages/Patrimonio/Alocacao/AlocarPatrimonio';
 
 function App() {
   const menuItems = [
@@ -53,6 +54,7 @@ function App() {
       subItems: [
         { id: 'patri1', label: 'Cadastrar Patrimônio', path: '/patrimonio/cadastrar' },
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
+        { id: 'patri3', label: 'Alocar Patrimônio', path: '/patrimonio/alocar' }
       ]
     }
   ];
@@ -74,6 +76,7 @@ function App() {
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
           <Route path="/patrimonio/cadastrar" element={<CadastrarPatrimonio />} />
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
+          <Route path="/patrimonio/alocar" element={<AlocarPatrimonio />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
