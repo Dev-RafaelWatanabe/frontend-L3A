@@ -28,76 +28,52 @@ export const Patrimonio: React.FC = () => {
   const onSubmit = async (data: PatrimonioFormData) => {
     try {
       console.log('📋 Dados do formulário recebidos:', data);
-      
-      // ✅ Validações básicas
-      if (!data.nome?.trim()) {
-        alert('Nome é obrigatório');
-        return;
-      }
-      
-      if (!data.marca) {
-        alert('Marca é obrigatória');
-        return;
-      }
-      
-      if (!data.categoria) {
-        alert('Categoria é obrigatória');
-        return;
-      }
-      
-      if (!data.centro_custo) {
-        alert('Centro de Custo (Obra) é obrigatório');
-        return;
-      }
-      
-      if (!data.situacao) {
-        alert('Situação é obrigatória');
+
+      const marcaSelecionada = marcas.find(m => m.id === Number(data.marca));
+      const categoriaSelecionada = categorias.find(c => c.id === Number(data.categoria));
+      const obraSelecionada = obras.find(o => o.id === Number(data.centro_custo));
+      const situacaoSelecionada = situacoes.find(s => s.id === Number(data.situacao));
+
+      if (!marcaSelecionada || !categoriaSelecionada || !obraSelecionada || !situacaoSelecionada) {
+        alert('Erro: Não foi possível encontrar os dados completos para os itens selecionados. Verifique se todos os campos estão preenchidos.');
         return;
       }
 
-      const formData = new FormData();
-      
-      // ✅ Campos obrigatórios
-      formData.append('nome', data.nome.trim());
-      formData.append('descricao', data.descricao?.trim() || '');
-      formData.append('marca', String(data.marca));
-      formData.append('categoria', String(data.categoria));
-      formData.append('obra', String(data.centro_custo));
-      formData.append('situacao', String(data.situacao));
-      
-      // ✅ Valor - se não fornecido, enviar 0
-      const valorNumerico = data.valor ? Number(data.valor) : 0;
-      formData.append('valor', String(valorNumerico));
-      
-      // ✅ Série - opcional
-      if (data.serie?.trim()) {
-        formData.append('serie', data.serie.trim());
-      }
-
-      // ✅ Nota fiscal - OPCIONAL (não obrigatória)
+      // Converte o arquivo para base64 se existir
+      let notaFiscalBase64 = '';
       if (data.nota_fiscal && data.nota_fiscal.length > 0 && data.nota_fiscal[0]) {
-        formData.append('nota_fiscal', data.nota_fiscal[0]);
-        console.log('📄 Nota fiscal incluída:', data.nota_fiscal[0].name);
-      } else {
-        console.log('📄 Nenhuma nota fiscal fornecida (opcional)');
+        const file = data.nota_fiscal[0];
+        const toBase64 = (file: File) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+          });
+        notaFiscalBase64 = await toBase64(file);
       }
 
-      // ✅ Debug final dos dados
-      console.log('📦 Dados finais sendo enviados:');
-      for (let [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(`  ${key}: [Arquivo] ${value.name} (${value.size} bytes)`);
-        } else {
-          console.log(`  ${key}: ${value}`);
-        }
-      }
+      // Monta o objeto conforme esperado pelo backend
+      const payload = {
+        nome: data.nome.trim(),
+        descricao: data.descricao?.trim() || '',
+        marca_nome: marcaSelecionada.nome,
+        categoria_nome: categoriaSelecionada.nome,
+        obra_nome: obraSelecionada.nome,
+        situacao_nome: situacaoSelecionada.nome,
+        valor: data.valor ? Number(data.valor) : 0.00,
+        nota_fiscal: notaFiscalBase64 // string base64 ou ''
+      };
 
-      const response = await Api.createFerramenta(formData);
+      console.log('📦 Payload final sendo enviado para o backend:', payload);
+
+      // Aqui você envia para a API:
+      const response = await Api.createFerramenta(payload);
       console.log("✅ Resposta do servidor:", response);
 
       alert('Patrimônio cadastrado com sucesso!');
       reset();
-      
+
     } catch (error: any) {
       console.error("❌ Erro completo:", error);
       

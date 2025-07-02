@@ -75,33 +75,11 @@ export const Api = {
   getSituacoes: () => api.get('/situacoes/'),
 
 
-  createFerramenta: (data: FormData) => {
-    console.log('🚀 Enviando patrimônio para o backend...');
-    
-    // Debug do FormData
-    console.log('📋 Conteúdo do FormData:');
-    for (let [key, value] of data.entries()) {
-      console.log(`  ${key}:`, value);
-    }
-    
-    // ✅ CORREÇÃO: Usar endpoint correto
-    return api.post('/ferramentas/por-nome', data, {
+  createFerramenta: (data: any) => {
+    return api.post('/ferramentas/', data, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then(response => {
-      console.log('✅ Patrimônio criado com sucesso:', response);
-      return response;
-    }).catch(error => {
-      console.error('❌ Erro ao criar patrimônio:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        url: error.config?.url,
-        sentData: 'FormData (ver logs acima)'
-      });
-      throw error;
+        'Content-Type': 'application/json'
+      }
     });
   },
 
