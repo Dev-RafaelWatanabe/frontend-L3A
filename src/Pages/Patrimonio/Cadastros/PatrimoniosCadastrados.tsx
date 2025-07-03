@@ -13,7 +13,9 @@ import {
   Title,
   EmptyStateContainer,
   DataContainer,
+  DeleteIconButton
 } from './Styles';
+import { FaTrashAlt } from 'react-icons/fa';
 import { PaginacaoComponent } from './Components/Pagination';
 
 export const PatrimonioDB: React.FC = () => {
@@ -30,7 +32,7 @@ export const PatrimonioDB: React.FC = () => {
   const columns = [
     { 
       key: 'id',
-      label: 'Númeração',
+      label: 'Nº',
       render: (value: any) => typeof value === 'object' && value !== null ? value.nome : value || '-'
     },
     { 
@@ -69,6 +71,18 @@ export const PatrimonioDB: React.FC = () => {
       label: 'Descrição',
       render: (value: string) => value || '-'
     },
+    {
+      key: 'actions',
+      label: '',
+      render: (_: any, row: Ferramenta) => (
+        <DeleteIconButton
+          title="Excluir patrimônio"
+          onClick={() => console.log(`Cliquei para deletar o patrimônio ID: ${row.id}`)}
+        >
+          <FaTrashAlt />
+        </DeleteIconButton>
+      )
+    }
   ];
 
   // Função fetchData OTIMIZADA (sem logs excessivos)

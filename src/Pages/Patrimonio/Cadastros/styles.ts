@@ -193,3 +193,27 @@ export const LoadingSpinner = styled.div`
     100% { transform: rotate(360deg); }
   }
 `;
+
+export const DeleteIconButton = styled.button`
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: auto;
+  padding: 4px;
+
+  &:hover {
+    color: #a71d2a;
+    background: rgba(220, 53, 69, 0.08);
+    border-radius: 4px;
+  }
+
+  &:focus {
+    outline: 2px solid #dc3545;
+    outline-offset: 2px;
+  }
+`;
