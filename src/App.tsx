@@ -8,7 +8,7 @@ import { Funcionarios } from './Pages/Database/Funcionarios/FuncionariosPage';
 import { Lancamentos } from './Pages/Database/Lancamentos/LancamentosCadastrados';
 import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
-import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrarPatrimonio';
+import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/CadastrarPatrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
 import { AlocarPatrimonio } from './Pages/Patrimonio/Alocacao/AlocarPatrimonio';
 

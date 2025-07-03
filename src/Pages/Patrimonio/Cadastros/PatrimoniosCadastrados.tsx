@@ -13,22 +13,29 @@ import {
   Title,
   EmptyStateContainer,
   DataContainer,
-} from './styles';
-import { PaginacaoComponent } from './Components/pagination';
+} from './Styles';
+import { PaginacaoComponent } from './Components/Pagination';
 
 export const PatrimonioDB: React.FC = () => {
-  console.log('🏗️ PatrimonioDB componente montado');
+  console.log('PatrimonioDB componente montado');
   
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
   
   const paginacaoRef = useRef<PaginacaoRef>(null);
   
-  // ✅ Ref para controlar se o componente já foi inicializado
+  // Ref para controlar se o componente já foi inicializado
   const initializedRef = useRef(false);
 
   const columns = [
-    { key: 'nome', label: 'Nome' },
+    { 
+      key: 'id',
+      label: 'Númeração',
+      render: (value: any) => typeof value === 'object' && value !== null ? value.nome : value || '-'
+    },
+    { 
+      key: 'nome', label: 'Nome'
+    },
     { 
       key: 'marca',
       label: 'Marca',
@@ -64,14 +71,14 @@ export const PatrimonioDB: React.FC = () => {
     },
   ];
 
-  // ✅ Função fetchData OTIMIZADA (sem logs excessivos)
+  // Função fetchData OTIMIZADA (sem logs excessivos)
   const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Ferramenta>> => {
     try {
       console.log('🔍 API: Buscando ferramentas...');
       
       const response = await Api.getFerramentas(params);
       
-      console.log(`✅ API: ${response.data?.length || 0} ferramentas recebidas`);
+      console.log(`API: ${response.data?.length || 0} ferramentas recebidas`);
       
       return {
         data: response.data || [],
@@ -83,14 +90,14 @@ export const PatrimonioDB: React.FC = () => {
     }
   };
 
-  // ✅ Callback otimizado para receber dados
+  // Callback otimizado para receber dados
   const handleDataChange = (newData: Ferramenta[], isLoading: boolean) => {
-    console.log(`📊 UI: ${newData.length} itens, loading: ${isLoading}`);
+    console.log(`UI: ${newData.length} itens, loading: ${isLoading}`);
     setData(newData);
     setLoading(isLoading);
   };
 
-  // ✅ useEffect ÚNICO para inicialização (sem testes redundantes)
+  // useEffect ÚNICO para inicialização (sem testes redundantes)
   useEffect(() => {
     if (!initializedRef.current) {
       console.log('🔍 PatrimonioDB inicializado');

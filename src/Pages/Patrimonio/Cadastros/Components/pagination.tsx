@@ -11,7 +11,7 @@ import {
   PaginationControls,
   PageInfo,
   LoadingSpinner
-} from '../styles';
+} from '../Styles';
 
 // Cache global para armazenar dados por mais tempo
 interface CacheData<T> {
@@ -147,8 +147,7 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
 
     // useEffect para navegação entre páginas (SEM fazer requisições)
     useEffect(() => {
-      if (dataLoaded && allItems.length > 0 && currentPage > 1) {
-        console.log(`🔄 Navegando para página ${currentPage} (local)`);
+      if (dataLoaded && allItems.length > 0) {
         showPage(currentPage);
       }
     }, [currentPage]); // Apenas currentPage como dependência
