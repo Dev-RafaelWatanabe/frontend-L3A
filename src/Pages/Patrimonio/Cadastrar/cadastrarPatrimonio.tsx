@@ -70,7 +70,7 @@ export const Patrimonio: React.FC = () => {
       console.log("Resposta do servidor:", response);
 
       alert('Patrimônio cadastrado com sucesso!');
-      // window.location.reload();
+      window.location.reload();
       reset();
 
     } catch (error: any) {

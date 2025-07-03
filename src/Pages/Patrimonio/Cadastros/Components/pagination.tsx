@@ -31,7 +31,7 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
     const [allItems, setAllItems] = useState<any[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [loading, setLoading] = useState(false);
-    const [dataLoaded, setDataLoaded] = useState(false); // ✅ Novo estado para controlar se dados foram carregados
+    const [dataLoaded, setDataLoaded] = useState(false); 
     
     // Refs para controlar requisições
     const isRequestingRef = useRef(false);
@@ -56,31 +56,14 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
       const endIndex = startIndex + itemsPerPage;
       const pageItems = allItems.slice(startIndex, endIndex);
       
-      console.log(`📄 Mostrando página ${page} (${pageItems.length} itens)`);
+      console.log(`Mostrando página ${page} (${pageItems.length} itens)`);
       onDataChange(pageItems, false);
     };
 
     // Função principal para carregar dados (COM PROTEÇÃO CONTRA LOOPS)
     const loadInitialData = async () => {
-      // ✅ PROTEÇÕES CONTRA REQUISIÇÕES MÚLTIPLAS
-      if (isRequestingRef.current) {
-        console.log('⚠️ Requisição já em andamento, cancelando');
-        return;
-      }
-
-      if (dataLoaded) {
-        console.log('✅ Dados já carregados, não fazendo nova requisição');
-        return;
-      }
-
-      if (hasInitializedRef.current) {
-        console.log('✅ Componente já inicializado, não fazendo nova requisição');
-        return;
-      }
-
       // Verificar cache primeiro
       if (isCacheValid(cacheKey)) {
-        console.log('📦 Dados encontrados em cache válido');
         const cached = dataCache.get(cacheKey)!;
         
         setAllItems(cached.data);
@@ -102,7 +85,6 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
 
       try {
         const response = await fetchData({ skip: 0 });
-        console.log(`✅ ${response.data?.length || 0} itens recebidos do backend`);
         
         const items = response.data || [];
         
@@ -115,7 +97,7 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
         
         setAllItems(items);
         setTotalItems(items.length);
-        setDataLoaded(true); // ✅ Marcar como carregado
+        setDataLoaded(true);
         hasInitializedRef.current = true;
         
         // Mostrar primeira página
@@ -123,7 +105,6 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
         onDataChange(pageItems, false);
         
       } catch (error) {
-        console.error('❌ Erro ao carregar dados:', error);
         setAllItems([]);
         setTotalItems(0);
         onDataChange([], false);
@@ -133,24 +114,21 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
       }
     };
 
-    // ✅ useEffect SIMPLIFICADO - executa apenas UMA VEZ
     useEffect(() => {
       console.log('🚀 useEffect inicial - carregando dados uma única vez');
       
-      // Timeout para garantir que o componente esteja totalmente montado
       const timer = setTimeout(() => {
         loadInitialData();
       }, 100);
 
       return () => clearTimeout(timer);
-    }, []); // ✅ Dependências VAZIAS - executa apenas na montagem
+    }, []);
 
-    // useEffect para navegação entre páginas (SEM fazer requisições)
     useEffect(() => {
       if (dataLoaded && allItems.length > 0) {
         showPage(currentPage);
       }
-    }, [currentPage]); // Apenas currentPage como dependência
+    }, [currentPage]);
 
     const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -180,7 +158,7 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
       setAllItems([]);
       setTotalItems(0);
 
-      // Recarrega os dados
+      
       setTimeout(() => {
         loadInitialData();
       }, 100);
@@ -198,11 +176,6 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
     // Calcular informações para exibição
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-    // ✅ Log de status para debug
-    console.log(`📊 Status: dataLoaded=${dataLoaded}, items=${allItems.length}, loading=${loading}, page=${currentPage}/${totalPages}`);
-
-    // Não renderizar controles se não há dados E não está carregando
     if (totalItems === 0 && !loading) {
       return (
         <PaginationContainer>

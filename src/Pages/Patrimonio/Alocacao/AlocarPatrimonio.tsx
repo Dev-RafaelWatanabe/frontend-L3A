@@ -11,7 +11,7 @@ import {
   Label,
   AlocarButton,
   LimparButton
-} from './styles';
+} from './Styles';
 
 interface AlocarFormData {
   obraId: string;

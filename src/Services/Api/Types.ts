@@ -131,10 +131,11 @@ export interface PaginacaoResponse<T> {
   total: number;
 }
 
-export interface PaginacaoComponentProps<T> {
-  fetchData: (params: PaginacaoParams) => Promise<PaginacaoResponse<T>>;
+export interface PaginacaoComponentProps<T = any> {
+  fetchData: (params: any) => Promise<any>;
   itemsPerPage?: number;
   onDataChange: (data: T[], loading: boolean) => void;
+  initialPage?: number;
 }
 
 export interface PaginacaoRef {

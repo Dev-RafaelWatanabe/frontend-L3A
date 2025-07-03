@@ -22,7 +22,7 @@ export const PatrimonioDB: React.FC = () => {
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
   const paginacaoRef = useRef<PaginacaoRef>(null);
-  const initializedRef = useRef(false);
+  const [initialPage, setInitialPage] = useState(1);
 
   // Função para deletar patrimônio
   const handleDelete = async (id: number) => {
@@ -31,7 +31,11 @@ export const PatrimonioDB: React.FC = () => {
     try {
       await Api.deleteFerramenta(id);
       alert('Patrimônio excluído com sucesso!');
-      window.location.reload(); // <-- Isso faz o "F5" automático
+      // Salva a página atual antes do reload
+      if (paginacaoRef.current && paginacaoRef.current.currentPage) {
+        localStorage.setItem('patrimonios_pagina_atual', paginacaoRef.current.currentPage.toString());
+      }
+      window.location.reload();
     } catch (error) {
       alert('Erro ao excluir patrimônio. Tente novamente.');
       console.error('Erro ao excluir patrimônio:', error);
@@ -113,10 +117,11 @@ export const PatrimonioDB: React.FC = () => {
     setLoading(isLoading);
   };
 
-  // useEffect ÚNICO para inicialização (sem testes redundantes)
   useEffect(() => {
-    if (!initializedRef.current) {
-      initializedRef.current = true;
+    const savedPage = localStorage.getItem('patrimonios_pagina_atual');
+    if (savedPage) {
+      setInitialPage(Number(savedPage));
+      localStorage.removeItem('patrimonios_pagina_atual');
     }
   }, []);
 
@@ -139,6 +144,7 @@ export const PatrimonioDB: React.FC = () => {
         fetchData={fetchData}
         itemsPerPage={20}
         onDataChange={handleDataChange}
+        initialPage={initialPage} // Passe a página inicial
       />
     </Container>
   );
