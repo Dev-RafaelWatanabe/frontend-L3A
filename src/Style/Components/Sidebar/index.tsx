@@ -38,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ items }) => {
       setOpenSubmenu(openSubmenu === item.id ? null : item.id);
     } else if (item.path) {
       navigate(item.path);
+      window.location.reload(); // Força reload ao navegar
     }
   };
 

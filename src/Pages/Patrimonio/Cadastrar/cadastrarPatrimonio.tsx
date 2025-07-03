@@ -65,20 +65,19 @@ export const Patrimonio: React.FC = () => {
         nota_fiscal: notaFiscalBase64 // string base64 ou ''
       };
 
-      console.log('📦 Payload final sendo enviado para o backend:', payload);
-
       // Aqui você envia para a API:
       const response = await Api.createFerramenta(payload);
-      console.log("✅ Resposta do servidor:", response);
+      console.log("Resposta do servidor:", response);
 
       alert('Patrimônio cadastrado com sucesso!');
+      // window.location.reload();
       reset();
 
     } catch (error: any) {
-      console.error("❌ Erro completo:", error);
+      console.error("Erro completo:", error);
       
       if (error.response?.status === 500) {
-        console.error("🚨 Erro 500 - Detalhes:", {
+        console.error("Erro 500 - Detalhes:", {
           status: error.response.status,
           data: error.response.data,
           message: error.message
@@ -92,11 +91,11 @@ export const Patrimonio: React.FC = () => {
         alert(`Erro no servidor: ${errorMessage}`);
         
       } else if (error.response?.status === 400) {
-        console.error("⚠️ Erro 400 - Dados inválidos:", error.response.data);
+        console.error("Erro 400 - Dados inválidos:", error.response.data);
         alert(`Dados inválidos: ${JSON.stringify(error.response.data)}`);
         
       } else if (error.response?.status === 422) {
-        console.error("📝 Erro 422 - Validação:", error.response.data);
+        console.error("Erro 422 - Validação:", error.response.data);
         alert(`Erro de validação: ${JSON.stringify(error.response.data)}`);
         
       } else {
