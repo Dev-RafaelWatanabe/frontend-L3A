@@ -171,18 +171,16 @@ export const PaginacaoComponent = forwardRef<PaginacaoRef, PaginacaoComponentPro
 
     // Função para recarregar dados (limpa tudo e recarrega)
     const reloadData = () => {
-      console.log('🔄 Recarregando dados...');
-      
-      // Limpar todos os controles
+      // Limpa cache e estados
       dataCache.delete(cacheKey);
       setDataLoaded(false);
       hasInitializedRef.current = false;
       isRequestingRef.current = false;
-      setCurrentPage(1);
+      setCurrentPage(1); // Volta para a primeira página
       setAllItems([]);
       setTotalItems(0);
-      
-      // Recarregar
+
+      // Recarrega os dados
       setTimeout(() => {
         loadInitialData();
       }, 100);

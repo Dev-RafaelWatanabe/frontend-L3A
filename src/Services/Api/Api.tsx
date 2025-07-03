@@ -113,7 +113,9 @@ export const Api = {
         });
         throw error;
       });
-  }
+  },
+
+  deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
 };
 
 export default Api;

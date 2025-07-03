@@ -19,15 +19,24 @@ import { FaTrashAlt } from 'react-icons/fa';
 import { PaginacaoComponent } from './Components/Pagination';
 
 export const PatrimonioDB: React.FC = () => {
-  console.log('PatrimonioDB componente montado');
-  
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
-  
   const paginacaoRef = useRef<PaginacaoRef>(null);
-  
-  // Ref para controlar se o componente já foi inicializado
   const initializedRef = useRef(false);
+
+  // Função para deletar patrimônio
+  const handleDelete = async (id: number) => {
+    const confirm = window.confirm('Tem certeza que deseja excluir este patrimônio? Esta ação não poderá ser desfeita!');
+    if (!confirm) return;
+    try {
+      await Api.deleteFerramenta(id);
+      alert('Patrimônio excluído com sucesso!');
+      window.location.reload(); // <-- Isso faz o "F5" automático
+    } catch (error) {
+      alert('Erro ao excluir patrimônio. Tente novamente.');
+      console.error('Erro ao excluir patrimônio:', error);
+    }
+  };
 
   const columns = [
     { 
@@ -77,7 +86,7 @@ export const PatrimonioDB: React.FC = () => {
       render: (_: any, row: Ferramenta) => (
         <DeleteIconButton
           title="Excluir patrimônio"
-          onClick={() => console.log(`Cliquei para deletar o patrimônio ID: ${row.id}`)}
+          onClick={() => handleDelete(row.id)}
         >
           <FaTrashAlt />
         </DeleteIconButton>
@@ -88,12 +97,7 @@ export const PatrimonioDB: React.FC = () => {
   // Função fetchData OTIMIZADA (sem logs excessivos)
   const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Ferramenta>> => {
     try {
-      console.log('🔍 API: Buscando ferramentas...');
-      
       const response = await Api.getFerramentas(params);
-      
-      console.log(`API: ${response.data?.length || 0} ferramentas recebidas`);
-      
       return {
         data: response.data || [],
         total: response.data?.length || 0
@@ -104,9 +108,7 @@ export const PatrimonioDB: React.FC = () => {
     }
   };
 
-  // Callback otimizado para receber dados
   const handleDataChange = (newData: Ferramenta[], isLoading: boolean) => {
-    console.log(`UI: ${newData.length} itens, loading: ${isLoading}`);
     setData(newData);
     setLoading(isLoading);
   };
@@ -114,7 +116,6 @@ export const PatrimonioDB: React.FC = () => {
   // useEffect ÚNICO para inicialização (sem testes redundantes)
   useEffect(() => {
     if (!initializedRef.current) {
-      console.log('🔍 PatrimonioDB inicializado');
       initializedRef.current = true;
     }
   }, []);
