@@ -13,15 +13,9 @@ import {
   LimparButton
 } from './Styles';
 
-interface AlocarFormData {
-  obraId: string;
-  observacao: string;
-  funcionarioId?: string;
-  ferramentaId: string;
-}
 
 export const AlocarPatrimonio: React.FC = () => {
-  const { register, handleSubmit, reset } = useForm<AlocarFormData>();
+  const { register, handleSubmit, reset } = useForm();
   const [obras, setObras] = useState<any[]>([]);
   const [funcionarios, setFuncionarios] = useState<any[]>([]);
   const [ferramentas, setFerramentas] = useState<any[]>([]);
@@ -32,9 +26,25 @@ export const AlocarPatrimonio: React.FC = () => {
     Api.getFerramentas().then(res => setFerramentas(res.data));
   }, []);
 
-  const onSubmit = (data: AlocarFormData) => {
-    console.log('Dados para alocação:', data);
-    // Chame a API de alocação aqui
+  const onSubmit = async (data: any) => {
+    try {
+      const ferramenta = ferramentas.find(f => f.id.toString() === data.ferramentaId);
+      const obra = obras.find(o => o.id.toString() === data.obraId);
+      if (!ferramenta || !obra) {
+        alert('Ferramenta ou obra não encontrada.');
+        return;
+      }
+
+      await Api.createAlocacao({
+        ferramenta_nome: ferramenta.nome,
+        obra_nome: obra.nome
+      });
+
+      reset();
+    } catch (error) {
+      console.error('Erro ao criar alocação:', error);
+      alert('Erro ao criar alocação.');
+    }
   };
 
   return (
@@ -55,7 +65,7 @@ export const AlocarPatrimonio: React.FC = () => {
           <FormField>
             <Label>Observação</Label>
             <TextArea
-              {...register('observacao', { required: true })}
+              {...register('observacao')}
               placeholder="Adicione informações adicionais"
               rows={3}
             />

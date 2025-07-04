@@ -51,14 +51,11 @@ export const Api = {
     
     // URL completa para debug
     const url = '/ferramentas/';
-    console.log('📍 URL completa:', api.defaults.baseURL + url);
-    
-    // Adicionar timestamp para evitar cache do navegador
     return api.get(url, { 
     // esse é a "padronização de paramentros utilizados anteriormente, porém, isso fazia com a limitação de dados padrões fossem atendidas{ ...params, _t: Date.now() }
       params: { 
       skip: params?.skip || 0,
-      limit: 50000, // ✅ Limite muito alto para carregar tudo
+      limit: 50000,
       _t: Date.now() 
     }  
     }).then(response => {
@@ -114,6 +111,19 @@ export const Api = {
         throw error;
       });
   },
+
+  
+
+  createAlocacao: (data: { ferramenta_nome: string; obra_nome: string }) =>
+    api.post('/api/alocacoes/', data),
+
+  // Lista todas as alocações
+  getAlocacoes: () => api.get('/api/alocacoes/'),
+
+  // Atualiza ferramenta/patrimônio
+  updateFerramenta: (ferramentaId: number | string, data: { obra: number }) =>
+    api.put(`/ferramentas/${ferramentaId}/`, data),
+
 
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
 };

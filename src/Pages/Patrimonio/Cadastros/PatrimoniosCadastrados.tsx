@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState} from 'react';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../../Database/Components/DataTable';
 import type { 
@@ -22,7 +22,7 @@ export const PatrimonioDB: React.FC = () => {
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
   const paginacaoRef = useRef<PaginacaoRef>(null);
-  const [initialPage, setInitialPage] = useState(1);
+
 
   // Função para deletar patrimônio
   const handleDelete = async (id: number) => {
@@ -31,16 +31,14 @@ export const PatrimonioDB: React.FC = () => {
     try {
       await Api.deleteFerramenta(id);
       alert('Patrimônio excluído com sucesso!');
-      // Salva a página atual antes do reload
-      if (paginacaoRef.current && paginacaoRef.current.currentPage) {
-        localStorage.setItem('patrimonios_pagina_atual', paginacaoRef.current.currentPage.toString());
-      }
       window.location.reload();
     } catch (error) {
       alert('Erro ao excluir patrimônio. Tente novamente.');
       console.error('Erro ao excluir patrimônio:', error);
     }
   };
+
+  
 
   const columns = [
     { 
@@ -117,14 +115,6 @@ export const PatrimonioDB: React.FC = () => {
     setLoading(isLoading);
   };
 
-  useEffect(() => {
-    const savedPage = localStorage.getItem('patrimonios_pagina_atual');
-    if (savedPage) {
-      setInitialPage(Number(savedPage));
-      localStorage.removeItem('patrimonios_pagina_atual');
-    }
-  }, []);
-
   return (
     <Container>
       <Title>Patrimônio</Title>
@@ -144,7 +134,6 @@ export const PatrimonioDB: React.FC = () => {
         fetchData={fetchData}
         itemsPerPage={20}
         onDataChange={handleDataChange}
-        initialPage={initialPage} // Passe a página inicial
       />
     </Container>
   );
