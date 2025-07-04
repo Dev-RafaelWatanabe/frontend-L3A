@@ -28,18 +28,10 @@ export const AlocarPatrimonio: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
-      const ferramenta = ferramentas.find(f => f.id.toString() === data.ferramentaId);
-      const obra = obras.find(o => o.id.toString() === data.obraId);
-      if (!ferramenta || !obra) {
-        alert('Ferramenta ou obra não encontrada.');
-        return;
-      }
-
       await Api.createAlocacao({
-        ferramenta_nome: ferramenta.nome,
-        obra_nome: obra.nome
+        ferramenta_nome: data.ferramenta_nome,
+        obra_nome: data.obra_nome
       });
-
       reset();
     } catch (error) {
       console.error('Erro ao criar alocação:', error);
@@ -54,10 +46,10 @@ export const AlocarPatrimonio: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField>
             <Label>Obra</Label>
-            <Select {...register('obraId', { required: true })}>
+            <Select {...register('obra_nome', { required: true })}>
               <option value="">Selecione uma obra</option>
               {obras.map((obra) => (
-                <option key={obra.id} value={obra.id}>{obra.nome}</option>
+                <option key={obra.id} value={obra.nome}>{obra.nome}</option>
               ))}
             </Select>
           </FormField>
@@ -83,10 +75,10 @@ export const AlocarPatrimonio: React.FC = () => {
 
           <FormField>
             <Label>Patrimônio/Ferramenta</Label>
-            <Select {...register('ferramentaId', { required: true })}>
+            <Select {...register('ferramenta_nome', { required: true })}>
               <option value="">Selecione um patrimônio/ferramenta</option>
               {ferramentas.map((ferramenta) => (
-                <option key={ferramenta.id} value={ferramenta.id}>{ferramenta.nome}</option>
+                <option key={ferramenta.id} value={ferramenta.nome}>{ferramenta.nome}</option>
               ))}
             </Select>
           </FormField>
