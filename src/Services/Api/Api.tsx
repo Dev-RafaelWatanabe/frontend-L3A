@@ -112,20 +112,36 @@ export const Api = {
       });
   },
 
-  
-
   createAlocacao: (data: { ferramenta_nome: string; obra_nome: string }) =>
     api.post('/api/alocacoes/', data),
 
   // Lista todas as alocações
   getAlocacoes: () => api.get('/api/alocacoes/'),
 
-  // Atualiza ferramenta/patrimônio
-  updateFerramenta: (ferramentaId: number | string, data: { obra: number }) =>
-    api.put(`/ferramentas/${ferramentaId}/`, data),
-
-
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
+
+  updateFerramenta: (id: number, data: any) =>
+  api.put(`/ferramentas/${id}`, data),
+
+  /**
+   * Atualiza a obra de uma ferramenta/patrimônio já alocado.
+   * Busca a ferramenta pelo nome, busca a obra pelo nome, e faz o PUT.
+   */
+  updateFerramentaObra: async (ferramentaNome: string, novaObraNome: string) => {
+    // Busca ferramentas
+    const ferramentasResp = await Api.getFerramentas();
+    const ferramenta = ferramentasResp.data.find((f: any) => f.nome === ferramentaNome);
+    if (!ferramenta) throw new Error('Ferramenta não encontrada.');
+
+    // Busca obras
+    const obrasResp = await Api.getObras();
+    const obra = obrasResp.data.find((o: any) => o.nome === novaObraNome);
+    if (!obra) throw new Error('Obra não encontrada.');
+
+    // Atualiza apenas o campo obra
+    const payload = { ...ferramenta, obra: obra.id };
+    return Api.updateFerramenta(ferramenta.id, payload);
+},
 };
 
 export default Api;

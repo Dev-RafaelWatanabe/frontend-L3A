@@ -26,16 +26,30 @@ export const AlocarPatrimonio: React.FC = () => {
     Api.getFerramentas().then(res => setFerramentas(res.data));
   }, []);
 
+  const verificarAlocacoesCriadas = async () => {
+    try {
+      await Api.getAlocacoes();
+      console.log('consegui verificar as alocações criadas');
+    } catch (error) {
+      console.error('Erro ao verificar alocações:', error);
+    }
+  };
+
   const onSubmit = async (data: any) => {
     try {
       await Api.createAlocacao({
         ferramenta_nome: data.ferramenta_nome,
         obra_nome: data.obra_nome
       });
+      await verificarAlocacoesCriadas();
+
+      // Atualiza a obra da ferramenta após alocar
+      await Api.updateFerramentaObra(data.ferramenta_nome, data.obra_nome);
+
       reset();
     } catch (error) {
-      console.error('Erro ao criar alocação:', error);
-      alert('Erro ao criar alocação.');
+      console.error('Erro ao criar alocação ou atualizar obra:', error);
+      alert('Erro ao criar alocação ou atualizar obra.');
     }
   };
 
