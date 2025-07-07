@@ -120,26 +120,39 @@ export const Api = {
 
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
 
+
   updateFerramenta: (id: number, data: any) =>
   api.put(`/ferramentas/${id}`, data),
-
-  /**
-   * Atualiza a obra de uma ferramenta/patrimônio já alocado.
-   * Busca a ferramenta pelo nome, busca a obra pelo nome, e faz o PUT.
-   */
-  updateFerramentaObra: async (ferramentaNome: string, novaObraNome: string) => {
-    // Busca ferramentas
+  updateFerramentaObra: async (
+    ferramentaNome: string,
+    obraNome: string,
+    situacaoNome: string,
+    valor: number
+  ) => {
+    // Busca ferramenta pelo nome
     const ferramentasResp = await Api.getFerramentas();
     const ferramenta = ferramentasResp.data.find((f: any) => f.nome === ferramentaNome);
     if (!ferramenta) throw new Error('Ferramenta não encontrada.');
 
-    // Busca obras
+    // Busca obra pelo nome
     const obrasResp = await Api.getObras();
-    const obra = obrasResp.data.find((o: any) => o.nome === novaObraNome);
+    const obra = obrasResp.data.find((o: any) => o.nome === obraNome);
     if (!obra) throw new Error('Obra não encontrada.');
 
-    // Atualiza apenas o campo obra
-    const payload = { ...ferramenta, obra: obra.id };
+    // Busca situação pelo nome
+    const situacoesResp = await Api.getSituacoes();
+    const situacao = situacoesResp.data.find((s: any) => s.nome === situacaoNome);
+    if (!situacao) throw new Error('Situação não encontrada.');
+
+    // Monta o payload conforme o backend espera
+    const payload = {
+      nome: ferramenta.nome,
+      obra_id: obra.id,
+      situacao_id: situacao.id,
+      valor: valor ?? ferramenta.valor
+    };
+
+    // Atualiza a ferramenta
     return Api.updateFerramenta(ferramenta.id, payload);
 },
 };

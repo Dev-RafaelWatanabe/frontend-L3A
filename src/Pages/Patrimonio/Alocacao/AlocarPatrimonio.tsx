@@ -19,11 +19,13 @@ export const AlocarPatrimonio: React.FC = () => {
   const [obras, setObras] = useState<any[]>([]);
   const [funcionarios, setFuncionarios] = useState<any[]>([]);
   const [ferramentas, setFerramentas] = useState<any[]>([]);
+  const [situacoes, setSituacoes] = useState<any[]>([]);
 
   useEffect(() => {
     Api.getObras().then(res => setObras(res.data));
     Api.getFuncionarios().then(res => setFuncionarios(res.data));
     Api.getFerramentas().then(res => setFerramentas(res.data));
+    Api.getSituacoes().then(res => setSituacoes(res.data));
   }, []);
 
   const verificarAlocacoesCriadas = async () => {
@@ -37,14 +39,23 @@ export const AlocarPatrimonio: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     try {
+      console.log('Payload alocacao:', {
+      ferramenta_nome: data.ferramenta_nome,
+      obra_nome: data.obra_nome
+      });
       await Api.createAlocacao({
         ferramenta_nome: data.ferramenta_nome,
         obra_nome: data.obra_nome
       });
       await verificarAlocacoesCriadas();
 
-      // Atualiza a obra da ferramenta após alocar
-      await Api.updateFerramentaObra(data.ferramenta_nome, data.obra_nome);
+      // Atualiza a obra, situação e valor da ferramenta após alocar
+      await Api.updateFerramentaObra(
+        data.ferramenta_nome,
+        data.obra_nome,
+        data.situacao,
+        Number(data.valor)
+      );
 
       reset();
     } catch (error) {
@@ -78,7 +89,7 @@ export const AlocarPatrimonio: React.FC = () => {
           </FormField>
 
           <FormField>
-            <Label>Funcionário (opcional)</Label>
+            <Label>Responsável (opcional)</Label>
             <Select {...register('funcionarioId')}>
               <option value="">Nenhum</option>
               {funcionarios.map((func) => (
@@ -95,6 +106,27 @@ export const AlocarPatrimonio: React.FC = () => {
                 <option key={ferramenta.id} value={ferramenta.nome}>{ferramenta.nome}</option>
               ))}
             </Select>
+          </FormField>
+
+          <FormField>
+            <Label>Situação</Label>
+            <Select {...register('situacao')}>
+              <option value="">Selecione a situação</option>
+              {situacoes.map((situacao) => (
+                <option key={situacao.id} value={situacao.nome}>{situacao.nome}</option>
+              ))}
+            </Select>
+          </FormField>
+
+          <FormField>
+            <Label>Valor</Label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              {...register('valor')}
+              placeholder="Valor do patrimônio"
+            />
           </FormField>
 
           <ButtonGroup>
