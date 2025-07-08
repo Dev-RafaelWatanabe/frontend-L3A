@@ -13,10 +13,12 @@ import {
   Title,
   EmptyStateContainer,
   DataContainer,
-  DeleteIconButton
+  DeleteIconButton,
+  SituacaoBadge
 } from './Styles';
 import { FaTrashAlt } from 'react-icons/fa';
 import { PaginacaoComponent } from './Components/Pagination';
+import { Link } from 'react-router-dom';
 
 export const PatrimonioDB: React.FC = () => {
   const [data, setData] = useState<Ferramenta[]>([]);
@@ -38,7 +40,28 @@ export const PatrimonioDB: React.FC = () => {
     }
   };
 
-  
+  function getSituacaoColor(nome: string) {
+    switch (nome) {
+      case 'Alocado':
+        return { cor: '#dc3545', letra: '#fff' };
+      case 'Em Manutenção':
+        return { cor: '#ffc107', letra: '#222' }; 
+      case 'Disponível':
+        return { cor: '#28a745', letra: '#fff' };
+      default:
+        return { cor: '#6c757d', letra: '#fff' };
+    }
+  }
+
+  const SituacaoCell: React.FC<{ value: any }> = ({ value }) => {
+    const nome = typeof value === 'object' && value ? value.nome : value || '-';
+    const { cor, letra } = getSituacaoColor(nome);
+    return (
+      <SituacaoBadge cor={cor} letra={letra}>
+        {nome}
+      </SituacaoBadge>
+    );
+  };
 
   const columns = [
     { 
@@ -47,7 +70,13 @@ export const PatrimonioDB: React.FC = () => {
       render: (value: any) => typeof value === 'object' && value !== null ? value.nome : value || '-'
     },
     { 
-      key: 'nome', label: 'Nome'
+      key: 'nome',
+      label: 'Nome',
+      render: (_: any, row: Ferramenta) => (
+        <Link to={`/patrimonio/${row.id}`} style={{ color: '#081168', textDecoration: 'underline', fontWeight: 500 }}>
+          {row.nome}
+        </Link>
+      )
     },
     { 
       key: 'marca',
@@ -55,9 +84,9 @@ export const PatrimonioDB: React.FC = () => {
       render: (value: any) => typeof value === 'object' && value !== null ? value.nome : value || '-'
     },
     { 
-      key: 'situacao', 
+      key: 'situacao',
       label: 'Situação',
-      render: (value: any) => typeof value === 'object' && value !== null ? value.nome : value || '-'
+      render: (value: any) => <SituacaoCell value={value} />
     },
     { 
       key: 'categoria', 

@@ -51,9 +51,9 @@ export const AlocarPatrimonio: React.FC = () => {
 
       // Atualiza a obra, situação e valor da ferramenta após alocar
       await Api.updateFerramentaObra(
-        data.ferramenta_nome,
-        data.obra_nome,
-        data.situacao,
+        data.ferramenta_nome, // ainda pode ser pelo nome, se sua função busca pelo nome
+        Number(data.obra_id),
+        Number(data.situacao_id),
         Number(data.valor)
       );
 
@@ -71,10 +71,10 @@ export const AlocarPatrimonio: React.FC = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormField>
             <Label>Obra</Label>
-            <Select {...register('obra_nome', { required: true })}>
+            <Select {...register('obra_id', { required: true })}>
               <option value="">Selecione uma obra</option>
               {obras.map((obra) => (
-                <option key={obra.id} value={obra.nome}>{obra.nome}</option>
+                <option key={obra.id} value={obra.id}>{obra.nome}</option>
               ))}
             </Select>
           </FormField>
@@ -110,10 +110,10 @@ export const AlocarPatrimonio: React.FC = () => {
 
           <FormField>
             <Label>Situação</Label>
-            <Select {...register('situacao')}>
+            <Select {...register('situacao_id', { required: true })}>
               <option value="">Selecione a situação</option>
               {situacoes.map((situacao) => (
-                <option key={situacao.id} value={situacao.nome}>{situacao.nome}</option>
+                <option key={situacao.id} value={situacao.id}>{situacao.nome}</option>
               ))}
             </Select>
           </FormField>

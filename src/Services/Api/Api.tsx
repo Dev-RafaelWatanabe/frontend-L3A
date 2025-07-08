@@ -67,6 +67,8 @@ export const Api = {
     });
   },
   
+  getFerramentaById: (id: number) => api.get(`/ferramentas/${id}`),
+
   getMarcas: () => api.get('/marcas/'),
   getCategorias: () => api.get('/categorias/'),
   getSituacoes: () => api.get('/situacoes/'),
@@ -125,34 +127,21 @@ export const Api = {
   api.put(`/ferramentas/${id}`, data),
   updateFerramentaObra: async (
     ferramentaNome: string,
-    obraNome: string,
-    situacaoNome: string,
+    obraId: number,
+    situacaoId: number,
     valor: number
   ) => {
-    // Busca ferramenta pelo nome
     const ferramentasResp = await Api.getFerramentas();
     const ferramenta = ferramentasResp.data.find((f: any) => f.nome === ferramentaNome);
     if (!ferramenta) throw new Error('Ferramenta não encontrada.');
 
-    // Busca obra pelo nome
-    const obrasResp = await Api.getObras();
-    const obra = obrasResp.data.find((o: any) => o.nome === obraNome);
-    if (!obra) throw new Error('Obra não encontrada.');
-
-    // Busca situação pelo nome
-    const situacoesResp = await Api.getSituacoes();
-    const situacao = situacoesResp.data.find((s: any) => s.nome === situacaoNome);
-    if (!situacao) throw new Error('Situação não encontrada.');
-
-    // Monta o payload conforme o backend espera
     const payload = {
       nome: ferramenta.nome,
-      obra_id: obra.id,
-      situacao_id: situacao.id,
+      obra_id: obraId,
+      situacao_id: situacaoId,
       valor: valor ?? ferramenta.valor
     };
 
-    // Atualiza a ferramenta
     return Api.updateFerramenta(ferramenta.id, payload);
 },
 };

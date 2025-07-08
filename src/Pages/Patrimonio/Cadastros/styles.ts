@@ -217,3 +217,32 @@ export const DeleteIconButton = styled.button`
     outline-offset: 2px;
   }
 `;
+
+export const SituacaoBadge = styled.span<{ cor: string; letra: string }>`
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-weight: 600;
+  color: ${({ letra }) => letra};
+  background: ${({ cor }) => cor};
+  font-size: 13px;
+`;
+
+export const CardDetalhe = styled.div`
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 32px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+
+  h2 {
+    margin-bottom: 24px;
+    color: #081168;
+  }
+
+  p {
+    margin: 8px 0;
+    font-size: 16px;
+  }
+`;

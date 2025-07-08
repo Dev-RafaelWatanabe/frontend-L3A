@@ -11,6 +11,7 @@ import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/CadastrarPatrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
 import { AlocarPatrimonio } from './Pages/Patrimonio/Alocacao/AlocarPatrimonio';
+import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/PatrimonioDetalhe';
 
 function App() {
   const menuItems = [
@@ -77,6 +78,7 @@ function App() {
           <Route path="/patrimonio/cadastrar" element={<CadastrarPatrimonio />} />
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
           <Route path="/patrimonio/alocar" element={<AlocarPatrimonio />} />
+          <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
