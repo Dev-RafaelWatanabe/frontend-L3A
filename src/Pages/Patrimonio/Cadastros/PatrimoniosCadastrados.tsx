@@ -73,7 +73,7 @@ export const PatrimonioDB: React.FC = () => {
       key: 'nome',
       label: 'Nome',
       render: (_: any, row: Ferramenta) => (
-        <Link to={`/patrimonio/${row.id}`} style={{ color: '#081168', textDecoration: 'underline', fontWeight: 500 }}>
+        <Link to={`/patrimonio/${row.id}`} style={{ color: '#081168', textDecoration: 'none', fontWeight: 400 }}>
           {row.nome}
         </Link>
       )

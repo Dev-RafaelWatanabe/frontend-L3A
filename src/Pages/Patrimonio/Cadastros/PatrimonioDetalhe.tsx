@@ -16,7 +16,7 @@ export const PatrimonioDetalhe: React.FC = () => {
     if (id) {
       Api.getFerramentaById(Number(id))
         .then(res => setFerramenta(res.data))
-        .catch(() => setErro('Erro ao carregar os dados do patrimônio.'))
+        .catch(() => setErro('Função em manutenção. Tente novamente mais tarde.'))
         .finally(() => setLoading(false));
     } else {
       setErro('ID inválido.');
