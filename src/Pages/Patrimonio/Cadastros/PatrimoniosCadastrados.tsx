@@ -106,11 +106,6 @@ export const PatrimonioDB: React.FC = () => {
           ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
           : 'R$ 0,00'
     },
-    { 
-      key: 'descricao', 
-      label: 'Descrição',
-      render: (value: string) => value || '-'
-    },
     {
       key: 'actions',
       label: '',

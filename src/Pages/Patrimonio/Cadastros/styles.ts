@@ -29,15 +29,6 @@ export const DebugInfo = styled.div`
   border-left: 3px solid #007bff;
 `;
 
-export const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #666;
-  font-size: 16px;
-`;
-
 export const EmptyStateContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -72,7 +63,7 @@ export const FirstItemDebug = styled.div`
   }
 `;
 
-// Estilos para paginação (mantendo os existentes)
+// Estilos para paginação
 export const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -228,6 +219,7 @@ export const SituacaoBadge = styled.span<{ cor: string; letra: string }>`
   font-size: 13px;
 `;
 
+// Estilos para página de detalhes
 export const CardDetalhe = styled.div`
   max-width: 480px;
   margin: 40px auto;
@@ -245,4 +237,166 @@ export const CardDetalhe = styled.div`
     margin: 8px 0;
     font-size: 16px;
   }
+`;
+
+export const DetalhesContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+export const BotaoEditar = styled.button`
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  svg {
+    font-size: 16px;
+  }
+`;
+
+export const ContainerBotoes = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const BotaoSalvar = styled.button<{ disabled?: boolean }>`
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background-color: #218838;
+  }
+
+  svg {
+    font-size: 16px;
+  }
+`;
+
+export const BotaoCancelar = styled.button<{ disabled?: boolean }>`
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.6 : 1};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    background-color: #5a6268;
+  }
+
+  svg {
+    font-size: 16px;
+  }
+`;
+
+export const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+`;
+
+export const CampoContainer = styled.div`
+  /* Contêiner para cada campo do formulário */
+`;
+
+export const Label = styled.label`
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+`;
+
+export const Select = styled.select`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+`;
+
+export const VisualizacaoContainer = styled.div`
+  /* Contêiner para o modo de visualização */
+`;
+
+export const Campo = styled.p`
+  margin-bottom: 10px;
+  
+  b {
+    margin-right: 8px;
+  }
+`;
+
+export const ErroMensagem = styled.div`
+  color: red;
+  padding: 10px;
+  border: 1px solid red;
+  border-radius: 4px;
+  background-color: #ffe6e6;
+  margin-bottom: 15px;
+`;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-size: 16px;
 `;
