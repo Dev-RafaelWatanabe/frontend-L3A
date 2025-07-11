@@ -138,32 +138,82 @@ export const PatrimonioDetalhe: React.FC = () => {
     if (!ferramenta) return;
     
     setSaving(true);
+    setErro(null);
+    
+    let payload: any = null; // Declare payload no escopo da função
     
     try {
-      // Prepara o payload conforme esperado pelo backend
-      const payload = {
+      // 1. Validações mais robustas
+      if (!editData.nome?.trim()) {
+        setErro('Nome é obrigatório.');
+        return;
+      }
+
+      if (!editData.obra_id || editData.obra_id === '') {
+        setErro('Obra é obrigatória.');
+        return;
+      }
+
+      if (!editData.situacao_id || editData.situacao_id === '') {
+        setErro('Situação é obrigatória.');
+        return;
+      }
+
+      // 2. Validação se os IDs existem nos arrays
+      const obraSelecionada = obras.find(o => o.id === Number(editData.obra_id));
+      const situacaoSelecionada = situacoes.find(s => s.id === Number(editData.situacao_id));
+
+      if (!obraSelecionada) {
+        setErro(`Obra com ID ${editData.obra_id} não encontrada.`);
+        return;
+      }
+
+      if (!situacaoSelecionada) {
+        setErro(`Situação com ID ${editData.situacao_id} não encontrada.`);
+        return;
+      }
+
+      // 3. Prepara o payload - testando diferentes formatos
+      payload = {
         nome: editData.nome.trim(),
         obra_id: Number(editData.obra_id),
         situacao_id: Number(editData.situacao_id),
-        valor: Number(editData.valor)
+        valor: Number(editData.valor) || 0
       };
 
-      console.log('Payload enviado para API:', payload);
+      console.log('🔧 Debug completo antes do envio:', {
+        ferramentaId: ferramenta.id,
+        payloadEnviado: payload,
+        dadosOriginais: {
+          nome: ferramenta.nome,
+          obra: ferramenta.obra,
+          situacao: ferramenta.situacao,
+          valor: ferramenta.valor
+        },
+        dadosEditados: editData,
+        obraSelecionada,
+        situacaoSelecionada
+      });
 
-      // Faz a requisição PUT com o ID da ferramenta
-      await Api.updateFerramenta(ferramenta.id, payload);
+      // 4. Teste se a API existe
+      if (!Api.updateFerramenta) {
+        throw new Error('Método Api.updateFerramenta não existe');
+      }
+
+      console.log('🚀 Iniciando requisição PUT...');
       
-      // Busca os objetos atualizados para atualizar a visualização local
-      const obraSelecionada = obras.find(o => o.id === Number(editData.obra_id));
-      const situacaoSelecionada = situacoes.find(s => s.id === Number(editData.situacao_id));
+      // 5. Faz a requisição PUT
+      const response = await Api.updateFerramenta(ferramenta.id, payload);
       
-      // Atualiza os dados locais
+      console.log('✅ Resposta da API:', response);
+      
+      // 6. Atualiza os dados locais
       const ferramentaAtualizada = {
         ...ferramenta,
-        nome: editData.nome,
-        valor: Number(editData.valor),
-        obra: obraSelecionada || ferramenta.obra,
-        situacao: situacaoSelecionada || ferramenta.situacao
+        nome: editData.nome.trim(),
+        valor: Number(editData.valor) || 0,
+        obra: obraSelecionada,
+        situacao: situacaoSelecionada
       };
       
       setFerramenta(ferramentaAtualizada);
@@ -172,9 +222,80 @@ export const PatrimonioDetalhe: React.FC = () => {
       
       alert('Ferramenta atualizada com sucesso!');
       
-    } catch (error) {
-      console.error('Erro ao atualizar ferramenta:', error);
-      setErro('Erro ao atualizar ferramenta. Tente novamente.');
+      // 7. Atualiza a página após sucesso
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } catch (error: any) {
+      console.error('❌ Erro completo ao atualizar ferramenta:', error);
+      
+      // Debug detalhado do erro
+      let errorMessage = 'Erro desconhecido ao atualizar ferramenta.';
+      
+      if (error.response) {
+        // Erro da API (4xx, 5xx)
+        console.error('🔍 Detalhes do erro da API:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          headers: error.response.headers,
+          config: {
+            url: error.response.config?.url,
+            method: error.response.config?.method,
+            data: error.response.config?.data
+          }
+        });
+        
+        switch (error.response.status) {
+          case 400:
+            errorMessage = `Erro 400 - Dados inválidos: ${JSON.stringify(error.response.data)}`;
+            break;
+          case 401:
+            errorMessage = 'Erro 401 - Não autorizado. Verifique suas credenciais.';
+            break;
+          case 403:
+            errorMessage = 'Erro 403 - Acesso negado. Você não tem permissão para esta operação.';
+            break;
+          case 404:
+            errorMessage = `Erro 404 - Ferramenta com ID ${ferramenta.id} não encontrada.`;
+            break;
+          case 422:
+            errorMessage = `Erro 422 - Dados de validação: ${JSON.stringify(error.response.data)}`;
+            break;
+          case 500:
+            errorMessage = `Erro 500 - Erro interno do servidor: ${error.response.data?.detail || error.response.data?.message || 'Erro interno'}`;
+            break;
+          default:
+            errorMessage = `Erro ${error.response.status}: ${error.response.data?.detail || error.response.data?.message || error.response.statusText}`;
+        }
+      } else if (error.request) {
+        // Erro de rede/conexão
+        console.error('🌐 Erro de rede:', error.request);
+        errorMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      } else if (error.message) {
+        // Erro na configuração da requisição
+        console.error('⚙️ Erro de configuração:', error.message);
+        errorMessage = `Erro de configuração: ${error.message}`;
+      }
+      
+      // Debug adicional
+      console.error('🔍 Debug adicional:', {
+        payloadEnviado: payload || 'Payload não foi criado',
+        ferramentaId: ferramenta.id,
+        dadosOriginais: ferramenta,
+        dadosEditados: editData,
+        errorType: error.constructor.name,
+        errorStack: error.stack,
+        apiExists: !!Api.updateFerramenta,
+        apiMethods: Object.keys(Api)
+      });
+      
+      setErro(errorMessage);
+      
+      // Também mostra o erro em um alert para facilitar visualização
+      alert(`❌ ${errorMessage}\n\nVerifique o console (F12) para mais detalhes técnicos.`);
+      
     } finally {
       setSaving(false);
     }
