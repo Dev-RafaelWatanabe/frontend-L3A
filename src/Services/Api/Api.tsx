@@ -118,7 +118,11 @@ export const Api = {
     api.post('/api/alocacoes/', data),
 
   // Lista todas as alocações
-  getAlocacoes: () => api.get('/api/alocacoes/'),
+  getAlocacoes: (params?: PaginacaoParams) => {
+    console.log('🔍 Buscando alocações com parâmetros:', params);
+    const queryParams = params ? `?skip=${params.skip}` : '';
+    return api.get(`/alocacoes/${queryParams}`);
+  },
 
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
 

@@ -151,3 +151,12 @@ export interface AlocarFormData {
   funcionarioId?: string;
   ferramenta_nome: string;
 }
+
+export interface Alocacao {
+  id: number;
+  ferramenta_nome: string;
+  obra_nome: string;
+  data_alocacao?: string;
+  observacao?: string;
+  responsavel?: string;
+}
