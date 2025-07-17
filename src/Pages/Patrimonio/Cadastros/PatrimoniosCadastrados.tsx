@@ -1,4 +1,5 @@
-import React, { useRef, useState} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../../Database/Components/DataTable';
 import type { 
@@ -24,7 +25,39 @@ export const PatrimonioDB: React.FC = () => {
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
   const paginacaoRef = useRef<PaginacaoRef>(null);
+  const location = useLocation();
 
+  // Hook para detectar mudança de rota e forçar refresh
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const previousPath = sessionStorage.getItem('patrimonio_previousPath');
+      const currentPath = location.pathname;
+
+      if (previousPath && previousPath !== currentPath) {
+        // Verifica se mudou de seção dentro de patrimônio
+        const previousSection = previousPath.split('/')[2];
+        const currentSection = currentPath.split('/')[2];
+
+        if (previousSection !== currentSection && 
+            ['alocacao', 'cadastros', 'cadastrar'].includes(previousSection) &&
+            ['alocacao', 'cadastros', 'cadastrar'].includes(currentSection)) {
+          
+          console.log('🔄 Forçando refresh devido a mudança de seção:', {
+            from: previousSection,
+            to: currentSection
+          });
+          
+          // Limpa cache e força refresh
+          sessionStorage.removeItem('patrimonio_cache');
+          window.location.reload();
+        }
+      }
+
+      sessionStorage.setItem('patrimonio_previousPath', currentPath);
+    };
+
+    handleRouteChange();
+  }, [location]);
 
   // Função para deletar patrimônio
   const handleDelete = async (id: number) => {
@@ -33,6 +66,9 @@ export const PatrimonioDB: React.FC = () => {
     try {
       await Api.deleteFerramenta(id);
       alert('Patrimônio excluído com sucesso!');
+      
+      // Limpa cache antes de recarregar
+      sessionStorage.removeItem('patrimonio_cache');
       window.location.reload();
     } catch (error) {
       alert('Erro ao excluir patrimônio. Tente novamente.');
@@ -120,10 +156,14 @@ export const PatrimonioDB: React.FC = () => {
     }
   ];
 
-  // Função fetchData OTIMIZADA (sem logs excessivos)
+  // Função fetchData com limpeza de cache
   const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Ferramenta>> => {
     try {
+      console.log('🔍 Buscando patrimônios...');
       const response = await Api.getFerramentas(params);
+      
+      console.log('✅ Patrimônios recebidos:', response.data);
+      
       return {
         data: response.data || [],
         total: response.data?.length || 0
@@ -135,6 +175,10 @@ export const PatrimonioDB: React.FC = () => {
   };
 
   const handleDataChange = (newData: Ferramenta[], isLoading: boolean) => {
+    console.log('📊 Dados alterados:', { 
+      count: newData.length, 
+      loading: isLoading 
+    });
     setData(newData);
     setLoading(isLoading);
   };
@@ -143,13 +187,17 @@ export const PatrimonioDB: React.FC = () => {
     <Container>
       <Title>Patrimônio</Title>
       <TableContainer>        
-        {data.length > 0 ? (
+        {loading ? (
+          <EmptyStateContainer>
+            <span>Carregando dados...</span>
+          </EmptyStateContainer>
+        ) : data.length > 0 ? (
           <DataContainer>
             <DataTable data={data} columns={columns} />
           </DataContainer>
         ) : (
           <EmptyStateContainer>
-            <span>{loading ? 'Carregando dados...' : 'Nenhum patrimônio encontrado'}</span>
+            <span>Nenhum patrimônio encontrado</span>
           </EmptyStateContainer>
         )}
       </TableContainer>

@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
-import { DataTable } from '../../Database/Components/DataTable';
+import { AlocacaoDataTable } from './AlocacaoDataTable';
+import { CriarAlocacaoModal } from './CriarAlocacaoModal';
 import { IoIosAddCircleOutline, IoIosRemoveCircleOutline } from "react-icons/io";
 import { MdOutlineDelete } from "react-icons/md";
+import { FaPlus } from "react-icons/fa";
 import type { 
   PaginacaoParams, 
   PaginacaoRef,
@@ -24,21 +27,56 @@ import {
   DataContainer,
   ActionButton,
   ActionButtonsContainer,
-  SearchContainer
+  SearchContainer,
+  HeaderContainer,
+  CreateButton
 } from './Styles';
 import { PaginacaoComponent } from '../Cadastros/Components/Pagination';
 
-export const AlocarPatrimonio: React.FC = () => {
+export const AlocacaoPatrimonio: React.FC = () => {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [obras, setObras] = useState<Obra[]>([]);
   const [ferramentas, setFerramentas] = useState<any[]>([]);
+  const [showModal, setShowModal] = useState(false);
   
   // Estados para filtros
   const [filtroObra, setFiltroObra] = useState('');
   const [filtroFerramenta, setFiltroFerramenta] = useState('');
   
   const paginacaoRef = useRef<PaginacaoRef>(null);
+  const location = useLocation();
+
+  // Hook para detectar mudança de rota e forçar refresh
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const previousPath = sessionStorage.getItem('patrimonio_previousPath');
+      const currentPath = location.pathname;
+
+      if (previousPath && previousPath !== currentPath) {
+        const previousSection = previousPath.split('/')[2];
+        const currentSection = currentPath.split('/')[2];
+
+        if (previousSection !== currentSection && 
+            ['alocacao', 'cadastros', 'cadastrar'].includes(previousSection) &&
+            ['alocacao', 'cadastros', 'cadastrar'].includes(currentSection)) {
+          
+          console.log('🔄 Forçando refresh devido a mudança de seção:', {
+            from: previousSection,
+            to: currentSection
+          });
+          
+          // Limpa cache e força refresh
+          sessionStorage.removeItem('patrimonio_cache');
+          window.location.reload();
+        }
+      }
+
+      sessionStorage.setItem('patrimonio_previousPath', currentPath);
+    };
+
+    handleRouteChange();
+  }, [location]);
 
   useEffect(() => {
     // Carregar dados para os filtros
@@ -58,17 +96,28 @@ export const AlocarPatrimonio: React.FC = () => {
     loadFilterData();
   }, []);
 
-  // Funções dos botões (apenas console.log conforme solicitado)
-  const handleAlocar = (alocacao: Alocacao) => {
-    console.log('ferramenta foi alocada', alocacao);
-  };
-
+  // Funções dos botões
   const handleDesalocar = (alocacao: Alocacao) => {
     console.log('ferramenta foi desalocada', alocacao);
   };
 
   const handleDeletar = (alocacao: Alocacao) => {
     console.log('alocação deletada', alocacao);
+  };
+
+  const handleCriarAlocacao = () => {
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+  };
+
+  const handleModalSuccess = () => {
+    // Recarrega os dados após criar alocação
+    if (paginacaoRef.current) {
+      paginacaoRef.current.reloadData();
+    }
   };
 
   // Função para buscar alocações
@@ -94,8 +143,12 @@ export const AlocarPatrimonio: React.FC = () => {
     }
   };
 
-  // Colunas da tabela
+  // Colunas da tabela atualizadas
   const columns = [
+    { 
+      key: 'id', 
+      label: 'Nº' 
+    },
     { 
       key: 'ferramenta_nome', 
       label: 'Ferramenta/Patrimônio' 
@@ -103,6 +156,11 @@ export const AlocarPatrimonio: React.FC = () => {
     { 
       key: 'obra_nome', 
       label: 'Centro de Custo/Obra' 
+    },
+    { 
+      key: 'funcionario_nome', 
+      label: 'Funcionário',
+      render: (value: string) => value || '-'
     },
     { 
       key: 'data_alocacao', 
@@ -117,14 +175,16 @@ export const AlocarPatrimonio: React.FC = () => {
       }
     },
     { 
-      key: 'observacao', 
-      label: 'Observação',
-      render: (value: string) => value || '-'
-    },
-    { 
-      key: 'responsavel', 
-      label: 'Responsável',
-      render: (value: string) => value || '-'
+      key: 'data_desalocacao', 
+      label: 'Data Desalocação',
+      render: (value: string) => {
+        if (!value) return '-';
+        try {
+          return new Date(value).toLocaleDateString('pt-BR');
+        } catch {
+          return value;
+        }
+      }
     },
     {
       key: 'actions',
@@ -132,18 +192,11 @@ export const AlocarPatrimonio: React.FC = () => {
       render: (_: any, row: Alocacao) => (
         <ActionButtonsContainer>
           <ActionButton
-            color="#28a745"
-            title="Alocar ferramenta"
-            onClick={() => handleAlocar(row)}
-          >
-            <IoIosAddCircleOutline />
-          </ActionButton>
-          <ActionButton
             color="#ffc107"
             title="Desalocar ferramenta"
             onClick={() => handleDesalocar(row)}
           >
-            <IoIosRemoveCircleOutline />
+            Desalocar Ferramenta
           </ActionButton>
           <ActionButton
             color="#dc3545"
@@ -187,7 +240,14 @@ export const AlocarPatrimonio: React.FC = () => {
 
   return (
     <Container>
-      <Title>Alocações de Patrimônio</Title>
+      {/* Header com título e botão criar */}
+      <HeaderContainer>
+        <Title>Alocações</Title>
+        <CreateButton onClick={handleCriarAlocacao}>
+          <FaPlus />
+          Criar Alocação
+        </CreateButton>
+      </HeaderContainer>
       
       {/* Formulário de Busca */}
       <SearchContainer>
@@ -240,7 +300,7 @@ export const AlocarPatrimonio: React.FC = () => {
           </EmptyStateContainer>
         ) : alocacoes.length > 0 ? (
           <DataContainer>
-            <DataTable data={alocacoes} columns={columns} />
+            <AlocacaoDataTable data={alocacoes} columns={columns} />
           </DataContainer>
         ) : (
           <EmptyStateContainer>
@@ -254,6 +314,13 @@ export const AlocarPatrimonio: React.FC = () => {
         fetchData={fetchData}
         itemsPerPage={20}
         onDataChange={handleDataChange}
+      />
+
+      {/* Modal de Criar Alocação */}
+      <CriarAlocacaoModal
+        isOpen={showModal}
+        onClose={handleModalClose}
+        onSuccess={handleModalSuccess}
       />
     </Container>
   );

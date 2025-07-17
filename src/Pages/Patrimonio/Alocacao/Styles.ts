@@ -4,10 +4,45 @@ export const Container = styled.div`
   padding: 20px;
 `;
 
-export const Title = styled.h1`
+export const HeaderContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+`;
+
+export const Title = styled.h1`
+  margin: 0;
   color: rgba(0, 0, 0, 0.94);
   font-size: 2rem;
+`;
+
+export const CreateButton = styled.button`
+  padding: 12px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  svg {
+    font-size: 16px;
+  }
 `;
 
 export const SearchContainer = styled.div`
@@ -77,15 +112,6 @@ export const Input = styled.input`
   }
 `;
 
-export const TextArea = styled.textarea`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  resize: vertical;
-`;
-
 export const ButtonGroup = styled.div`
   display: flex;
   gap: 10px;
@@ -112,7 +138,8 @@ export const ActionButton = styled.button<{ color?: string }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-width: 44px;
+  min-width: 100px; /* Largura mínima para igualar os botões */
+  height: 40px; /* Altura fixa para uniformidade */
   
   &:hover {
     opacity: 0.9;

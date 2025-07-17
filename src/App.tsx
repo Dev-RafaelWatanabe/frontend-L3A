@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './Style/Components/Sidebar/index';
 import { Dashboard } from './Pages/Dashboard/Dashboard';
@@ -10,8 +11,15 @@ import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/CadastrarPatrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
-import { AlocarPatrimonio } from './Pages/Patrimonio/Alocacao/AlocarPatrimonio';
+import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
 import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/PatrimonioDetalhe';
+import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
+
+// Componente wrapper para aplicar o hook
+const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useRouteRefresh();
+  return <>{children}</>;
+};
 
 function App() {
   const menuItems = [
@@ -55,7 +63,7 @@ function App() {
       subItems: [
         { id: 'patri1', label: 'Cadastrar Patrimônio', path: '/patrimonio/cadastrar' },
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
-        { id: 'patri3', label: 'Alocar Patrimônio', path: '/patrimonio/alocar' }
+        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocar' }
       ]
     }
   ];
@@ -77,7 +85,7 @@ function App() {
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
           <Route path="/patrimonio/cadastrar" element={<CadastrarPatrimonio />} />
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
-          <Route path="/patrimonio/alocar" element={<AlocarPatrimonio />} />
+          <Route path="/patrimonio/alocar" element={<AlocacaoPatrimonio />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
@@ -90,7 +98,9 @@ function App() {
 export function AppWrapper() {
   return (
     <Router>
-      <App />
+      <AppWithRouteRefresh>
+        <App />
+      </AppWithRouteRefresh>
     </Router>
   );
 }

@@ -114,14 +114,22 @@ export const Api = {
       });
   },
 
-  createAlocacao: (data: { ferramenta_nome: string; obra_nome: string }) =>
-    api.post('/api/alocacoes/', data),
+  createAlocacao: (data: {
+    ferramenta_nome: string;
+    obra_nome: string;
+    funcionario_nome?: string;
+    observacao?: string;
+    data_alocacao: string;
+  }) => {
+    console.log('📦 Criando alocação:', data);
+    return api.post('/alocacoes/', data);
+  },
 
   // Lista todas as alocações
   getAlocacoes: (params?: PaginacaoParams) => {
     console.log('🔍 Buscando alocações com parâmetros:', params);
     const queryParams = params ? `?skip=${params.skip}` : '';
-    return api.get(`/alocacoes/${queryParams}`);
+    return api.get(`/api/alocacoes/${queryParams}`);
   },
 
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),

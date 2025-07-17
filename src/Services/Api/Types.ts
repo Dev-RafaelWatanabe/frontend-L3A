@@ -156,7 +156,8 @@ export interface Alocacao {
   id: number;
   ferramenta_nome: string;
   obra_nome: string;
-  data_alocacao?: string;
+  funcionario_nome: string;
+  data_alocacao: string;
+  data_desalocacao?: string;
   observacao?: string;
-  responsavel?: string;
 }
