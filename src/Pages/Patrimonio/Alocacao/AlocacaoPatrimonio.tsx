@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
 import { AlocacaoDataTable } from './AlocacaoDataTable';
 import { CriarAlocacaoModal } from './CriarAlocacaoModal';
-import { IoIosAddCircleOutline, IoIosRemoveCircleOutline } from "react-icons/io";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import type { 
@@ -159,7 +158,7 @@ export const AlocacaoPatrimonio: React.FC = () => {
     },
     { 
       key: 'funcionario_nome', 
-      label: 'Funcionário',
+      label: 'Responsável',
       render: (value: string) => value || '-'
     },
     { 

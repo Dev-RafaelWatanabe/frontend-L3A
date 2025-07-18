@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  padding: 20px;
+  padding: 10px;
 `;
 
 export const HeaderContainer = styled.div`
@@ -47,7 +47,7 @@ export const CreateButton = styled.button`
 
 export const SearchContainer = styled.div`
   background: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   margin-bottom: 20px;
@@ -55,7 +55,7 @@ export const SearchContainer = styled.div`
 
 export const TableContainer = styled.div`
   background: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   margin-bottom: 20px;
@@ -64,12 +64,12 @@ export const TableContainer = styled.div`
 export const FormContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr auto;
-  gap: 20px;
+  gap: 10px;
   align-items: end;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 10px;
   }
 `;
 
@@ -115,14 +115,6 @@ export const Input = styled.input`
 export const ButtonGroup = styled.div`
   display: flex;
   gap: 10px;
-  
-  @media (max-width: 768px) {
-    justify-content: stretch;
-    
-    button {
-      flex: 1;
-    }
-  }
 `;
 
 export const ActionButton = styled.button<{ color?: string }>`

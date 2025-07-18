@@ -114,15 +114,8 @@ export const Api = {
       });
   },
 
-  createAlocacao: (data: {
-    ferramenta_nome: string;
-    obra_nome: string;
-    funcionario_nome?: string;
-    observacao?: string;
-    data_alocacao: string;
-  }) => {
-    console.log('📦 Criando alocação:', data);
-    return api.post('/alocacoes/', data);
+  createAlocacao: (data: { ferramenta_nome: string; obra_nome: string; funcionario_nome?: string }) => {
+    return api.post('/api/alocacoes/', data);
   },
 
   // Lista todas as alocações

@@ -9,6 +9,11 @@ export const SidebarContainer = styled.div`
   top: 0;
   padding: 20px;
   color: #fff;
+  transition: width 0.2s;
+
+  @media (max-width: 1366px), (max-height: 768px) {
+    width: 200px;
+  }
 `;
 
 export const SidebarLogo = styled.div`

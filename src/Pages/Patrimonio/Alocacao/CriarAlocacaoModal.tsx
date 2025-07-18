@@ -200,13 +200,12 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validações
+
+    // Validação dos campos obrigatórios
     if (!formData.ferramenta_id) {
       setError('Selecione uma ferramenta');
       return;
     }
-    
     if (!formData.obra_id) {
       setError('Selecione uma obra');
       return;
@@ -221,25 +220,20 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
       const obraSelecionada = obras.find(o => o.id === Number(formData.obra_id));
       const funcionarioSelecionado = funcionarios.find(f => f.id === Number(formData.funcionario_id));
 
+      // Monta o payload conforme o backend espera
       const payload = {
         ferramenta_nome: ferramentaSelecionada?.nome || '',
         obra_nome: obraSelecionada?.nome || '',
-        funcionario_nome: funcionarioSelecionado?.nome || '',
-        observacao: formData.observacao || '',
-        data_alocacao: new Date().toISOString().split('T')[0] // Data atual
+        funcionario_nome: funcionarioSelecionado?.nome || ''
       };
 
-      console.log('📦 Criando alocação:', payload);
-
-      // Chama a API para criar a alocação
+      // Chama o endpoint POST /api/alocacoes/
       await Api.createAlocacao(payload);
 
-      console.log('✅ Alocação criada com sucesso!');
-      
       alert('Alocação criada com sucesso!');
       onSuccess();
       handleClose();
-      
+
     } catch (error) {
       console.error('Erro ao criar alocação:', error);
       setError('Erro ao criar alocação. Tente novamente.');
