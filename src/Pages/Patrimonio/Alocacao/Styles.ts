@@ -63,35 +63,37 @@ export const TableContainer = styled.div`
 
 export const FormContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 120px 120px;
   gap: 10px;
   align-items: end;
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 10px;
   }
 `;
 
 export const FormField = styled.div`
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
 
 export const Label = styled.label`
+  display: block;
+  margin-bottom: 4px;
   font-weight: 600;
   color: #333;
   font-size: 14px;
 `;
 
 export const Select = styled.select`
+  width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   background: white;
-  
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -104,7 +106,21 @@ export const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
-  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
   &:focus {
     outline: none;
     border-color: #007bff;
@@ -114,7 +130,42 @@ export const Input = styled.input`
 
 export const ButtonGroup = styled.div`
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+`;
+
+export const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  ${props => props.variant === 'primary' ? `
+    background: #007bff;
+    color: white;
+    &:hover {
+      background: #0056b3;
+    }
+  ` : `
+    background: #6c757d;
+    color: white;
+    &:hover {
+      background: #545b62;
+    }
+  `}
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+export const ErrorMessage = styled.div`
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 4px;
 `;
 
 export const ActionButton = styled.button<{ color?: string }>`
@@ -130,8 +181,8 @@ export const ActionButton = styled.button<{ color?: string }>`
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-width: 100px; /* Largura mínima para igualar os botões */
-  height: 40px; /* Altura fixa para uniformidade */
+  min-width: 80px;
+  height: 40px;
   
   &:hover {
     opacity: 0.9;
@@ -170,7 +221,6 @@ export const DataContainer = styled.div`
   flex-direction: column;
 `;
 
-// Botões antigos mantidos para compatibilidade (se necessário)
 export const AlocarButton = styled(ActionButton)`
   background: rgba(8, 1, 104, 0.94);
   width: 100%;
@@ -186,5 +236,54 @@ export const LimparButton = styled(ActionButton)`
 
   &:hover {
     background: #c82333;
+  }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const ModalContent = styled.div`
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+`;
+
+export const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+`;
+
+export const ModalTitle = styled.h2`
+  margin: 0;
+  color: #333;
+`;
+
+export const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  &:hover {
+    color: #333;
   }
 `;

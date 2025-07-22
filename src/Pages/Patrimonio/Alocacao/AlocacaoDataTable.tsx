@@ -28,9 +28,10 @@ const Th = styled.th`
 `;
 
 const Td = styled.td`
-  padding: 12px;
+  padding: 6px;
   text-align: center; /* Conteúdo centralizado */
   border-bottom: 1px solid #dee2e6;
+  border-right: 1px solid #dee2e6;
   color: #495057;
 `;
 

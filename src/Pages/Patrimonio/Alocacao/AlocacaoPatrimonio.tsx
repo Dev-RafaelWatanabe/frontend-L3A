@@ -192,14 +192,16 @@ export const AlocacaoPatrimonio: React.FC = () => {
         <ActionButtonsContainer>
           <ActionButton
             color="#ffc107"
-            title="Desalocar ferramenta"
+            title="Desalocar"
+            style={{ minWidth: '80px', maxWidth: '100px', padding: '8px 10px'}}
             onClick={() => handleDesalocar(row)}
           >
-            Desalocar Ferramenta
+            Desalocar
           </ActionButton>
           <ActionButton
             color="#dc3545"
             title="Deletar alocação"
+            style={{ minWidth: '80px', maxWidth: '100px', padding: '8px 10px'}}
             onClick={() => handleDeletar(row)}
           >
             <MdOutlineDelete />
@@ -263,31 +265,32 @@ export const AlocacaoPatrimonio: React.FC = () => {
               ))}
             </Select>
           </FormField>
-
           <FormField>
             <Label>Ferramenta/Patrimônio:</Label>
-            <Input
-              type="text"
-              placeholder="Nome da ferramenta..."
-              value={filtroFerramenta}
+            <Select 
+              value={filtroFerramenta} 
               onChange={(e) => setFiltroFerramenta(e.target.value)}
-            />
+            >
+              <option value="">Todas as ferramentas</option>
+              {ferramentas.map((ferramenta) => (
+                <option key={ferramenta.id} value={ferramenta.nome}>{ferramenta.nome}</option>
+              ))}
+            </Select>
           </FormField>
-
-          <ButtonGroup>
-            <ActionButton
-              color="#007bff"
-              onClick={handleBuscar}
-            >
-              Buscar
-            </ActionButton>
-            <ActionButton
-              color="#6c757d"
-              onClick={handleLimparFiltros}
-            >
-              Limpar
-            </ActionButton>
-          </ButtonGroup>
+          <ActionButton
+            color="#007bff"
+            onClick={handleBuscar}
+            style={{ height: 40, marginBottom: '16px'}}
+          >
+            Buscar
+          </ActionButton>
+          <ActionButton
+            color="#6c757d"
+            onClick={handleLimparFiltros}
+            style={{ height: 40, marginBottom: '16px' }}
+          >
+            Limpar
+          </ActionButton>
         </FormContainer>
       </SearchContainer>
 
