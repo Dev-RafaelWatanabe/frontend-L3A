@@ -149,6 +149,10 @@ export const Api = {
 
     return Api.updateFerramenta(ferramenta.id, payload);
 },
+
+  desalocarAlocacao: (alocacaoId: number) => {
+    return api.post(`/api/alocacoes/${alocacaoId}/desalocar`);
+  },
 };
 
 export default Api;

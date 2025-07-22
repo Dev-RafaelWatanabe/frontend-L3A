@@ -98,15 +98,43 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
       const obraSelecionada = obras.find(o => o.id === Number(formData.obra_id));
       const funcionarioSelecionado = funcionarios.find(f => f.id === Number(formData.funcionario_id));
 
-      // Monta o payload conforme o backend espera
-      const payload = {
-        ferramenta_nome: ferramentaSelecionada?.nome || '',
-        obra_nome: obraSelecionada?.nome || '',
-        funcionario_nome: funcionarioSelecionado?.nome || ''
+      // ✅ VALIDAÇÃO ADICIONAL - NÃO PERMITA OBJETOS UNDEFINED
+      if (!ferramentaSelecionada) {
+        setError('Ferramenta selecionada inválida');
+        return;
+      }
+      if (!obraSelecionada) {
+        setError('Obra selecionada inválida');
+        return;
+      }
+
+      // ✅ MONTA O PAYLOAD CORRETAMENTE
+      const payload: {
+        ferramenta_nome: string;
+        obra_nome: string;
+        funcionario_nome: string;  // Sempre string, mesmo que vazia
+      } = {
+        ferramenta_nome: ferramentaSelecionada.nome,
+        obra_nome: obraSelecionada.nome,
+        funcionario_nome: funcionarioSelecionado ? funcionarioSelecionado.nome : ''  // String vazia se não selecionado
       };
 
-      // Chama o endpoint POST /api/alocacoes/
+      console.log('📤 Payload enviado:', payload);  // ✅ DEBUG
+
+      // Cria a alocação
       await Api.createAlocacao(payload);
+
+      // Resto do código permanece igual...
+      if (ferramentaSelecionada && obraSelecionada) {
+        await Api.updateFerramenta(ferramentaSelecionada.id, {
+          nome: ferramentaSelecionada.nome,
+          obra_id: obraSelecionada.id,
+          situacao_id: typeof ferramentaSelecionada.situacao === 'object'
+            ? ferramentaSelecionada.situacao.id
+            : ferramentaSelecionada.situacao,
+          valor: ferramentaSelecionada.valor
+        });
+      }
 
       alert('Alocação criada com sucesso!');
       onSuccess();

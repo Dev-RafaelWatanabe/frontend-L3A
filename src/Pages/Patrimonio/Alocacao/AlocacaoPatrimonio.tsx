@@ -96,8 +96,16 @@ export const AlocacaoPatrimonio: React.FC = () => {
   }, []);
 
   // Funções dos botões
-  const handleDesalocar = (alocacao: Alocacao) => {
-    console.log('ferramenta foi desalocada', alocacao);
+  const handleDesalocar = async (alocacao: Alocacao) => {
+    if (!window.confirm('Tem certeza que deseja desalocar esta ferramenta?')) return;
+    try {
+      await Api.desalocarAlocacao(alocacao.id);
+      alert('Ferramenta desalocada com sucesso!');
+      if (paginacaoRef.current) paginacaoRef.current.reloadData();
+    } catch (error) {
+      alert('Erro ao desalocar ferramenta. Tente novamente.');
+      console.error('Erro ao desalocar:', error);
+    }
   };
 
   const handleDeletar = (alocacao: Alocacao) => {
