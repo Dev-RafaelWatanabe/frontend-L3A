@@ -34,6 +34,7 @@ import { PaginacaoComponent } from '../Cadastros/Components/Pagination';
 
 export const AlocacaoPatrimonio: React.FC = () => {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
+  const [todasAlocacoes, setTodasAlocacoes] = useState<Alocacao[]>([]); // Novo estado para todas as alocações
   const [loading, setLoading] = useState(true);
   const [obras, setObras] = useState<Obra[]>([]);
   const [ferramentas, setFerramentas] = useState<any[]>([]);
@@ -108,8 +109,16 @@ export const AlocacaoPatrimonio: React.FC = () => {
     }
   };
 
-  const handleDeletar = (alocacao: Alocacao) => {
-    console.log('alocação deletada', alocacao);
+  const handleDeletar = async (alocacao: Alocacao) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta alocação? Esta ação não poderá ser desfeita!')) return;
+    try {
+      await Api.deleteAlocacao(alocacao.id); // Consome o endpoint /alocacao/{alocacao_id}
+      alert('Alocação excluída com sucesso!');
+      if (paginacaoRef.current) paginacaoRef.current.reloadData();
+    } catch (error) {
+      alert('Erro ao excluir alocação. Tente novamente.');
+      console.error('Erro ao excluir alocação:', error);
+    }
   };
 
   const handleCriarAlocacao = () => {
@@ -127,27 +136,83 @@ export const AlocacaoPatrimonio: React.FC = () => {
     }
   };
 
-  // Função para buscar alocações
+  // Função para aplicar filtros
+  const aplicarFiltros = (alocacoesOriginais: Alocacao[]) => {
+    let alocacoesFiltradas = [...alocacoesOriginais];
+
+    // Filtro por obra
+    if (filtroObra) {
+      alocacoesFiltradas = alocacoesFiltradas.filter(alocacao => 
+        alocacao.obra_nome?.toLowerCase().includes(filtroObra.toLowerCase())
+      );
+    }
+
+    // Filtro por ferramenta
+    if (filtroFerramenta) {
+      alocacoesFiltradas = alocacoesFiltradas.filter(alocacao => 
+        alocacao.ferramenta_nome?.toLowerCase().includes(filtroFerramenta.toLowerCase())
+      );
+    }
+
+    return alocacoesFiltradas;
+  };
+
+  // Função fetchData modificada para suportar filtros
+  const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Alocacao>> => {
+    try {
+      console.log('🔄 Buscando alocações...');
+      const response = await Api.getAlocacoes(params);
+      
+      console.log('✅ Alocações recebidas:', response.data);
+      
+      const todasAlocacoesDados = response.data || [];
+      setTodasAlocacoes(todasAlocacoesDados); // Armazena todas as alocações
+      
+      // Aplica filtros
+      const alocacoesFiltradas = aplicarFiltros(todasAlocacoesDados);
+      
+      return {
+        data: alocacoesFiltradas,
+        total: alocacoesFiltradas.length
+      };
+    } catch (error) {
+      console.error('❌ API: Erro ao buscar alocações:', error);
+      
+      return {
+        data: [],
+        total: 0
+      };
+    }
+  };
+
+  // Função para buscar alocações (acionada pelo botão Buscar)
   const handleBuscar = () => {
-    console.log('Buscando alocações com filtros:', {
+    console.log('🔍 Aplicando filtros:', {
       obra: filtroObra,
       ferramenta: filtroFerramenta
     });
     
-    // Recarregar dados com filtros
-    if (paginacaoRef.current) {
-      paginacaoRef.current.reloadData();
-    }
+    // Aplica filtros nas alocações já carregadas
+    const alocacoesFiltradas = aplicarFiltros(todasAlocacoes);
+    setAlocacoes(alocacoesFiltradas);
+    
+    // Se quiser recarregar do servidor e depois filtrar
+    // if (paginacaoRef.current) {
+    //   paginacaoRef.current.reloadData();
+    // }
   };
 
   const handleLimparFiltros = () => {
     setFiltroObra('');
     setFiltroFerramenta('');
     
-    // Recarregar dados sem filtros
-    if (paginacaoRef.current) {
-      paginacaoRef.current.reloadData();
-    }
+    // Mostra todas as alocações novamente
+    setAlocacoes(todasAlocacoes);
+    
+    // Ou recarrega do servidor
+    // if (paginacaoRef.current) {
+    //   paginacaoRef.current.reloadData();
+    // }
   };
 
   // Colunas da tabela atualizadas
@@ -218,29 +283,6 @@ export const AlocacaoPatrimonio: React.FC = () => {
       )
     }
   ];
-
-  // Função fetchData para a paginação
-  const fetchData = async (params: PaginacaoParams): Promise<PaginacaoResponse<Alocacao>> => {
-    try {
-      console.log('🔄 Buscando alocações...');
-      const response = await Api.getAlocacoes(params);
-      
-      console.log('✅ Alocações recebidas:', response.data);
-      
-      return {
-        data: response.data || [],
-        total: response.data?.length || 0
-      };
-    } catch (error) {
-      console.error('❌ API: Erro ao buscar alocações:', error);
-      
-      // Retorna dados vazios em caso de erro para não quebrar a interface
-      return {
-        data: [],
-        total: 0
-      };
-    }
-  };
 
   const handleDataChange = (newData: Alocacao[], isLoading: boolean) => {
     setAlocacoes(newData);

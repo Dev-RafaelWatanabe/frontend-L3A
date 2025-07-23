@@ -36,35 +36,17 @@ export const Api = {
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
 
-  getLancamentos: () => {
-    console.log('Chamando getLancamentos');
-    return api.get('/lancamento/').then(response => {
-      console.log('Resposta getLancamentos:', response);
-      return response;
-    }).catch(error => {
-      console.error('Erro getLancamentos:', error);
-      throw error;
-    });
-  },
-
   getFerramentas: (params?: PaginacaoParams) => {
     console.log('📡 getFerramentas chamado com params:', params);
     
     // URL completa para debug
     const url = '/ferramentas/';
     return api.get(url, { 
-    // esse é a "padronização de paramentros utilizados anteriormente, porém, isso fazia com a limitação de dados padrões fossem atendidas{ ...params, _t: Date.now() }
       params: { 
-      skip: params?.skip || 0,
-      limit: 50000,
-      _t: Date.now() 
-    }  
-    }).then(response => {
-      console.log('📦 Resposta getFerramentas:', response);
-      return response;
-    }).catch(error => {
-      console.error('❌ Erro getFerramentas:', error);
-      throw error;
+        skip: params?.skip || 0,
+        limit: 50000,
+        _t: Date.now() 
+      }  
     });
   },
   
@@ -83,50 +65,21 @@ export const Api = {
     });
   },
 
-  createLancamento: (data: {
-    funcionario_id: number;
-    obra_id: number;
-    data_trabalho: string;
-    is_planejamento?: boolean;
-  }) => {
-    // Formata os dados antes de enviar
-    const formattedData = {
-      funcionario: data.funcionario_id,  // Mudando para 'funcionario'
-      obra: data.obra_id,        // Mudando para 'obra'
-      data_trabalho: data.data_trabalho,
-      is_planejamento: data.is_planejamento || false
-    };
-
-    console.log('Enviando dados formatados para API:', formattedData);
-    
-    return api.post('/lancamento/', formattedData)
-      .then(response => {
-        console.log('Resposta createLancamento:', response);
-        return response;
-      })
-      .catch(error => {
-        console.error('Erro detalhado:', {
-          message: error.message,
-          status: error.response?.status,
-          data: error.response?.data,
-          sentData: formattedData
-        });
-        throw error;
-      });
-  },
-
   createAlocacao: (data: { ferramenta_nome: string; obra_nome: string; funcionario_nome?: string }) => {
-    return api.post('/api/alocacoes/', data);
+    // ALTERADO para novo endpoint
+    return api.post('/alocacao/por-nome', data);
   },
 
   // Lista todas as alocações
   getAlocacoes: (params?: PaginacaoParams) => {
-    console.log('🔍 Buscando alocações com parâmetros:', params);
+    // ALTERADO para novo endpoint
     const queryParams = params ? `?skip=${params.skip}` : '';
-    return api.get(`/api/alocacoes/${queryParams}`);
+    return api.get(`/alocacao/${queryParams}`);
   },
 
   deleteFerramenta: (id: number) => api.delete(`/ferramentas/${id}`),
+
+  deleteAlocacao: (id: number) => api.delete(`/alocacao/${id}`),
 
 
   updateFerramenta: (id: number, data: any) =>
@@ -152,7 +105,8 @@ export const Api = {
 },
 
   desalocarAlocacao: (alocacaoId: number) => {
-    return api.post(`/api/alocacoes/${alocacaoId}/desalocar`);
+    // ALTERADO para novo endpoint
+    return api.post(`/alocacao/${alocacaoId}/desalocar`);
   },
 };
 
