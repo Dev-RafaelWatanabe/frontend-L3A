@@ -14,7 +14,7 @@ import {
   ErrorMessage
 } from './Styles';
 import { Api } from '../../../Services/Api/Api';
-import type { Ferramenta, Obra, Funcionario } from '../../../Services/Api/Types';
+import type { Ferramenta, Obra, Funcionario, Situacao } from '../../../Services/Api/Types';
 
 interface CriarAlocacaoModalProps {
   isOpen: boolean;
@@ -30,6 +30,7 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
   const [ferramentas, setFerramentas] = useState<Ferramenta[]>([]);
   const [obras, setObras] = useState<Obra[]>([]);
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
+  const [situacoes, setSituacoes] = useState<Situacao[]>([]); // Novo estado
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +38,7 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
     ferramenta_id: '',
     obra_id: '',
     funcionario_id: '',
+    situacao_id: '', // Novo campo
     observacao: ''
   });
 
@@ -49,15 +51,17 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
   const loadData = async () => {
     try {
       setLoading(true);
-      const [ferramentasRes, obrasRes, funcionariosRes] = await Promise.all([
+      const [ferramentasRes, obrasRes, funcionariosRes, situacoesRes] = await Promise.all([
         Api.getFerramentas(),
         Api.getObras(),
-        Api.getFuncionarios()
+        Api.getFuncionarios(),
+        Api.getSituacoes() // Busca situações
       ]);
 
       setFerramentas(ferramentasRes.data || []);
       setObras(obrasRes.data || []);
       setFuncionarios(funcionariosRes.data || []);
+      setSituacoes(situacoesRes.data || []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
       setError('Erro ao carregar dados. Tente novamente.');
@@ -88,17 +92,20 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
       setError('Selecione uma obra');
       return;
     }
+    if (!formData.situacao_id) {
+      setError('Selecione uma situação');
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      // Busca os dados completos para enviar
       const ferramentaSelecionada = ferramentas.find(f => f.id === Number(formData.ferramenta_id));
       const obraSelecionada = obras.find(o => o.id === Number(formData.obra_id));
       const funcionarioSelecionado = funcionarios.find(f => f.id === Number(formData.funcionario_id));
+      const situacaoSelecionada = situacoes.find(s => s.id === Number(formData.situacao_id));
 
-      // ✅ VALIDAÇÃO ADICIONAL - NÃO PERMITA OBJETOS UNDEFINED
       if (!ferramentaSelecionada) {
         setError('Ferramenta selecionada inválida');
         return;
@@ -107,34 +114,28 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
         setError('Obra selecionada inválida');
         return;
       }
+      if (!situacaoSelecionada) {
+        setError('Situação selecionada inválida');
+        return;
+      }
 
-      // ✅ MONTA O PAYLOAD CORRETAMENTE
-      const payload: {
-        ferramenta_nome: string;
-        obra_nome: string;
-        funcionario_nome: string;  // Sempre string, mesmo que vazia
-      } = {
+      // Cria alocação
+      const payload = {
         ferramenta_nome: ferramentaSelecionada.nome,
         obra_nome: obraSelecionada.nome,
-        funcionario_nome: funcionarioSelecionado ? funcionarioSelecionado.nome : ''  // String vazia se não selecionado
+        funcionario_nome: funcionarioSelecionado ? funcionarioSelecionado.nome : '',
+        observacao: formData.observacao
       };
 
-      console.log('📤 Payload enviado:', payload);  // ✅ DEBUG
-
-      // Cria a alocação
       await Api.createAlocacao(payload);
 
-      // Resto do código permanece igual...
-      if (ferramentaSelecionada && obraSelecionada) {
-        await Api.updateFerramenta(ferramentaSelecionada.id, {
-          nome: ferramentaSelecionada.nome,
-          obra_id: obraSelecionada.id,
-          situacao_id: typeof ferramentaSelecionada.situacao === 'object'
-            ? ferramentaSelecionada.situacao.id
-            : ferramentaSelecionada.situacao,
-          valor: ferramentaSelecionada.valor
-        });
-      }
+      // Atualiza obra e situação da ferramenta
+      await Api.updateFerramenta(ferramentaSelecionada.id, {
+        nome: ferramentaSelecionada.nome,
+        obra_id: obraSelecionada.id,
+        situacao_id: situacaoSelecionada.id,
+        valor: ferramentaSelecionada.valor
+      });
 
       alert('Alocação criada com sucesso!');
       onSuccess();
@@ -153,6 +154,7 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
       ferramenta_id: '',
       obra_id: '',
       funcionario_id: '',
+      situacao_id: '', // Resetando o novo campo
       observacao: ''
     });
     setError(null);
@@ -213,6 +215,22 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
               {funcionarios.map((funcionario) => (
                 <option key={funcionario.id} value={funcionario.id}>
                   {funcionario.nome}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+
+          <FormField>
+            <Label>Situação *</Label>
+            <Select
+              value={formData.situacao_id}
+              onChange={(e) => handleInputChange('situacao_id', e.target.value)}
+              disabled={loading}
+            >
+              <option value="">Selecione uma situação</option>
+              {situacoes.map((situacao) => (
+                <option key={situacao.id} value={situacao.id}>
+                  {situacao.nome}
                 </option>
               ))}
             </Select>
