@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CiEdit } from "react-icons/ci";
 import { Api } from '../../../Services/Api/Api';
-import type { Ferramenta, Marca, Categoria, Situacao, Obra } from '../../../Services/Api/Types';
+import type { Ferramenta, Marca, Categoria, Situacao, Obra, Alocacao } from '../../../Services/Api/Types';
 import {
   CardDetalhe,
   DetalhesContainer,
@@ -21,6 +21,7 @@ import {
   ErroMensagem,
   LoadingContainer
 } from './Styles';
+import { HistoricoTableContainer, HistoricoTable, HistoricoTh, HistoricoTd } from './HistoricoStyles'; // novo import
 
 export const PatrimonioDetalhe: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +47,8 @@ export const PatrimonioDetalhe: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [obras, setObras] = useState<Obra[]>([]);
   const [situacoes, setSituacoes] = useState<Situacao[]>([]);
+  const [historico, setHistorico] = useState<Alocacao[]>([]);
+  const [loadingHistorico, setLoadingHistorico] = useState(false);
 
   useEffect(() => {
     const fetchFerramentaDetails = async () => {
@@ -110,8 +113,23 @@ export const PatrimonioDetalhe: React.FC = () => {
       }
     };
 
+    const fetchHistorico = async () => {
+      if (!id) return;
+      setLoadingHistorico(true);
+      try {
+        const response = await Api.getAlocacaoHistoricoPorFerramenta(Number(id));
+        setHistorico(response.data || []);
+      } catch (error) {
+        setHistorico([]);
+        console.error('Erro ao buscar histórico de alocações:', error);
+      } finally {
+        setLoadingHistorico(false);
+      }
+    };
+
     fetchFerramentaDetails();
     fetchSelectData();
+    fetchHistorico();
   }, [id]);
 
   const handleEdit = () => {
@@ -450,6 +468,36 @@ export const PatrimonioDetalhe: React.FC = () => {
           <Campo><b>Descrição:</b> {ferramenta.descricao || '-'}</Campo>
         </VisualizacaoContainer>
       )}
+
+      <HistoricoTableContainer>
+        <h3>Histórico de Alocações</h3>
+        {loadingHistorico ? (
+          <div>Carregando histórico...</div>
+        ) : historico.length === 0 ? (
+          <div>Nenhum histórico encontrado.</div>
+        ) : (
+          <HistoricoTable>
+            <thead>
+              <tr>
+                <HistoricoTh>Obra</HistoricoTh>
+                <HistoricoTh>Responsável</HistoricoTh>
+                <HistoricoTh>Data Alocação</HistoricoTh>
+                <HistoricoTh>Data Desalocação</HistoricoTh>
+              </tr>
+            </thead>
+            <tbody>
+              {historico.map((aloc) => (
+                <tr key={aloc.id}>
+                  <HistoricoTd>{aloc.obra_nome || '-'}</HistoricoTd>
+                  <HistoricoTd>{aloc.funcionario_nome || '-'}</HistoricoTd>
+                  <HistoricoTd>{aloc.data_alocacao ? new Date(aloc.data_alocacao).toLocaleDateString('pt-BR') : '-'}</HistoricoTd>
+                  <HistoricoTd>{aloc.data_desalocacao ? new Date(aloc.data_desalocacao).toLocaleDateString('pt-BR') : '-'}</HistoricoTd>
+                </tr>
+              ))}
+            </tbody>
+          </HistoricoTable>
+        )}
+      </HistoricoTableContainer>
     </CardDetalhe>
   );
 };

@@ -221,9 +221,9 @@ export const SituacaoBadge = styled.span<{ cor: string; letra: string }>`
 
 // Estilos para página de detalhes
 export const CardDetalhe = styled.div`
-  max-width: 480px;
+  max-width: 900px; // antes era 480px
   margin: 40px auto;
-  padding: 32px;
+  padding: 32px 40px; // mais espaço lateral
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.10);

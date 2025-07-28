@@ -108,6 +108,9 @@ export const Api = {
     // ALTERADO para novo endpoint
     return api.post(`/alocacao/${alocacaoId}/desalocar`);
   },
+
+  getAlocacaoHistoricoPorFerramenta: (ferramentaId: number) =>
+    api.get(`/alocacao/ferramenta/${ferramentaId}/historico`)
 };
 
 export default Api;
