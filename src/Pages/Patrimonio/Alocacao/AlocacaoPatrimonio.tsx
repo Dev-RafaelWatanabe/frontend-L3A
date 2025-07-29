@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
 import { AlocacaoDataTable } from './AlocacaoDataTable';
 import { CriarAlocacaoModal } from './CriarAlocacaoModal';
+import { RealocarModal } from './RealocarModal';
 import { MdOutlineDelete } from "react-icons/md";
 import { FaPlus } from "react-icons/fa";
 import type { 
@@ -39,6 +40,8 @@ export const AlocacaoPatrimonio: React.FC = () => {
   const [obras, setObras] = useState<Obra[]>([]);
   const [ferramentas, setFerramentas] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [showRealocarModal, setShowRealocarModal] = useState(false);
+  const [alocacaoSelecionada, setAlocacaoSelecionada] = useState<Alocacao | null>(null);
   
   // Estados para filtros
   const [filtroObra, setFiltroObra] = useState('');
@@ -134,6 +137,16 @@ export const AlocacaoPatrimonio: React.FC = () => {
     if (paginacaoRef.current) {
       paginacaoRef.current.reloadData();
     }
+  };
+
+  const handleAbrirRealocar = (alocacao: Alocacao) => {
+    setAlocacaoSelecionada(alocacao);
+    setShowRealocarModal(true);
+  };
+
+  const handleFecharRealocar = () => {
+    setShowRealocarModal(false);
+    setAlocacaoSelecionada(null);
   };
 
   // Função para aplicar filtros
@@ -264,13 +277,23 @@ export const AlocacaoPatrimonio: React.FC = () => {
       render: (_: any, row: Alocacao) => (
         <ActionButtonsContainer>
           <ActionButton
-            color="#ffc107"
+            color="#6c757d"
             title="Desalocar"
             style={{ minWidth: '80px', maxWidth: '100px', padding: '8px 10px'}}
             onClick={() => handleDesalocar(row)}
           >
             Desalocar
           </ActionButton>
+
+           <ActionButton
+            color="#007bff"
+            title="Realocar"
+            style={{ minWidth: '80px', maxWidth: '100px', padding: '8px 10px'}}
+            onClick={() => handleAbrirRealocar(row)}
+          >
+            Realocar
+          </ActionButton>
+
           <ActionButton
             color="#dc3545"
             title="Deletar alocação"
@@ -373,6 +396,16 @@ export const AlocacaoPatrimonio: React.FC = () => {
         isOpen={showModal}
         onClose={handleModalClose}
         onSuccess={handleModalSuccess}
+      />
+
+      {/* Modal de Realocar Ferramenta */}
+      <RealocarModal
+        isOpen={showRealocarModal}
+        alocacao={alocacaoSelecionada}
+        onClose={handleFecharRealocar}
+        onSuccess={() => {
+          if (paginacaoRef.current) paginacaoRef.current.reloadData();
+        }}
       />
     </Container>
   );
