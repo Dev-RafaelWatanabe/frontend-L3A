@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../../Database/Components/DataTable';
 import type { 
@@ -16,16 +16,18 @@ import {
   DataContainer,
   DeleteIconButton,
   SituacaoBadge
-} from './Styles';
-import { FaTrashAlt } from 'react-icons/fa';
-import { PaginacaoComponent } from './Components/Pagination';
+} from './styles';
+import { FaTrashAlt, FaPlus } from 'react-icons/fa';
+import { PaginacaoComponent } from './Components/pagination';
 import { Link } from 'react-router-dom';
+import { CreateButton } from '../Alocacao/Styles';
 
 export const PatrimonioDB: React.FC = () => {
   const [data, setData] = useState<Ferramenta[]>([]);
   const [loading, setLoading] = useState(true);
   const paginacaoRef = useRef<PaginacaoRef>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Hook para detectar mudança de rota e forçar refresh
   useEffect(() => {
@@ -182,10 +184,18 @@ export const PatrimonioDB: React.FC = () => {
     setData(newData);
     setLoading(isLoading);
   };
+  
+  const handleCreateTools = () => {
+    navigate('/patrimonio/cadastrar');
+  };
 
   return (
     <Container>
       <Title>Patrimônio</Title>
+      <CreateButton onClick={handleCreateTools}>
+        <FaPlus /> 
+        Criar Patrimônio
+      </CreateButton>
       <TableContainer>        
         {loading ? (
           <EmptyStateContainer>

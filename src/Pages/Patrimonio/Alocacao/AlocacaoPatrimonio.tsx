@@ -31,7 +31,7 @@ import {
   HeaderContainer,
   CreateButton
 } from './Styles';
-import { PaginacaoComponent } from '../Cadastros/Components/Pagination';
+import { PaginacaoComponent } from '../Cadastros/Components/pagination';
 
 export const AlocacaoPatrimonio: React.FC = () => {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
