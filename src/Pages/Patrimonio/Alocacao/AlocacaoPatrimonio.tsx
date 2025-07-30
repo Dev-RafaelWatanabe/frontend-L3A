@@ -269,6 +269,23 @@ export const AlocacaoPatrimonio: React.FC = () => {
     // }
   };
 
+  // Função para verificar status da previsão
+  const getStatusPrevisao = (previsao: string) => {
+    if (!previsao) return null;
+    
+    const hoje = new Date();
+    const dataPrevisao = new Date(previsao);
+    const diasRestantes = Math.ceil((dataPrevisao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diasRestantes < 0) {
+      return { status: 'vencida', cor: '#dc3545', texto: 'Vencida' };
+    } else if (diasRestantes <= 7) {
+      return { status: 'proxima', cor: '#ffc107', texto: 'Próxima' };
+    } else {
+      return { status: 'normal', cor: '#28a745', texto: 'Normal' };
+    }
+  };
+
   // Colunas da tabela atualizadas
   const columns = [
     { 
@@ -295,6 +312,30 @@ export const AlocacaoPatrimonio: React.FC = () => {
         if (!value) return '-';
         try {
           return new Date(value).toLocaleDateString('pt-BR');
+        } catch {
+          return value;
+        }
+      }
+    },
+    { 
+      key: 'previsao_desalocacao', 
+      label: 'Previsão Desalocação',
+      render: (value: string) => {
+        if (!value) return '-';
+        try {
+          const statusInfo = getStatusPrevisao(value);
+          const dataFormatada = new Date(value).toLocaleDateString('pt-BR');
+          
+          return (
+            <span style={{ 
+              color: statusInfo?.cor || '#000',
+              fontWeight: statusInfo?.status === 'vencida' ? 'bold' : 'normal'
+            }}>
+              {dataFormatada}
+              {statusInfo?.status === 'vencida' && ' (Vencida)'}
+              {statusInfo?.status === 'proxima' && ' (Próxima)'}
+            </span>
+          );
         } catch {
           return value;
         }

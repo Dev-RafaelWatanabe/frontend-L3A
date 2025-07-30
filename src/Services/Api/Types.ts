@@ -154,11 +154,12 @@ export interface AlocarFormData {
 
 export interface Alocacao {
   id: number;
-  ferramenta_nome: string;
   ferramenta_id: number;
+  ferramenta_nome: string;
   obra_nome: string;
   funcionario_nome: string;
   data_alocacao: string;
   data_desalocacao?: string;
+  previsao_desalocacao?: string; // Nova linha
   observacao?: string;
 }

@@ -18,6 +18,7 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
     obra_id: '',
     funcionario_nome: '',
     situacao_id: '',
+    previsao_desalocacao: '', // Nova linha
     observacao: ''
   });
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,7 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
           obra_id: '',
           funcionario_nome: '',
           situacao_id: '',
+          previsao_desalocacao: '', // Nova linha
           observacao: ''
         });
       }
@@ -135,6 +137,7 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
         ferramenta_nome: alocacao.ferramenta_nome,
         obra_nome: obraSelecionada.nome,
         funcionario_nome: formData.funcionario_nome || '',
+        previsao_desalocacao: formData.previsao_desalocacao || null, // Nova linha
       };
       
       console.log('📤 PASSO 4: Criando nova alocação...');
@@ -207,6 +210,22 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
                 <option key={sit.id} value={sit.id}>{sit.nome}</option>
               ))}
             </Select>
+          </FormField>
+          <FormField>
+            <Label>Nova Previsão de Desalocação</Label>
+            <input
+              type="date"
+              value={formData.previsao_desalocacao}
+              onChange={(e) => handleInputChange('previsao_desalocacao', e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            />
           </FormField>
           <FormField>
             <Label>Observação</Label>

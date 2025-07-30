@@ -64,14 +64,33 @@ export const Api = {
     });
   },
 
-  createAlocacao: (data: { ferramenta_nome: string; obra_nome: string; funcionario_nome?: string }) => {
-    // ALTERADO para novo endpoint
-    return api.post('/alocacao/por-nome', data);
+  // CORRIGIDO: Usando axios em vez de fetch
+  createAlocacao: async (data: {
+    ferramenta_nome: string;
+    obra_nome: string;
+    funcionario_nome: string;
+    previsao_desalocacao?: string | null;
+    observacao?: string;
+  }) => {
+    try {
+      const response = await api.post('/alocacao/por-nome', {
+        ferramenta_nome: data.ferramenta_nome,
+        obra_nome: data.obra_nome,
+        funcionario_nome: data.funcionario_nome,
+        previsao_desalocacao: data.previsao_desalocacao,
+        observacao: data.observacao
+      });
+
+      return response.data;
+    } catch (error: any) {
+      // Mantém compatibilidade com o tratamento de erro existente
+      const errorMessage = error.response?.data?.detail || 'Erro ao criar alocação';
+      throw new Error(errorMessage);
+    }
   },
 
   // Lista todas as alocações
   getAlocacoes: (params?: PaginacaoParams) => {
-    // ALTERADO para novo endpoint
     const queryParams = params ? `?skip=${params.skip}` : '';
     return api.get(`/alocacao/${queryParams}`);
   },
@@ -104,7 +123,6 @@ export const Api = {
 },
 
   desalocarAlocacao: (alocacaoId: number) => {
-    // ALTERADO para novo endpoint
     return api.post(`/alocacao/${alocacaoId}/desalocar`);
   },
 

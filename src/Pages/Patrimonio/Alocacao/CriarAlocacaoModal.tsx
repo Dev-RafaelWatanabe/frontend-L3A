@@ -38,7 +38,8 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
     ferramenta_id: '',
     obra_id: '',
     funcionario_id: '',
-    situacao_id: '', // Novo campo
+    situacao_id: '',
+    previsao_desalocacao: '', // Nova linha
     observacao: ''
   });
 
@@ -119,11 +120,12 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
         return;
       }
 
-      // Cria alocação
+      // Cria alocação com previsão de desalocação
       const payload = {
         ferramenta_nome: ferramentaSelecionada.nome,
         obra_nome: obraSelecionada.nome,
         funcionario_nome: funcionarioSelecionado ? funcionarioSelecionado.nome : '',
+        previsao_desalocacao: formData.previsao_desalocacao || null, // Nova linha
         observacao: formData.observacao
       };
 
@@ -154,7 +156,8 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
       ferramenta_id: '',
       obra_id: '',
       funcionario_id: '',
-      situacao_id: '', // Resetando o novo campo
+      situacao_id: '',
+      previsao_desalocacao: '', // Nova linha
       observacao: ''
     });
     setError(null);
@@ -234,6 +237,24 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
                 </option>
               ))}
             </Select>
+          </FormField>
+
+          <FormField>
+            <Label>Previsão de Desalocação (opcional)</Label>
+            <input
+              type="date"
+              value={formData.previsao_desalocacao}
+              onChange={(e) => handleInputChange('previsao_desalocacao', e.target.value)}
+              min={new Date().toISOString().split('T')[0]} // Não permite datas passadas
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            />
           </FormField>
 
           <FormField>
