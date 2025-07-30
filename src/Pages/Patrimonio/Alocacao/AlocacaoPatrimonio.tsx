@@ -17,10 +17,8 @@ import {
   Container,
   FormContainer,
   FormField,
-  ButtonGroup,
   Select,
   Label,
-  Input,
   TableContainer,
   Title,
   EmptyStateContainer,
@@ -104,10 +102,53 @@ export const AlocacaoPatrimonio: React.FC = () => {
     if (!window.confirm('Tem certeza que deseja desalocar esta ferramenta?')) return;
     try {
       await Api.desalocarAlocacao(alocacao.id);
-      alert('Ferramenta desalocada com sucesso!');
+
+      if (!alocacao.ferramenta_id) {
+        console.error('❌ ferramenta_id não encontrado na alocacao:', alocacao);
+        throw new Error('ID da ferramenta não encontrado na alocação');
+      }
+
+      const ferramentaResp = await Api.getFerramentaById(alocacao.ferramenta_id);
+      const ferramenta = ferramentaResp.data;
+      console.log('Ferramenta encontrada:', ferramenta);
+
+      // ================== PASSO 3: ATUALIZAR FERRAMENTA ==================
+      const updatePayload = {
+        nome: ferramenta.nome,
+        obra_id: 1,      // SEMPRE obra_id = 1 (Almoxarifado)
+        situacao_id: 1,  // SEMPRE situacao_id = 1 
+        valor: ferramenta.valor
+      };
+      
+      console.log('Atualizando ferramenta...');
+      console.log('Payload para updateFerramenta:', updatePayload);
+      
+      await Api.updateFerramenta(ferramenta.id, updatePayload);
+      console.log('Ferramenta atualizada com sucesso');
+
+      console.log('Desalocação e atualização concluídas com sucesso!');
+      alert('Ferramenta desalocada e movida para o Estoque com sucesso!');
+      
       if (paginacaoRef.current) paginacaoRef.current.reloadData();
-    } catch (error) {
-      alert('Erro ao desalocar ferramenta. Tente novamente.');
+      
+    } catch (error: any) {
+      console.error('Erro durante desalocação:', error);
+      console.error('Detalhes do erro:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      let errorMessage = 'Erro ao desalocar ferramenta. ';
+      if (error.response?.data?.detail) {
+        errorMessage += error.response.data.detail;
+      } else if (error.message) {
+        errorMessage += error.message;
+      } else {
+        errorMessage += 'Tente novamente.';
+      }
+      
+      alert(errorMessage);
       console.error('Erro ao desalocar:', error);
     }
   };
