@@ -13,7 +13,26 @@ export const Obras: React.FC = () => {
     { key: 'data_inicio', label: 'Data Iníco' },
     { key: 'data_fim', label: 'Data Final' },
     { key: 'atividade', label: 'Atividade' },
-    { key: 'orcamento_previsto', label: 'Orça. Previsto' },
+    { 
+      key: 'orcamento_previsto', 
+      label: 'Orça. Previsto',
+      render: (value: number) => {
+        // Verifica se o valor é válido
+        if (value === null || value === undefined || isNaN(value)) {
+          return 'R$ 0,00';
+        }
+        
+        // Formata como moeda brasileira
+        try {
+          return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+          }).format(value);
+        } catch {
+          return 'R$ 0,00';
+        }
+      }
+    },
     { key: 'ativo', label: 'Status' },
     { key: 'tipo_unidade', label: 'Unidade' }
   ];

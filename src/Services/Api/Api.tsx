@@ -35,6 +35,10 @@ export const Api = {
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
 
+  getLancamentos: () => {
+  return api.get('/lancamento/');
+},
+
   getFerramentas: (params?: PaginacaoParams) => {
     console.log('📡 getFerramentas chamado com params:', params);
     
@@ -127,7 +131,7 @@ export const Api = {
   },
 
   getAlocacaoHistoricoPorFerramenta: (ferramentaId: number) =>
-    api.get(`/alocacao/ferramenta/${ferramentaId}/historico`)
+    api.get(`/alocacao/ferramenta/${ferramentaId}/historico`),
 };
 
 export default Api;

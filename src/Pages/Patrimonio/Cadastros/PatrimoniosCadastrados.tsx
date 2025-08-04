@@ -16,9 +16,9 @@ import {
   DataContainer,
   DeleteIconButton,
   SituacaoBadge
-} from './styles';
+} from './Styles';
 import { FaTrashAlt, FaPlus } from 'react-icons/fa';
-import { PaginacaoComponent } from './Components/pagination';
+import { PaginacaoComponent } from './Components/Pagination';
 import { Link } from 'react-router-dom';
 import { CreateButton } from '../Alocacao/Styles';
 

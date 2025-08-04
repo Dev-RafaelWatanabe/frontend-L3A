@@ -54,7 +54,7 @@ export const Lancamentos: React.FC = () => {
 
   return (
     <div>
-      <h1>Lançamentos</h1>
+      <h1>Controle de obra</h1>
       {data.length > 0 ? (
         <DataTable data={data} columns={columns} />
       ) : (
