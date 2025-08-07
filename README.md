@@ -1,15 +1,72 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# frontend-L3A
 
-Currently, two official plugins are available:
+## Sobre o Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este projeto é o frontend do sistema de Rateio, desenvolvido com React, TypeScript e Vite. Ele fornece a interface visual para o usuário interagir com funcionalidades como gerenciamento de equipes, obras, cronogramas, patrimônios e lançamentos. O objetivo é facilitar o controle e a visualização de dados do sistema de Rateio de forma rápida e intuitiva.
 
-## Expanding the ESLint configuration
+## Estrutura de Pastas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```
+frontend-L3A/
+│
+├── src/
+│   ├── App.tsx                // Configuração de rotas e layout principal
+│   ├── main.tsx               // Ponto de entrada do React
+│   ├── Pages/                 // Páginas principais do sistema
+│   │   ├── Dashboard/
+│   │   ├── Automation/
+│   │   ├── Database/
+│   │   ├── Cronograma/
+│   │   └── Patrimonio/
+│   ├── Services/
+│   │   ├── Api/               // Serviços de integração com backend
+│   │   └── hooks/             // Hooks customizados
+│   ├── Style/
+│   │   ├── GlobalStyle.ts     // Estilos globais
+│   │   └── Components/        // Componentes de estilo reutilizáveis
+│   └── vite-env.d.ts
+├── public/                    // Assets públicos (imagens, favicon)
+├── package.json
+├── tsconfig*.json
+├── vite.config.ts
+└── README.md
+```
+
+## Padrões e Tecnologias
+
+- **Componentização:** Componentes reutilizáveis e organizados por página ou por função.
+- **Estilização:** CSS-in-JS, geralmente com styled-components.
+- **Gerenciamento de Estado:** Principalmente local (useState/useEffect), sem uso de Redux ou Context API global.
+- **Rotas:** Definidas em `App.tsx` usando React Router.
+- **Integração com Backend:** Centralizada em `src/Services/Api/Api.ts`.
+
+## Como rodar o projeto
+
+1. Instale as dependências:
+   ```
+   npm install
+   ```
+2. Inicie o servidor de desenvolvimento:
+   ```
+   npm run dev
+   ```
+3. Acesse no navegador:
+   ```
+   http://localhost:5173
+   ```
+
+## Recomendações para novos desenvolvedores
+
+- Leia o código em `src/App.tsx` para entender as rotas e a navegação.
+- Explore as pastas em `src/Pages` para conhecer as principais funcionalidades.
+- Consulte `src/Services/Api` para ver como são feitas as integrações com o backend.
+- Siga os padrões de componentes e estilos já existentes.
+- Utilize o ESLint para manter a padronização do código.
+
+---
+
+## Configuração Avançada do ESLint
 
 ```js
 export default tseslint.config({
