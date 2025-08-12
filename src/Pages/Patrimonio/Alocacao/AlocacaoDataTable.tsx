@@ -1,100 +1,108 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import type { Alocacao } from '../../../Services/Api/Types';
 
-const Table = styled.table`
+const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 `;
 
-const Th = styled.th`
-  padding: 12px;
-  text-align: center; /* Títulos centralizados */
+const StyledTableHead = styled.thead`
   background-color: #f8f9fa;
+`;
+
+const StyledTableHeader = styled.th`
+  padding: 12px 15px;
+  text-align: left;
   font-weight: 600;
+  color: #495057;
   border-bottom: 2px solid #dee2e6;
-  color: #495057;
-  
-  &:first-child {
-    border-top-left-radius: 4px;
-  }
-  
-  &:last-child {
-    border-top-right-radius: 4px;
-  }
+  font-size: 14px;
 `;
 
-const Td = styled.td`
-  padding: 6px;
-  text-align: center; /* Conteúdo centralizado */
-  border-bottom: 1px solid #dee2e6;
-  border-right: 1px solid #dee2e6;
-  color: #495057;
-`;
+const StyledTableBody = styled.tbody``;
 
-const Tr = styled.tr`
-  &:nth-child(even) {
+const StyledTableRow = styled.tr`
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
     background-color: #f8f9fa;
   }
-  
-  &:hover {
-    background-color: #e9ecef;
+
+  &:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  &:nth-child(even):hover {
+    background-color: #f0f0f0;
   }
 `;
 
-const EmptyMessage = styled.div`
-  text-align: center;
-  padding: 40px;
-  color: #666;
-  font-style: italic;
+const StyledTableCell = styled.td`
+  padding: 12px 15px;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+  font-size: 14px;
+  vertical-align: middle;
 `;
 
-interface Column {
-  key: string;
-  label: string;
-  render?: (value: any, row: any) => React.ReactNode;
-}
-
 interface AlocacaoDataTableProps {
-  data: any[];
-  columns: Column[];
+  data: Alocacao[];
+  columns: Array<{
+    key: string;
+    label: string;
+    render?: (value: any, row?: any) => React.ReactNode;
+  }>;
 }
 
 export const AlocacaoDataTable: React.FC<AlocacaoDataTableProps> = ({ data, columns }) => {
-  console.log('AlocacaoDataTable recebeu:', { data, columns });
+  const navigate = useNavigate();
 
-  if (!data || !Array.isArray(data)) {
-    console.error('Dados inválidos recebidos:', data);
-    return <div>Erro: Dados inválidos</div>;
-  }
-
-  if (data.length === 0) {
-    return <EmptyMessage>Nenhuma alocação encontrada</EmptyMessage>;
-  }
+  const handleRowClick = (alocacao: Alocacao, event: React.MouseEvent) => {
+    // Verifica se o clique foi em um botão de ação
+    const target = event.target as HTMLElement;
+    if (target.closest('button')) {
+      return; // Não navega se clicou em um botão
+    }
+    
+    navigate(`/patrimonio/alocacao/detalhe/${alocacao.id}`);
+  };
 
   return (
-    <Table>
-      <thead>
-        <tr>
+    <StyledTable>
+      <StyledTableHead>
+        <StyledTableRow>
           {columns.map((column) => (
-            <Th key={column.key}>{column.label}</Th>
+            <StyledTableHeader key={column.key}>
+              {column.label}
+            </StyledTableHeader>
           ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, index) => (
-          <Tr key={index}>
+        </StyledTableRow>
+      </StyledTableHead>
+      <StyledTableBody>
+        {data.map((row) => (
+          <StyledTableRow 
+            key={row.id} 
+            onClick={(event) => handleRowClick(row, event)}
+            title="Clique para ver detalhes"
+          >
             {columns.map((column) => (
-              <Td key={`${index}-${column.key}`}>
-                {column.render ? column.render(row[column.key], row) : row[column.key]}
-              </Td>
+              <StyledTableCell key={`${row.id}-${column.key}`}>
+                {column.render 
+                  ? column.render(row[column.key as keyof typeof row], row)
+                  : row[column.key as keyof typeof row]
+                }
+              </StyledTableCell>
             ))}
-          </Tr>
+          </StyledTableRow>
         ))}
-      </tbody>
-    </Table>
+      </StyledTableBody>
+    </StyledTable>
   );
 };

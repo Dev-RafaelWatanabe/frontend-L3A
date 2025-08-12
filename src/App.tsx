@@ -9,9 +9,10 @@ import { Funcionarios } from './Pages/Database/Funcionarios/FuncionariosPage';
 import { Lancamentos } from './Pages/Database/Lancamentos/LancamentosCadastrados';
 import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
-import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/CadastrarPatrimonio';
+import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrarPatrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
 import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
+import { AlocacaoDetalhe } from './Pages/Patrimonio/Alocacao/AlocacaoDetalhe';
 import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/PatrimonioDetalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
 
@@ -62,7 +63,7 @@ function App() {
       label: 'Patrimônio',
       subItems: [
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
-        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocar' }
+        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocacao' }
       ]
     }
   ];
@@ -84,7 +85,8 @@ function App() {
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
           <Route path="/patrimonio/cadastrar" element={<CadastrarPatrimonio />} />
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
-          <Route path="/patrimonio/alocar" element={<AlocacaoPatrimonio />} />
+          <Route path="/patrimonio/alocacao" element={<AlocacaoPatrimonio />} />
+          <Route path="/patrimonio/alocacao/detalhe/:id" element={<AlocacaoDetalhe />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>

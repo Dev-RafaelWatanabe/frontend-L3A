@@ -132,6 +132,12 @@ export const Api = {
 
   getAlocacaoHistoricoPorFerramenta: (ferramentaId: number) =>
     api.get(`/alocacao/ferramenta/${ferramentaId}/historico`),
+
+  // Buscar alocação específica por ID
+  getAlocacaoById: async (id: number) => {
+    const response = await api.get(`/alocacao/${id}`);
+    return response.data;
+  },
 };
 
 export default Api;

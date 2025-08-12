@@ -29,7 +29,7 @@ import {
   HeaderContainer,
   CreateButton
 } from './Styles';
-import { PaginacaoComponent } from '../Cadastros/Components/pagination';
+import { PaginacaoComponent } from '../Cadastros/Components/Pagination';
 
 export const AlocacaoPatrimonio: React.FC = () => {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
@@ -249,24 +249,12 @@ export const AlocacaoPatrimonio: React.FC = () => {
     // Aplica filtros nas alocações já carregadas
     const alocacoesFiltradas = aplicarFiltros(todasAlocacoes);
     setAlocacoes(alocacoesFiltradas);
-    
-    // Se quiser recarregar do servidor e depois filtrar
-    // if (paginacaoRef.current) {
-    //   paginacaoRef.current.reloadData();
-    // }
   };
 
   const handleLimparFiltros = () => {
     setFiltroObra('');
     setFiltroFerramenta('');
-    
-    // Mostra todas as alocações novamente
     setAlocacoes(todasAlocacoes);
-    
-    // Ou recarrega do servidor
-    // if (paginacaoRef.current) {
-    //   paginacaoRef.current.reloadData();
-    // }
   };
 
   // Função para verificar status da previsão
