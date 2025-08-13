@@ -28,7 +28,7 @@ import {
   SearchContainer,
   HeaderContainer,
   CreateButton
-} from './Styles';
+} from './styles';
 import { PaginacaoComponent } from '../Cadastros/Components/pagination';
 
 export const AlocacaoPatrimonio: React.FC = () => {

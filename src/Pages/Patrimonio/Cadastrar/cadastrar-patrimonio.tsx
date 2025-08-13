@@ -7,7 +7,7 @@ import {
   ButtonGroup,
   PatrimonioButton,
   PatrimonioDeleteButton
-} from './Styles';
+} from './styles';
 import type { PatrimonioFormData, Obra, Categoria, Situacao, Marca } from '../../../Services/Api/Types';
 import { Api } from '../../../Services/Api/Api';
 

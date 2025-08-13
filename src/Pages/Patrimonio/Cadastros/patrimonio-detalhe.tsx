@@ -20,8 +20,8 @@ import {
   Campo,
   ErroMensagem,
   LoadingContainer
-} from './Styles';
-import { HistoricoTableContainer, HistoricoTable, HistoricoTh, HistoricoTd } from './HistoricoStyles'; // novo import
+} from './styles';
+import { HistoricoTableContainer, HistoricoTable, HistoricoTh, HistoricoTd } from './historico-styles'; // novo import
 
 export const PatrimonioDetalhe: React.FC = () => {
   const { id } = useParams<{ id: string }>();

@@ -11,7 +11,7 @@ import {
   PaginationControls,
   PageInfo,
   LoadingSpinner
-} from '../Styles';
+} from '../styles';
 
 // Cache global para armazenar dados por mais tempo
 interface CacheData<T> {

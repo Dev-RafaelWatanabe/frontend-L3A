@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Api } from '../../../Services/Api/Api';
 import type { Obra, Funcionario, Situacao, Alocacao } from '../../../Services/Api/Types';
-import { ModalOverlay, ModalContent, ModalHeader, ModalTitle, CloseButton, FormField, Label, Select, ButtonGroup, Button, ErrorMessage } from './Styles';
+import { ModalOverlay, ModalContent, ModalHeader, ModalTitle, CloseButton, FormField, Label, Select, ButtonGroup, Button, ErrorMessage } from './styles';
 
 interface RealocarModalProps {
   isOpen: boolean;
