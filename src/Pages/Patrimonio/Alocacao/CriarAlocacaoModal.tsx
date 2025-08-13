@@ -12,7 +12,7 @@ import {
   ButtonGroup,
   Button,
   ErrorMessage
-} from './Styles';
+} from './styles';
 import { Api } from '../../../Services/Api/Api';
 import type { Ferramenta, Obra, Funcionario, Situacao } from '../../../Services/Api/Types';
 

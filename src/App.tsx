@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Sidebar } from './Style/Components/Sidebar/index';
+import { Sidebar } from './style/Components/Sidebar/index';
 import { Dashboard } from './Pages/Dashboard/Dashboard';
 import { Automations } from './Pages/Automation/Automations';
 import { Restaurantes } from './Pages/Database/Restaurantes/RestaurantePage';
@@ -9,10 +9,10 @@ import { Funcionarios } from './Pages/Database/Funcionarios/FuncionariosPage';
 import { Lancamentos } from './Pages/Database/Lancamentos/LancamentosCadastrados';
 import { CronogramaLancamento } from './Pages/Cronograma/LancamentoPage';
 import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
-import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/CadastrarPatrimonio';
-import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/PatrimoniosCadastrados';
+import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrar-patrimonio';
+import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/patrimonios-cadastrados';
 import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
-import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/PatrimonioDetalhe';
+import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
 
 // Componente wrapper para aplicar o hook
