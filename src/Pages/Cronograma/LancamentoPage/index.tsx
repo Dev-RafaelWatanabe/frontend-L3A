@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Api } from '../../../Services/Api/Api';
-import { Button } from '../../../style/Components/Buttons';
+import { Button } from '../../../style/components/buttons';
 import type { Funcionario, Obra, Restaurante, LancamentoPage } from '../../../Services/Api/Types';
 import {
   Container,

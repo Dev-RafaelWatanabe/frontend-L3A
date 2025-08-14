@@ -6,7 +6,7 @@ import {
   DeleteButton, 
   ActionButtonGroup,
   ClearButton 
-} from '../../../style/Components/Buttons';
+} from '../../../style/components/buttons';
 import type { Funcionario, Obra } from '../../../Services/Api/Types';
 import type { PlanejamentoDiario } from '../../../Services/Api/Types';
 import {
