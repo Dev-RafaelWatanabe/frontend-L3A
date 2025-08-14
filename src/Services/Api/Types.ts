@@ -36,6 +36,17 @@ export interface Obra {
   ativo: boolean;
   tipo_unidade: string;
 }
+export interface CriarObra {
+  atividade: string;
+  ativo: boolean;
+  centro_custo: number;
+  codigo_obra: number;
+  data_fim?: string;
+  data_inicio?: string;
+  nome: string;
+  orcamento_previsto?: number;
+  tipo_unidade: string;
+}
 
 export interface Lancamento {
   id: number;

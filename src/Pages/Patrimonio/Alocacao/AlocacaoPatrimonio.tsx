@@ -28,8 +28,8 @@ import {
   SearchContainer,
   HeaderContainer,
   CreateButton
-} from './Styles';
-import { PaginacaoComponent } from '../Cadastros/Components/Pagination';
+} from './styles';
+import { PaginacaoComponent } from '../Cadastros/Components/pagination';
 
 export const AlocacaoPatrimonio: React.FC = () => {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
@@ -288,11 +288,11 @@ export const AlocacaoPatrimonio: React.FC = () => {
       key: 'obra_nome', 
       label: 'Centro de Custo/Obra' 
     },
-    { 
-      key: 'funcionario_nome', 
-      label: 'Responsável',
-      render: (value: string) => value || '-'
-    },
+    // { 
+    //   key: 'funcionario_nome', 
+    //   label: 'Responsável',
+    //   render: (value: string) => value || '-'
+    // },
     { 
       key: 'data_alocacao', 
       label: 'Data Alocação',

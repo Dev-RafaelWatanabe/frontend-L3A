@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../Components/DataTable';
-import { Button } from '../../../Style/Components/Buttons';
+import { Button } from '../../../Style/Components/Buttons/index';
 import type { Restaurante } from '../../../Services/Api/Types';
 import styled from 'styled-components';
 
@@ -144,6 +144,10 @@ export const Restaurantes: React.FC = () => {
         throw new Error('Valor inválido');
       }
 
+      setIsModalOpen(false);
+      setNewRestaurante({ nome: '', valor: '' });
+      setSelectedRestaurante(null);
+
       if (selectedRestaurante?.id) {
         await Api.updateRestaurante(selectedRestaurante.id, {
           nome: newRestaurante.nome,
@@ -158,9 +162,9 @@ export const Restaurantes: React.FC = () => {
         });
       }
       
-      setIsModalOpen(false);
-      setNewRestaurante({ nome: '', valor: '' });
-      setSelectedRestaurante(null);
+      // setIsModalOpen(false);
+      // setNewRestaurante({ nome: '', valor: '' });
+      // setSelectedRestaurante(null);
       
     } catch (error) {
       console.error('Erro ao salvar restaurante:', error);
