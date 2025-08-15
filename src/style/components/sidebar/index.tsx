@@ -10,7 +10,7 @@ import {
   UserIcon,
   UserName,
   SubMenu
-} from './Siderbar';
+} from './siderbar';
 
 interface SubItem {
   id: string;
