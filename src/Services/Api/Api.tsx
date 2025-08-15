@@ -154,6 +154,14 @@ export const Api = {
 
   getAlocacaoHistoricoPorFerramenta: (ferramentaId: number) =>
     api.get(`/alocacao/ferramenta/${ferramentaId}/historico`),
+  
+  // createLancamento: (data: any) => {
+  //   return api.post('/lancamento/', data, {
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     }
+  //   });
+  // },
 
   // Buscar alocação específica por ID
   getAlocacaoById: async (id: number) => {

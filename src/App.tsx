@@ -12,8 +12,8 @@ import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrar-patrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/patrimonios-cadastrados';
 import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
-import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { AlocacaoDetalhe } from './Pages/Patrimonio/Alocacao/AlocacaoDetalhe';
+import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
 
 // Componente wrapper para aplicar o hook

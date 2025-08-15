@@ -28,6 +28,7 @@ export const Title = styled.h1`
 
 export const BackButton = styled.button`
   background: #6c757d;
+  max-width: 120px;
   color: white;
   border: none;
   padding: 8px 16px;
