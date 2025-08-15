@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../Components/DataTable';
-import { Button } from '../../../Style/Components/Buttons/index';
+import { Button } from '../../../style/components/buttons';
 import type { Restaurante } from '../../../Services/Api/Types';
 import styled from 'styled-components';
 

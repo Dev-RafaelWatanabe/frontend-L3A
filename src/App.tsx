@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Sidebar } from './Style/Components/Sidebar/index';
+import { Sidebar } from './style/components/sidebar/index';
 import { Dashboard } from './Pages/Dashboard/Dashboard';
 import { Automations } from './Pages/Automation/Automations';
 import { Restaurantes } from './Pages/Database/Restaurantes/RestaurantePage';
@@ -15,6 +15,7 @@ import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimon
 import { AlocacaoDetalhe } from './Pages/Patrimonio/Alocacao/AlocacaoDetalhe';
 import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
+import { ManutencaoPatrimonio } from './Pages/Patrimonio/manutencao/manutencao-patrimonio';
 
 // Componente wrapper para aplicar o hook
 const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -64,6 +65,7 @@ function App() {
       subItems: [
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
         { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocacao' }
+        { id: 'patri4', label: 'Manutenção', path: '/patrimonio/manutencao' }
       ]
     }
   ];
@@ -88,6 +90,7 @@ function App() {
           <Route path="/patrimonio/alocacao" element={<AlocacaoPatrimonio />} />
           <Route path="/patrimonio/alocacao/detalhe/:id" element={<AlocacaoDetalhe />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
+          <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>
