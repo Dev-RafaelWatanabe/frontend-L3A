@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Sidebar } from './style/Components/Sidebar/index';
+import { Sidebar } from './style/components/sidebar/index';
 import { Dashboard } from './Pages/Dashboard/Dashboard';
 import { Automations } from './Pages/Automation/Automations';
 import { Restaurantes } from './Pages/Database/Restaurantes/RestaurantePage';
@@ -14,6 +14,7 @@ import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/patrimonios-cadastrad
 import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
 import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
+import { ManutencaoPatrimonio } from './Pages/Patrimonio/manutencao/manutencao-patrimonio';
 
 // Componente wrapper para aplicar o hook
 const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -62,7 +63,8 @@ function App() {
       label: 'Patrimônio',
       subItems: [
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
-        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocar' }
+        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocar' },
+        { id: 'patri4', label: 'Manutenção', path: '/patrimonio/manutencao' }
       ]
     }
   ];
@@ -86,6 +88,7 @@ function App() {
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
           <Route path="/patrimonio/alocar" element={<AlocacaoPatrimonio />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
+          <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>

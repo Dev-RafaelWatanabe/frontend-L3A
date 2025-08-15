@@ -140,6 +140,34 @@ export const Api = {
       }
     });
   },
+
+  getManutencoes: (params?: PaginacaoParams) => {
+    // Busca todas as manutenções, com paginação se precisar
+    const queryParams = params ? `?skip=${params.skip}` : '';
+    return api.get(`/manutencao-ferramenta/${queryParams}`);
+  },
+
+  createManutencao: (data: any) => {
+    // Monta os params na URL
+    const params = new URLSearchParams();
+    params.append('ferramenta_nome', data.ferramenta_nome);
+    params.append('motivo', data.motivo);
+    if (data.descricao_servico) params.append('descricao_servico', data.descricao_servico);
+    if (data.responsavel_id) params.append('responsavel_id', data.responsavel_id);
+    if (data.custo) params.append('custo', data.custo);
+
+    return api.post(`/manutencao-ferramenta/por-nome?${params.toString()}`);
+  },
+
+  updateManutencao: (id: number, data: any) => {
+    // Atualiza uma manutenção existente
+    return api.put(`/manutencao-ferramenta/${id}/`, data);
+  },
+
+  deleteManutencao: (id: number) => {
+    // Remove uma manutenção
+    return api.delete(`/manutencao-ferramenta/${id}/`);
+  },
 };
 
 export default Api;
