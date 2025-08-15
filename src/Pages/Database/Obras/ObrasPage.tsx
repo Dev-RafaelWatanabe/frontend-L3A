@@ -1,52 +1,123 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Api } from '../../../Services/Api/Api';
 import { DataTable } from '../Components/DataTable';
+import { CriarObraModal } from './CriarObraModal';
+import { FaPlus } from 'react-icons/fa';
 import type { Obra } from '../../../Services/Api/Types';
+import {
+  Container,
+  Header,
+  Title,
+  AddButton,
+  TableContainer,
+  LoadingContainer
+} from './styles';
 
 export const Obras: React.FC = () => {
-  const [data, setData] = useState<Obra[]>([]);
+  const [obras, setObras] = useState<Obra[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
-  const columns = [
-    { key: 'id', label: 'id' },
-    { key: 'codigo_obra', label: 'Código da obra' },
-    { key: 'nome', label: 'Nome da Obra' },
-    { key: 'data_inicio', label: 'Data Iníco' },
-    { key: 'data_fim', label: 'Data Final' },
-    { key: 'atividade', label: 'Atividade' },
-    { 
-      key: 'orcamento_previsto', 
-      label: 'Orça. Previsto',
-      render: (value: number) => {
-        // Verifica se o valor é válido
-        if (value === null || value === undefined || isNaN(value)) {
-          return 'R$ 0,00';
-        }
-        
-        // Formata como moeda brasileira
-        try {
-          return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-          }).format(value);
-        } catch {
-          return 'R$ 0,00';
-        }
-      }
-    },
-    { key: 'ativo', label: 'Status' },
-    { key: 'tipo_unidade', label: 'Unidade' }
-  ];
+  const loadObras = async () => {
+    try {
+      setLoading(true);
+      const response = await Api.getObras();
+      setObras(response.data || []);
+    } catch (error) {
+      console.error('Erro ao carregar obras:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    Api.getObras()
-      .then(response => setData(response.data))
-      .catch(error => console.error('Erro ao buscar obras:', error));
+    loadObras();
   }, []);
 
+  const handleCreateSuccess = () => {
+    loadObras();
+    setShowModal(false);
+  };
+
+  const formatCurrency = (value?: number) => {
+    if (!value) return '-';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '-';
+    try {
+      if (dateString.includes('/')) return dateString;
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR');
+    } catch {
+      return dateString;
+    }
+  };
+
+  const columns = [
+    { key: 'id', label: 'Nº' },
+    { key: 'codigo_obra', label: 'Cód. Obra' },
+    { key: 'nome', label: 'Nome da Obra' },
+    { key: 'atividade', label: 'Atividade' },
+    { key: 'tipo_unidade', label: 'Unidade' },
+    {
+      key: 'data_inicio',
+      label: 'Início',
+      render: (value: string) => formatDate(value)
+    },
+    {
+      key: 'data_fim',
+      label: 'Fim',
+      render: (value: string) => formatDate(value)
+    },
+    {
+      key: 'orcamento_previsto',
+      label: 'Orçamento',
+      render: (value: number) => formatCurrency(value)
+    },
+    {
+      key: 'ativo',
+      label: 'Status',
+      render: (value: boolean) => (
+        <span style={{ 
+          color: value ? '#28a745' : '#dc3545',
+          fontWeight: 'bold'
+        }}>
+          {value ? 'Ativa' : 'Inativa'}
+        </span>
+      )
+    }
+  ];
+
   return (
-    <div>
-      <h1>Obras</h1>
-      <DataTable data={data} columns={columns} />
-    </div>
+    <Container>
+      <Header>
+        <Title>Obras</Title>
+        <AddButton onClick={() => setShowModal(true)}>
+          <FaPlus />
+          Adicionar Obra
+        </AddButton>
+      </Header>
+
+      <TableContainer>
+        {loading ? (
+          <LoadingContainer>
+            <span>Carregando obras...</span>
+          </LoadingContainer>
+        ) : (
+          <DataTable data={obras} columns={columns} />
+        )}
+      </TableContainer>
+
+      <CriarObraModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={handleCreateSuccess}
+      />
+    </Container>
   );
 };

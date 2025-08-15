@@ -34,10 +34,32 @@ export const Api = {
 
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
+  createObra: async (data: {
+    atividade: string;
+    ativo: boolean;
+    centro_custo: number;
+    codigo_obra: number;
+    data_fim?: string;
+    data_inicio?: string;
+    nome: string;
+    orcamento_previsto?: number;
+    tipo_unidade: string;
+  }) => {
+    const response = await api.post('/obras/', data);
+    return response;
+  },
 
   getLancamentos: () => {
   return api.get('/lancamento/');
 },
+
+  createLancamento: (data: any) => {
+    return api.post('/lancamento/', data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  },
 
   getFerramentas: (params?: PaginacaoParams) => {
     console.log('📡 getFerramentas chamado com params:', params);
@@ -133,12 +155,19 @@ export const Api = {
   getAlocacaoHistoricoPorFerramenta: (ferramentaId: number) =>
     api.get(`/alocacao/ferramenta/${ferramentaId}/historico`),
   
-  createLancamento: (data: any) => {
-    return api.post('/lancamento/', data, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
+  // createLancamento: (data: any) => {
+  //   return api.post('/lancamento/', data, {
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     }
+  //   });
+  // },
+
+  // Buscar alocação específica por ID
+  getAlocacaoById: async (id: number) => {
+    const response = await api.get(`/alocacao/${id}`);
+    console.log("Resposta da API:", response);
+    return response;
   },
 
   getManutencoes: (params?: PaginacaoParams) => {

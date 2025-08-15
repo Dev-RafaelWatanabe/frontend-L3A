@@ -144,6 +144,10 @@ export const Restaurantes: React.FC = () => {
         throw new Error('Valor inválido');
       }
 
+      setIsModalOpen(false);
+      setNewRestaurante({ nome: '', valor: '' });
+      setSelectedRestaurante(null);
+
       if (selectedRestaurante?.id) {
         await Api.updateRestaurante(selectedRestaurante.id, {
           nome: newRestaurante.nome,
@@ -158,9 +162,9 @@ export const Restaurantes: React.FC = () => {
         });
       }
       
-      setIsModalOpen(false);
-      setNewRestaurante({ nome: '', valor: '' });
-      setSelectedRestaurante(null);
+      // setIsModalOpen(false);
+      // setNewRestaurante({ nome: '', valor: '' });
+      // setSelectedRestaurante(null);
       
     } catch (error) {
       console.error('Erro ao salvar restaurante:', error);

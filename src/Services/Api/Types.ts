@@ -36,6 +36,17 @@ export interface Obra {
   ativo: boolean;
   tipo_unidade: string;
 }
+export interface CriarObra {
+  atividade: string;
+  ativo: boolean;
+  centro_custo: number;
+  codigo_obra: number;
+  data_fim?: string;
+  data_inicio?: string;
+  nome: string;
+  orcamento_previsto?: number;
+  tipo_unidade: string;
+}
 
 export interface Lancamento {
   id: number;
@@ -155,11 +166,12 @@ export interface AlocarFormData {
 export interface Alocacao {
   id: number;
   ferramenta_id: number;
-  ferramenta_nome: string;
-  obra_nome: string;
-  funcionario_nome: string;
+  obra_id: number;
+  funcionario_id: number;
   data_alocacao: string;
-  data_desalocacao?: string;
-  previsao_desalocacao?: string; // Nova linha
-  observacao?: string;
+  previsao_desalocacao: string;
+  data_desalocacao?: string; // Opcional pois pode não existir ainda
+  ferramenta_nome?: string;
+  obra_nome?: string;
+  funcionario_nome?: string;
 }

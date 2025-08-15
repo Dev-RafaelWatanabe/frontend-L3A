@@ -12,6 +12,7 @@ import { CronogramaPlanejamento } from './Pages/Cronograma/Planejamento';
 import { Patrimonio as CadastrarPatrimonio } from './Pages/Patrimonio/Cadastrar/cadastrar-patrimonio';
 import { PatrimonioDB } from './Pages/Patrimonio/Cadastros/patrimonios-cadastrados';
 import { AlocacaoPatrimonio } from './Pages/Patrimonio/Alocacao/AlocacaoPatrimonio';
+import { AlocacaoDetalhe } from './Pages/Patrimonio/Alocacao/AlocacaoDetalhe';
 import { PatrimonioDetalhe } from './Pages/Patrimonio/Cadastros/patrimonio-detalhe';
 import { useRouteRefresh } from './Services/hooks/useRouteRefresh';
 import { ManutencaoPatrimonio } from './Pages/Patrimonio/manutencao/manutencao-patrimonio';
@@ -63,7 +64,7 @@ function App() {
       label: 'Patrimônio',
       subItems: [
         { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
-        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocar' },
+        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocacao' }
         { id: 'patri4', label: 'Manutenção', path: '/patrimonio/manutencao' }
       ]
     }
@@ -86,7 +87,8 @@ function App() {
           <Route path="/cronograma/planejamento" element={<CronogramaPlanejamento />} />
           <Route path="/patrimonio/cadastrar" element={<CadastrarPatrimonio />} />
           <Route path="/patrimonio/cadastros" element={<PatrimonioDB />} />
-          <Route path="/patrimonio/alocar" element={<AlocacaoPatrimonio />} />
+          <Route path="/patrimonio/alocacao" element={<AlocacaoPatrimonio />} />
+          <Route path="/patrimonio/alocacao/detalhe/:id" element={<AlocacaoDetalhe />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
           <Route path="/" element={<Dashboard />} />

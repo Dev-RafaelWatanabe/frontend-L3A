@@ -249,24 +249,12 @@ export const AlocacaoPatrimonio: React.FC = () => {
     // Aplica filtros nas alocações já carregadas
     const alocacoesFiltradas = aplicarFiltros(todasAlocacoes);
     setAlocacoes(alocacoesFiltradas);
-    
-    // Se quiser recarregar do servidor e depois filtrar
-    // if (paginacaoRef.current) {
-    //   paginacaoRef.current.reloadData();
-    // }
   };
 
   const handleLimparFiltros = () => {
     setFiltroObra('');
     setFiltroFerramenta('');
-    
-    // Mostra todas as alocações novamente
     setAlocacoes(todasAlocacoes);
-    
-    // Ou recarrega do servidor
-    // if (paginacaoRef.current) {
-    //   paginacaoRef.current.reloadData();
-    // }
   };
 
   // Função para verificar status da previsão
@@ -300,11 +288,11 @@ export const AlocacaoPatrimonio: React.FC = () => {
       key: 'obra_nome', 
       label: 'Centro de Custo/Obra' 
     },
-    { 
-      key: 'funcionario_nome', 
-      label: 'Responsável',
-      render: (value: string) => value || '-'
-    },
+    // { 
+    //   key: 'funcionario_nome', 
+    //   label: 'Responsável',
+    //   render: (value: string) => value || '-'
+    // },
     { 
       key: 'data_alocacao', 
       label: 'Data Alocação',
