@@ -183,7 +183,7 @@ export const Patrimonio: React.FC = () => {
             />
           </FormField>
 
-          <FormField>
+          {/* <FormField>
             <label htmlFor="nota_fiscal">Nota Fiscal (PDF, Excel ou Imagem)</label>
             <input
               id="nota_fiscal"
@@ -192,7 +192,7 @@ export const Patrimonio: React.FC = () => {
               multiple
               {...register('nota_fiscal')}
             />
-          </FormField>
+          </FormField> */}
 
           <FormField>
             <label htmlFor="situacao">Situação</label>

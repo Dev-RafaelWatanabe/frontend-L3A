@@ -257,7 +257,7 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
             />
           </FormField>
 
-          <FormField>
+          {/* <FormField>
             <Label>Observação (opcional)</Label>
             <TextArea
               value={formData.observacao}
@@ -265,7 +265,7 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
               placeholder="Observações sobre a alocação..."
               disabled={loading}
             />
-          </FormField>
+          </FormField> */}
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 

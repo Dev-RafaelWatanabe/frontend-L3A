@@ -242,10 +242,10 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
               }}
             />
           </FormField>
-          <FormField>
+          {/* <FormField>
             <Label>Observação</Label>
             <textarea value={formData.observacao} onChange={e => handleInputChange('observacao', e.target.value)} />
-          </FormField>
+          </FormField> */}
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <ButtonGroup>
             <Button type="button" variant="secondary" onClick={onClose} disabled={loading}>Cancelar</Button>
