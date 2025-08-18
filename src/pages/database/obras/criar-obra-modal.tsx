@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Api } from '../../../services/api/api';
-import type { CriarObra } from '../../../services/api/types';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -183,9 +182,22 @@ interface CriarObraModalProps {
   onSuccess: () => void;
 }
 
+// Interface local para o formulário
+interface FormDataObra {
+  atividade: string;
+  ativo: boolean;
+  centro_custo: number;
+  codigo_obra: number;
+  data_fim: string;
+  data_inicio: string;
+  nome: string;
+  orcamento_previsto: number;
+  tipo_unidade: string;
+}
+
 export const CriarObraModal: React.FC<CriarObraModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataObra>({
     atividade: '',
     ativo: true,
     centro_custo: 0,
@@ -193,19 +205,18 @@ export const CriarObraModal: React.FC<CriarObraModalProps> = ({ isOpen, onClose,
     data_fim: '',
     data_inicio: '',
     nome: '',
-    orcamento_previsto: 0, // Mudança: usar 0 em vez de undefined
+    orcamento_previsto: 0,
     tipo_unidade: 'Obra'
   });
 
-  const handleInputChange = (field: string, value: string | number | boolean) => {
+  const handleInputChange = (field: keyof FormDataObra, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  // Função específica para números que podem ser undefined
-  const handleNumberChange = (field: string, value: string) => {
+  const handleNumberChange = (field: keyof FormDataObra, value: string) => {
     const numValue = value === '' ? 0 : parseFloat(value);
     if (!isNaN(numValue)) {
       setFormData(prev => ({
@@ -226,11 +237,17 @@ export const CriarObraModal: React.FC<CriarObraModalProps> = ({ isOpen, onClose,
     setLoading(true);
     
     try {
+      // Preparar payload removendo campos vazios
       const payload = {
-        ...formData,
-        data_inicio: formData.data_inicio || undefined,
-        data_fim: formData.data_fim || undefined,
-        orcamento_previsto: formData.orcamento_previsto || undefined
+        atividade: formData.atividade,
+        ativo: formData.ativo,
+        centro_custo: formData.centro_custo,
+        codigo_obra: formData.codigo_obra,
+        nome: formData.nome,
+        tipo_unidade: formData.tipo_unidade,
+        ...(formData.data_inicio && { data_inicio: formData.data_inicio }),
+        ...(formData.data_fim && { data_fim: formData.data_fim }),
+        ...(formData.orcamento_previsto > 0 && { orcamento_previsto: formData.orcamento_previsto })
       };
       
       console.log('📤 Enviando dados da obra:', payload);
@@ -238,7 +255,6 @@ export const CriarObraModal: React.FC<CriarObraModalProps> = ({ isOpen, onClose,
       await Api.createObra(payload);
       
       alert('Obra criada com sucesso!');
-      onSuccess();
       
       // Reset form
       setFormData({
@@ -252,6 +268,9 @@ export const CriarObraModal: React.FC<CriarObraModalProps> = ({ isOpen, onClose,
         orcamento_previsto: 0,
         tipo_unidade: 'Obra'
       });
+      
+      onSuccess();
+      onClose();
       
     } catch (error) {
       console.error('❌ Erro ao criar obra:', error);
