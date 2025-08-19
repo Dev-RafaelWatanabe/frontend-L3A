@@ -400,3 +400,77 @@ export const LoadingContainer = styled.div`
   padding: 20px;
   font-size: 16px;
 `;
+
+export const FilterContainer = styled.div`
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+`;
+
+export const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: end;
+`;
+
+export const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  flex: 1;
+`;
+
+export const FilterLabel = styled.label`
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+`;
+
+export const FilterSelect = styled.select`
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background-color: white;
+  
+  &:focus {
+    outline: none;
+    border-color: #081168;
+    box-shadow: 0 0 0 2px rgba(8, 17, 104, 0.2);
+  }
+`;
+
+export const FilterInput = styled.input`
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  
+  &:focus {
+    outline: none;
+    border-color: #081168;
+    box-shadow: 0 0 0 2px rgba(8, 17, 104, 0.2);
+  }
+`;
+
+export const ClearFiltersButton = styled.button`
+  color: #505050ff;
+  width: fit-content;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: fit-content;
+  
+  &:hover {
+    color: black;
+  }
+`;
