@@ -3,71 +3,15 @@ import { Api } from '../../../services/api/api';
 import { DataTable } from '../components/data-table';
 import { Button } from '../../../style/components/buttons';
 import type { Restaurante } from '../../../services/api/types';
-import styled from 'styled-components';
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ModalContent = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-`;
-
-const FormField = styled.div`
-  margin-bottom: 15px;
-  
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-  }
-
-  input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(8, 1, 104, 0.94);
-    }
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const HeaderContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
-
-  h1 {
-    margin-bottom: 15px;
-  }
-
-  ${Button} {
-    align-self: flex-end;
-  }
-`;
+import { FaPlus } from 'react-icons/fa';
+import {
+  Modal,
+  ModalContent,
+  FormField,
+  ButtonGroup,
+  HeaderContainer,
+  CreateButton
+} from './styles';
 
 export const Restaurantes: React.FC = () => {
   const [data, setData] = useState<Restaurante[]>([]);
@@ -110,7 +54,6 @@ export const Restaurantes: React.FC = () => {
       )
     }
   ];
-
 
   const refreshData = async () => {
     try {
@@ -162,10 +105,6 @@ export const Restaurantes: React.FC = () => {
         });
       }
       
-      // setIsModalOpen(false);
-      // setNewRestaurante({ nome: '', valor: '' });
-      // setSelectedRestaurante(null);
-      
     } catch (error) {
       console.error('Erro ao salvar restaurante:', error);
       alert('Erro ao salvar restaurante. Verifique se o valor está correto.');
@@ -176,13 +115,14 @@ export const Restaurantes: React.FC = () => {
     <div>
       <HeaderContainer>
         <h1>Restaurantes</h1>
-        <Button onClick={() => {
+        <CreateButton onClick={() => {
           setSelectedRestaurante(null);
           setNewRestaurante({ nome: '', valor: '' });
           setIsModalOpen(true);
         }}>
+          <FaPlus />
           Adicionar Restaurante
-        </Button>
+        </CreateButton>
       </HeaderContainer>
       <DataTable data={data} columns={columns} />
 
@@ -217,7 +157,7 @@ export const Restaurantes: React.FC = () => {
                     valor: e.target.value
                   })}
                   required
-                  step="0.01" // Changed from "0.00" to "0.01" for decimal precision
+                  step="0.01"
                   min="0"
                   placeholder="Coloque o valor da refeição (R$)"
                 />
