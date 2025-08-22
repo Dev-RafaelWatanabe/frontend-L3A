@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './style/components/sidebar/index';
-import { Dashboard } from './pages/dashboard/dashboard';
+import Dashboard from './pages/dashboard/dashboard';
 import { Automations } from './pages/automation/Automations';
 import { Restaurantes } from './pages/database/restaurantes/restaurante-page';
 import { Obras } from './pages/database/obras/obras-page';
