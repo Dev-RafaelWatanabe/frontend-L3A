@@ -14,8 +14,9 @@ import { PatrimonioDB } from './pages/patrimonio/cadastros/patrimonios-cadastrad
 import { AlocacaoPatrimonio } from './pages/patrimonio/alocacao/alocacao-patrimonio';
 import { AlocacaoDetalhe } from './pages/patrimonio/alocacao/alocacao-detalhe';
 import { PatrimonioDetalhe } from './pages/patrimonio/cadastros/patrimonio-detalhe';
-import { useRouteRefresh } from './services/hooks/use-route-refresh';
 import { ManutencaoPatrimonio } from './pages/patrimonio/manutencao/manutencao-patrimonio';
+import { ManutencaoDetalhe } from './pages/patrimonio/manutencao/manutencao-detalhe';
+import { useRouteRefresh } from './services/hooks/use-route-refresh';
 
 // Componente wrapper para aplicar o hook
 const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -91,6 +92,8 @@ function App() {
           <Route path="/patrimonio/alocacao/detalhe/:id" element={<AlocacaoDetalhe />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
+          {/* NOVA ROTA PARA DETALHES DA MANUTENÇÃO */}
+          <Route path="/patrimonio/manutencao/detalhe/:id" element={<ManutencaoDetalhe />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </div>

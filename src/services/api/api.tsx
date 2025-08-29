@@ -197,6 +197,12 @@ export const Api = {
     // Remove uma manutenção
     return api.delete(`/manutencao-ferramenta/${id}/`);
   },
+
+  // Buscar manutenção por ID
+  getManutencaoById: (id: number) => {
+    console.log(`🔍 Buscando manutenção ID: ${id}`);
+    return api.get(`/manutencao-ferramenta/${id}`);
+  },
 };
 
 export default Api;

@@ -35,4 +35,13 @@ export const Table = styled.table`
     border-bottom: 1px solid #eee;
     text-align: left;
   }
+
+  tbody tr {
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+  }
+
+  tbody tr:hover {
+    background: #f5f7ff;
+  }
 `;

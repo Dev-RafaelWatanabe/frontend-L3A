@@ -423,11 +423,7 @@ export const PatrimonioDB: React.FC = () => {
             fontSize: '0.8rem',
             color: '#495057'
           }}>
-            <strong>Debug:</strong> 
-            Total: {allData.length} | 
-            Filtrado: {filteredData.length} | 
-            Termo: "{filtros.nome}" | 
-            Filtros ativos: {hasActiveFilters ? 'Sim' : 'Não'}
+            Total: {allData.length} 
           </div>
         </FilterContainer>
       )}
