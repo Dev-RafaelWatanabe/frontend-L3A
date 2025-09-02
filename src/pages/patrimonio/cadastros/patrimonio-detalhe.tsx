@@ -117,8 +117,29 @@ export const PatrimonioDetalhe: React.FC = () => {
       if (!id) return;
       setLoadingHistorico(true);
       try {
-        const response = await Api.getAlocacaoHistoricoPorFerramenta(Number(id));
-        setHistorico(response.data || []);
+        const [histRes, funcRes] = await Promise.all([
+          Api.getAlocacaoHistoricoPorFerramenta(Number(id)),
+          Api.getFuncionarios()
+        ]);
+
+        const funcionarios: Array<{ id: number; nome: string }> = funcRes.data || [];
+        const mapFuncionario = new Map<number, string>(
+          funcionarios.map((f) => [f.id, f.nome])
+        );
+
+        const dados = histRes.data || [];
+        const historicoEnriquecido = dados.map((aloc: any) => ({
+          ...aloc,
+          funcionario_nome:
+            aloc?.funcionario_nome ||
+            aloc?.funcionario?.nome ||
+            mapFuncionario.get(aloc?.funcionario_id) ||
+            aloc?.responsavel_nome ||
+            aloc?.responsavel?.nome ||
+            '-'
+        }));
+
+        setHistorico(historicoEnriquecido);
       } catch (error) {
         setHistorico([]);
         console.error('Erro ao buscar histórico de alocações:', error);
@@ -347,6 +368,17 @@ export const PatrimonioDetalhe: React.FC = () => {
     }).format(valor);
   };
 
+  // Normaliza o nome do responsável vindo do histórico (pode variar por endpoint)
+  const getResponsavelNome = (aloc: any): string => {
+    return (
+      aloc?.funcionario_nome ||
+      aloc?.funcionario?.nome ||
+      aloc?.responsavel_nome ||
+      aloc?.responsavel?.nome ||
+      '-'
+    );
+  };
+
   return (
     <CardDetalhe>
       <DetalhesContainer>
@@ -489,7 +521,7 @@ export const PatrimonioDetalhe: React.FC = () => {
               {historico.map((aloc) => (
                 <tr key={aloc.id}>
                   <HistoricoTd>{aloc.obra_nome || '-'}</HistoricoTd>
-                  <HistoricoTd>{aloc.funcionario_nome || '-'}</HistoricoTd>
+                  <HistoricoTd>{getResponsavelNome(aloc)}</HistoricoTd>
                   <HistoricoTd>{aloc.data_alocacao ? new Date(aloc.data_alocacao).toLocaleDateString('pt-BR') : '-'}</HistoricoTd>
                   <HistoricoTd>{aloc.data_desalocacao ? new Date(aloc.data_desalocacao).toLocaleDateString('pt-BR') : '-'}</HistoricoTd>
                 </tr>

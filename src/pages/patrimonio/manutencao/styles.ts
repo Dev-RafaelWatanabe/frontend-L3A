@@ -12,16 +12,29 @@ export const Header = styled.div`
 `;
 
 export const Title = styled.h2`
-  color: #081168;
+  color: rgba(0, 0, 0, 0.94);
 `;
 
-export const Button = styled.button`
-  background: #081168;
-  color: #fff;
-  border: none;
-  padding: 8px 24px;
-  border-radius: 6px;
-  cursor: pointer;
+export const Button = styled.button<{ disabled?: boolean }>`
+padding: 8px 16px;
+background-color: #28a745;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+opacity: ${props => props.disabled ? 0.6 : 1};
+display: flex;
+align-items: center;
+gap: 8px;
+transition: background-color 0.2s ease;
+
+&:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+svg {
+  font-size: 16px;
+}
 `;
 
 export const Table = styled.table`
