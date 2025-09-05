@@ -4,75 +4,87 @@ import estilosDashboard from './dashboard-styles';
 
 // Define o tipo dos dados que vêm do backend
 interface ResumoFinanceiro {
-  descricao_financeira: string;
+  data?: string;
   nome_centro_custo: string;
-  grupo: string;
-  complemento: string;
   valor_reais: number;
-  data?: string; // <-- inclui data
+  descricao_financeira: string;
+  observacao?: string;
 }
 
 const Dashboard: React.FC = () => {
   const [resumo, setResumo] = useState<ResumoFinanceiro[]>([]);
-  const [abertos, setAbertos] = useState<string[]>([]);
-  const [subAbertos, setSubAbertos] = useState<string[]>([]);
-  const [filtroCentroCusto, setFiltroCentroCusto] = useState<string>('');
-  const [dataInicio, setDataInicio] = useState<string>('');
-  const [dataFim, setDataFim] = useState<string>('');
+  const [filtroDescricao, setFiltroDescricao] = useState<string>(''); // Filtro de descrição financeira
+  const [filtroCentroCusto, setFiltroCentroCusto] = useState<string>(''); // Filtro de centro de custo
+  const [dataInicio, setDataInicio] = useState<string>(''); // Filtro de data inicial
+  const [dataFim, setDataFim] = useState<string>(''); // Filtro de data final
+  const [pagina, setPagina] = useState<number>(1); // Paginação
+  const [gruposExpandido, setGruposExpandido] = useState<Record<string, boolean>>({}); // Controle de expansão dos grupos
+  const tamanhoPagina = 100; // Tamanho da página
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/relatorio/resumo')
+  // Função para buscar os dados da API
+  const buscarDados = () => {
+    const url = new URL('http://localhost:8000/relatorio/resumo');
+    url.searchParams.append('pagina', pagina.toString());
+    url.searchParams.append('tamanho_pagina', tamanhoPagina.toString());
+    if (filtroDescricao) {
+      url.searchParams.append('descricao_financeira', filtroDescricao);
+    }
+    if (filtroCentroCusto) {
+      url.searchParams.append('centro_custo', filtroCentroCusto);
+    }
+    if (dataInicio) {
+      url.searchParams.append('data_inicio', dataInicio);
+    }
+    if (dataFim) {
+      url.searchParams.append('data_fim', dataFim);
+    }
+
+    axios.get(url.toString())
       .then(response => {
         setResumo(response.data);
       })
       .catch(error => {
         console.error('Erro ao buscar resumo:', error);
       });
-  }, []);
-
-  // Filtra pelo nome do centro de custo e intervalo de datas
-  const resumoFiltrado = resumo.filter(item => {
-    const centroOk = filtroCentroCusto
-      ? item.nome_centro_custo.toLowerCase().includes(filtroCentroCusto.toLowerCase())
-      : true;
-
-    // Converte data para formato YYYY-MM-DD
-    const dataItem = item.data
-      ? item.data.length === 10 && item.data.includes('/')
-        ? item.data.split('/').reverse().join('-')
-        : item.data
-      : '';
-
-    const inicioOk = dataInicio ? dataItem >= dataInicio : true;
-    const fimOk = dataFim ? dataItem <= dataFim : true;
-
-    return centroOk && inicioOk && fimOk;
-  });
-
-  // Agrupa por descricao_financeira, depois por grupo
-  const agrupado = resumoFiltrado.reduce((acc, item) => {
-    const chave1 = item.descricao_financeira;
-    const chave2 = item.grupo;
-    if (!acc[chave1]) acc[chave1] = {};
-    if (!acc[chave1][chave2]) acc[chave1][chave2] = [];
-    acc[chave1][chave2].push(item);
-    return acc;
-  }, {} as Record<string, Record<string, ResumoFinanceiro[]>>);
-
-  const toggleGrupo = (chave: string) => {
-    setAbertos(prev =>
-      prev.includes(chave)
-        ? prev.filter(d => d !== chave)
-        : [...prev, chave]
-    );
   };
 
-  const toggleSubGrupo = (chave: string) => {
-    setSubAbertos(prev =>
-      prev.includes(chave)
-        ? prev.filter(d => d !== chave)
-        : [...prev, chave]
-    );
+  // Atualiza os dados sempre que a página ou os filtros mudarem
+  useEffect(() => {
+    buscarDados();
+  }, [pagina, filtroDescricao, filtroCentroCusto, dataInicio, dataFim]);
+
+  const proximaPagina = () => setPagina(prev => prev + 1);
+  const paginaAnterior = () => pagina > 1 && setPagina(prev => prev - 1);
+
+  // Agrupa os dados por descrição financeira
+  const agruparPorDescricaoFinanceira = (dados: ResumoFinanceiro[]) => {
+    return dados.reduce((acc, item) => {
+      if (!acc[item.descricao_financeira]) {
+        acc[item.descricao_financeira] = [];
+      }
+      acc[item.descricao_financeira].push(item);
+      return acc;
+    }, {} as Record<string, ResumoFinanceiro[]>);
+  };
+
+  // Ordena os grupos pela soma dos valores
+  const ordenarGrupos = (dadosAgrupados: Record<string, ResumoFinanceiro[]>) => {
+    return Object.entries(dadosAgrupados)
+      .sort(([, grupoA], [, grupoB]) => {
+        const somaA = grupoA.reduce((acc, item) => acc + item.valor_reais, 0);
+        const somaB = grupoB.reduce((acc, item) => acc + item.valor_reais, 0);
+        return somaB - somaA; // Ordena em ordem decrescente
+      });
+  };
+
+  const dadosAgrupados = ordenarGrupos(agruparPorDescricaoFinanceira(resumo));
+
+  // Alterna o estado de expansão de um grupo
+  const alternarGrupo = (descricao: string) => {
+    setGruposExpandido(prev => ({
+      ...prev,
+      [descricao]: !prev[descricao],
+    }));
   };
 
   return (
@@ -80,7 +92,18 @@ const Dashboard: React.FC = () => {
       <h1 style={{ marginBottom: 0, color: '#1976d2' }}>Dashboard</h1>
       <h2 style={{ marginTop: 4, fontWeight: 400, color: '#333' }}>Resumo Financeiro</h2>
 
-      <div style={{ marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+        <label htmlFor="filtroDescricao" style={{ fontWeight: 500 }}>
+          Descrição Financeira:
+        </label>
+        <input
+          id="filtroDescricao"
+          type="text"
+          style={estilosDashboard.select}
+          placeholder="Digite a descrição..."
+          value={filtroDescricao}
+          onChange={e => setFiltroDescricao(e.target.value)}
+        />
         <label htmlFor="filtroCentroCusto" style={{ fontWeight: 500 }}>
           Centro de Custo:
         </label>
@@ -88,7 +111,7 @@ const Dashboard: React.FC = () => {
           id="filtroCentroCusto"
           type="text"
           style={estilosDashboard.select}
-          placeholder="Digite o nome..."
+          placeholder="Digite o centro de custo..."
           value={filtroCentroCusto}
           onChange={e => setFiltroCentroCusto(e.target.value)}
         />
@@ -114,78 +137,70 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      <table style={estilosDashboard.table}>
-        <thead>
-          <tr>
-            <th style={estilosDashboard.th}>Descrição Financeira</th>
-            <th style={estilosDashboard.th}>Grupo</th>
-            <th style={estilosDashboard.th}>Valor (R$)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(agrupado).map(([descricao, grupos]) => {
-            const valorDescricao = Object.values(grupos).flat().reduce((soma, i) => soma + i.valor_reais, 0);
-            return (
-              <React.Fragment key={descricao}>
-                <tr
-                  style={estilosDashboard.trGrupo}
-                  onClick={() => toggleGrupo(descricao)}
-                >
-                  <td style={estilosDashboard.td}>
-                    <b>{descricao}</b> <span style={{ color: '#1976d2' }}>({Object.values(grupos).flat().length} registros)</span>
-                    <span style={{ float: 'right', fontSize: 18 }}>
-                      {abertos.includes(descricao) ? '▲' : '▼'}
-                    </span>
-                  </td>
-                  <td style={estilosDashboard.td}></td>
-                  <td style={estilosDashboard.td}>
-                    <b>{valorDescricao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</b>
-                  </td>
-                </tr>
-                {abertos.includes(descricao) && Object.entries(grupos).map(([grupo, itens]) => {
-                  const valorGrupo = itens.reduce((soma, i) => soma + i.valor_reais, 0);
-                  return (
-                    <React.Fragment key={grupo}>
-                      <tr
-                        style={{ ...estilosDashboard.trGrupo, background: '#f5f5f5' }}
-                        onClick={() => toggleSubGrupo(descricao + grupo)}
-                      >
-                        <td style={estilosDashboard.td}></td>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={estilosDashboard.table}>
+          <thead>
+            <tr>
+              <th style={estilosDashboard.th}>Data</th>
+              <th style={estilosDashboard.th}>Centro de Custo</th>
+              <th style={estilosDashboard.th}>Valor (R$)</th>
+              <th style={estilosDashboard.th}>Observação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dadosAgrupados.map(([descricao, grupo], idx) => {
+              const subtotal = grupo.reduce((acc, item) => acc + item.valor_reais, 0); // Calcula o subtotal do grupo
+
+              return (
+                <React.Fragment key={idx}>
+                  {/* Cabeçalho do grupo com subtotal */}
+                  <tr style={estilosDashboard.trGrupo}>
+                    <td colSpan={2} style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={() => alternarGrupo(descricao)}>
+                      {descricao} {gruposExpandido[descricao] ? '[-]' : '[+]'}
+                    </td>
+                    <td style={{ fontWeight: 'bold' }}>
+                      {subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </td>
+                    <td></td>
+                  </tr>
+                  {/* Linhas do grupo */}
+                  {gruposExpandido[descricao] &&
+                    grupo.map((item, subIdx) => (
+                      <tr key={subIdx}>
+                        <td style={estilosDashboard.td}>{item.data}</td>
+                        <td style={estilosDashboard.td}>{item.nome_centro_custo}</td>
                         <td style={estilosDashboard.td}>
-                          <b>{grupo}</b> <span style={{ color: '#1976d2' }}>({itens.length} registros)</span>
-                          <span style={{ float: 'right', fontSize: 16 }}>
-                            {subAbertos.includes(descricao + grupo) ? '▲' : '▼'}
-                          </span>
+                          {item.valor_reais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                         </td>
-                        <td style={estilosDashboard.td}>
-                          <b>{valorGrupo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</b>
-                        </td>
+                        <td style={estilosDashboard.td}>{item.observacao || '-'}</td>
                       </tr>
-                      {subAbertos.includes(descricao + grupo) && itens.map((item, idx) => (
-                        <tr key={idx}>
-                          <td style={estilosDashboard.td}></td>
-                          <td style={estilosDashboard.td}>
-                            <div style={estilosDashboard.detalhe}>
-                              <div><b>Centro de Custo:</b> {item.nome_centro_custo}</div>
-                              <div><b>Complemento:</b> {item.complemento}</div>
-                              <div><b>Data:</b> {item.data}</div>
-                            </div>
-                          </td>
-                          <td style={estilosDashboard.td}>
-                            <span style={{ fontWeight: 500 }}>
-                              {item.valor_reais.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </React.Fragment>
-                  );
-                })}
-              </React.Fragment>
-            );
-          })}
-        </tbody>
-      </table>
+                    ))}
+                  {/* Subtotal do grupo (quando expandido) */}
+                  {gruposExpandido[descricao] && (
+                    <tr style={{ backgroundColor: '#f0f0f0', fontWeight: 'bold' }}>
+                      <td colSpan={2} style={estilosDashboard.td}>Subtotal</td>
+                      <td style={estilosDashboard.td}>
+                        {subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </td>
+                      <td style={estilosDashboard.td}></td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between' }}>
+        <button onClick={paginaAnterior} disabled={pagina === 1} style={estilosDashboard.botao}>
+          Página Anterior
+        </button>
+        <span>Página {pagina}</span>
+        <button onClick={proximaPagina} style={estilosDashboard.botao}>
+          Próxima Página
+        </button>
+      </div>
     </div>
   );
 };

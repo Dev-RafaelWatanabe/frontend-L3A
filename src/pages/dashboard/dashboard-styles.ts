@@ -43,7 +43,20 @@ const estilosDashboard = {
     padding: '6px 10px',
     marginBottom: 4,
     boxShadow: '0 1px 4px #0001'
-  } as React.CSSProperties
+  } as React.CSSProperties,
+  botao: {
+    padding: '8px 16px',
+    background: '#1976d2',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'pointer',
+    fontSize: 14,
+    transition: 'background 0.3s',
+    ':hover': {
+      background: '#1565c0',
+    },
+  } as React.CSSProperties,
 };
 
 export default estilosDashboard;

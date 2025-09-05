@@ -49,9 +49,14 @@ export const Api = {
     return response;
   },
 
-  getLancamentos: () => {
-  return api.get('/lancamento/');
-},
+  getLancamentos: (params?: Record<string, string | number>) => {
+    return api.get('/lancamento/', {
+      params, // Envia os parâmetros diretamente na query string
+      headers: {
+        'accept': 'application/json',
+      },
+    });
+  },
 
   createLancamento: (data: any) => {
     return api.post('/lancamento/', data, {
