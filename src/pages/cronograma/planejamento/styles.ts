@@ -60,6 +60,20 @@ export const ButtonGroup = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: rgba(8, 1, 104, 0.94);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(8, 1, 104, 0.8);
+    }
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
   }
 `;
 
@@ -80,9 +94,14 @@ export const DayCell = styled.div<{ isSelected?: boolean; isWeekend?: boolean }>
   border-radius: 4px;
   cursor: pointer;
   background-color: ${props => {
-    if (props.isSelected) return 'rgba(8, 1, 104, 0.1)';
+    if (props.isSelected) return 'rgba(8, 1, 104, 0.94)';
     if (props.isWeekend) return '#f5f5f5';
     return 'white';
+  }};
+  color: ${props => {
+    if (props.isSelected) return 'white';
+    if (props.isWeekend) return '#999';
+    return '#333';
   }};
   text-align: center;
 
@@ -164,80 +183,51 @@ export const PlanningCard = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  min-width: 300px;
-  max-width: 350px;
-  height: fit-content;
+  border-left: 4px solid rgba(8, 1, 104, 0.94);
 
   h3 {
+    margin: 0 0 15px 0;
     color: rgba(8, 1, 104, 0.94);
-    margin-bottom: 15px;
     font-size: 16px;
-    border-bottom: 2px solid rgba(8, 1, 104, 0.1);
-    padding-bottom: 10px;
   }
 
   .planejamento-grupo {
-    margin-bottom: 15px;
-    padding: 12px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    position: relative;
-
     .obra-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-
-    .obra-info {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .edit-icon {
-      font-size: 20px;
-      color: rgb(3, 3, 3);
-      cursor: pointer;
-      padding: 2px;
-      border-radius: 4px;
-      transition: all 0.2s ease;
-      margin-left: 8px;
-
-      &:hover {
-        color:rgb(63, 63, 63);
-        background-color: rgba(0, 0, 0, 0.05);
+      margin-bottom: 10px;
+      
+      .obra-info {
+        .obra {
+          font-weight: 600;
+          font-size: 14px;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .turno {
+          font-size: 12px;
+          color: #666;
+          background: rgba(8, 1, 104, 0.1);
+          padding: 4px 8px;
+          border-radius: 4px;
+          display: inline-block;
+        }
       }
     }
-
-    .obra {
-      font-weight: 500;
-      color: rgba(8, 1, 104, 0.94);
-      font-size: 14px;
-
-      .turnos {
-        color: rgba(0, 0, 0, 0.66);
-        font-style: italic;
-        margin-left: 4px;
-      }
-    }
-
+    
     .funcionarios {
       list-style: none;
-      padding-left: 15px;
+      padding: 0;
+      margin: 10px 0 0 0;
       
       li {
-        padding: 3px 0;
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 4px;
         font-size: 14px;
+        color: #555;
+        border-left: 3px solid rgba(8, 1, 104, 0.3);
       }
-    }
-
-    .turno {
-      color: #666;
-      font-size: 13px;
-      margin-bottom: 8px;
-      font-style: italic;
     }
   }
 `;
@@ -304,4 +294,13 @@ export const SelectedFuncionariosDisplay = styled.div`
   font-size: 14px;
   color: #666;
   margin-top: 5px;
+`;
+
+export const TurnoContainer = styled.div`
+  .turno-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
 `;

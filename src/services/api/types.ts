@@ -85,8 +85,26 @@ export interface PlanejamentoDiario {
 }
 
 export interface Planejamento {
-  obra: Obra;
-  funcionarios: Funcionario[];
+  id: number;
+  data_trabalho: string;
+  horario_inicio: string;
+  funcionario_id: number;
+  obra_id: number;
+  funcionario: {
+    id: number;
+    nome: string;
+  };
+  obra: {
+    id: number;
+    nome: string;
+  };
+}
+
+export interface PlanejamentoCreate {
+  data_trabalho: string;
+  horario_inicio: string;
+  funcionario_nome: string;
+  obra_nome: string;
 }
 
 export interface LancamentoPage {
@@ -175,4 +193,26 @@ export interface Alocacao {
   ferramenta_nome?: string;
   obra_nome?: string;
   funcionario_nome?: string;
+}
+
+export interface Manutencao {
+  id: number;
+  obra_id: number;
+  funcionario_id: number;
+  ferramenta_id: number;
+  data_manutencao: string;
+  descricao_problema: string;
+  acao_tomada: string;
+  funcionario: {
+    id: number;
+    nome: string;
+  };
+  obra: {
+    id: number;
+    nome: string;
+  };
+  ferramenta: {
+    id: number;
+    nome: string;
+  };
 }
