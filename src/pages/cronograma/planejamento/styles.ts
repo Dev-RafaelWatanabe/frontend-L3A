@@ -123,39 +123,11 @@ export const DayCell = styled.div<{ isSelected?: boolean; isWeekend?: boolean }>
   }
 `;
 
-export const MultiSelectContainer = styled.div`
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-`;
-
-export const CheckboxOption = styled.div`
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  &:hover {
-    background-color: rgba(8, 1, 104, 0.05);
-  }
-
-  input[type="checkbox"] {
-    width: auto;
-  }
-
-  label {
-    cursor: pointer;
-    flex: 1;
-  }
-`;
-
 export const SearchInput = styled.input`
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  margin-bottom: 8px;
   font-size: 14px;
 
   &:focus {
@@ -165,8 +137,73 @@ export const SearchInput = styled.input`
 `;
 
 export const SelectWrapper = styled.div`
+  position: relative;
   display: flex;
   flex-direction: column;
+`;
+
+export const DropdownContainer = styled.div`
+  position: relative;
+`;
+
+export const DropdownList = styled.div<{ isOpen?: boolean }>`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: ${props => props.isOpen ? '200px' : '0'};
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: max-height 0.2s ease;
+  opacity: ${props => props.isOpen ? '1' : '0'};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+`;
+
+export const DropdownOption = styled.div`
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:hover {
+    background-color: rgba(8, 1, 104, 0.05);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+export const CheckboxOption = styled.div`
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:hover {
+    background-color: rgba(8, 1, 104, 0.05);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+  }
+
+  label {
+    cursor: pointer;
+    flex: 1;
+    margin: 0;
+  }
 `;
 
 export const PlanningCardContainer = styled.div`
@@ -230,70 +267,6 @@ export const PlanningCard = styled.div`
       }
     }
   }
-`;
-
-export const ComboboxInput = styled.input`
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-
-  &:focus {
-    outline: none;
-    border-color: rgba(8, 1, 104, 0.94);
-  }
-`;
-
-export const ComboboxOptions = styled.div`
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-top: 4px;
-  max-height: 161px;
-  overflow-y: auto;
-  z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-`;
-
-export const ComboboxOption = styled.div`
-  padding: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: rgba(8, 1, 104, 0.05);
-  }
-
-  &:not(:last-child) {
-    border-bottom: 1px solid #eee;
-  }
-`;
-
-export const FuncionariosCombobox = styled(ComboboxContainer)`
-  .checkbox-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-`;
-
-export const SelectedFuncionariosDisplay = styled.div`
-  font-size: 14px;
-  color: #666;
-  margin-top: 5px;
 `;
 
 export const TurnoContainer = styled.div`

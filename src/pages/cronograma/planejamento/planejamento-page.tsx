@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Container,
   FormContainer,
@@ -8,13 +8,14 @@ import {
   Calendar,
   CalendarContainer,
   DayCell,
-  MultiSelectContainer,
   CheckboxOption,
   SearchInput,
-  SelectWrapper,
   TurnoContainer,
   PlanningCardContainer,
   PlanningCard,
+  DropdownContainer,
+  DropdownList,
+  DropdownOption,
 } from './styles'
 import { Api } from '../../../services/api/api'
 import type { Planejamento, PlanejamentoCreate, Funcionario, Obra } from '../../../services/api/types'
@@ -29,10 +30,31 @@ export function CronogramaPlanejamento() {
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [funcionarioSearch, setFuncionarioSearch] = useState('')
   const [obraSearch, setObraSearch] = useState('')
+  const [isFuncionarioDropdownOpen, setIsFuncionarioDropdownOpen] = useState(false)
+  const [isObraDropdownOpen, setIsObraDropdownOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Refs para detectar cliques fora dos dropdowns
+  const funcionarioRef = useRef<HTMLDivElement>(null)
+  const obraRef = useRef<HTMLDivElement>(null)
+
   const turnos = ['Manhã', 'Tarde', 'Noite']
+
+  // Fechar dropdowns quando clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (funcionarioRef.current && !funcionarioRef.current.contains(event.target as Node)) {
+        setIsFuncionarioDropdownOpen(false)
+      }
+      if (obraRef.current && !obraRef.current.contains(event.target as Node)) {
+        setIsObraDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Gerar próximos 14 dias
   const getNext14Days = () => {
@@ -100,6 +122,13 @@ export function CronogramaPlanejamento() {
     )
   }
 
+  const handleObraSelect = (obraId: number) => {
+    setSelectedObra(obraId)
+    const obra = obras.find(o => o.id === obraId)
+    setObraSearch(obra?.nome || '')
+    setIsObraDropdownOpen(false)
+  }
+
   const handleTurnoToggle = (turno: string) => {
     setSelectedTurnos(prev =>
       prev.includes(turno)
@@ -154,6 +183,8 @@ export function CronogramaPlanejamento() {
       setSelectedObra(null)
       setSelectedTurnos([])
       setSelectedDates([])
+      setFuncionarioSearch('')
+      setObraSearch('')
       
       // Recarregar planejamentos
       const response = await Api.getPlanejamentos()
@@ -175,13 +206,14 @@ export function CronogramaPlanejamento() {
         <SelectGroup>
           <FormField>
             <label>Funcionários:</label>
-            <SelectWrapper>
+            <DropdownContainer ref={funcionarioRef}>
               <SearchInput
                 placeholder="Buscar funcionário..."
                 value={funcionarioSearch}
                 onChange={(e) => setFuncionarioSearch(e.target.value)}
+                onFocus={() => setIsFuncionarioDropdownOpen(true)}
               />
-              <MultiSelectContainer>
+              <DropdownList isOpen={isFuncionarioDropdownOpen}>
                 {filteredFuncionarios.map(funcionario => (
                   <CheckboxOption key={funcionario.id}>
                     <input
@@ -195,36 +227,47 @@ export function CronogramaPlanejamento() {
                     </label>
                   </CheckboxOption>
                 ))}
-              </MultiSelectContainer>
+                {filteredFuncionarios.length === 0 && (
+                  <DropdownOption>
+                    Nenhum funcionário encontrado
+                  </DropdownOption>
+                )}
+              </DropdownList>
               <small>
                 {selectedFuncionarios.length === 0 
                   ? 'Nenhum funcionário selecionado' 
                   : `${selectedFuncionarios.length} funcionário(s) selecionado(s)`
                 }
               </small>
-            </SelectWrapper>
+            </DropdownContainer>
           </FormField>
 
           <FormField>
             <label>Obra:</label>
-            <SelectWrapper>
+            <DropdownContainer ref={obraRef}>
               <SearchInput
                 placeholder="Buscar obra por nome ou código..."
                 value={obraSearch}
-                onChange={(e) => setObraSearch(e.target.value)}
+                onChange={(e) => {
+                  setObraSearch(e.target.value)
+                  setSelectedObra(null)
+                }}
+                onFocus={() => setIsObraDropdownOpen(true)}
               />
-              <select
-                value={selectedObra || ''}
-                onChange={(e) => setSelectedObra(e.target.value ? Number(e.target.value) : null)}
-              >
-                <option value="">Selecione uma obra</option>
+              <DropdownList isOpen={isObraDropdownOpen}>
                 {filteredObras.map(obra => (
-                  <option key={obra.id} value={obra.id}>
+                  <DropdownOption
+                    key={obra.id}
+                    onClick={() => handleObraSelect(obra.id)}
+                  >
                     {obra.nome}
-                  </option>
+                  </DropdownOption>
                 ))}
-              </select>
-            </SelectWrapper>
+                {filteredObras.length === 0 && (
+                  <DropdownOption>Nenhuma obra encontrada</DropdownOption>
+                )}
+              </DropdownList>
+            </DropdownContainer>
           </FormField>
         </SelectGroup>
 
