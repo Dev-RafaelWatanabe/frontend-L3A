@@ -80,7 +80,7 @@ function App() {
           <Route path="/dashboard/reports" element={<Dashboard />} />
           <Route path="/automations/settings" element={<Automations />} />
           <Route path="/automations/history" element={<Automations />} />
-          <Route path="/database/restaurantes" element={<Restaurantes />} />
+          <Route path="/restaurantes/" element={<Restaurantes />} />
           <Route path="/database/obras" element={<Obras />} />
           <Route path="/database/funcionarios" element={<Funcionarios />} />
           <Route path="/database/lancamentos" element={<Lancamentos />} />
