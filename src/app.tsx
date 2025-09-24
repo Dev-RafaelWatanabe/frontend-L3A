@@ -46,7 +46,7 @@ function App() {
       id: 3,
       label: 'Banco de Dados',
       subItems: [
-        { id: 'db1', label: 'Restaurantes', path: '/database/restaurantes' },
+        { id: 'db1', label: 'Restaurantes', path: 'database/restaurantes' },
         { id: 'db2', label: 'Obras', path: '/database/obras' },
         { id: 'db3', label: 'Funcionários', path: '/database/funcionarios' },
         { id: 'db4', label: 'Lançamentos', path: '/database/lancamentos' },

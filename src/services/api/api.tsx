@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { PaginacaoParams } from './types';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/'
+  baseURL: '/api/'
 });
 
 // Adicionar interceptors para debug
