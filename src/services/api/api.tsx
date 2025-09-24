@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { PaginacaoParams } from './types';
+import type { PlanejamentoCreate } from './types';
 
 const api = axios.create({
   baseURL: '/api/'
@@ -203,6 +204,11 @@ export const Api = {
     console.log(`🔍 Buscando manutenção ID: ${id}`);
     return api.get(`/manutencao-ferramenta/${id}`);
   },
+
+  getPlanejamentos: () => api.get('/planejamento/'),
+  
+  createPlanejamento: (data: PlanejamentoCreate) => 
+    api.post('/planejamento/', data),
 };
 
 export default Api;

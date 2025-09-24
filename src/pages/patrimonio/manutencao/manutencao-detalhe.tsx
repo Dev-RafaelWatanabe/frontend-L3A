@@ -20,7 +20,7 @@ interface ManutencaoDetalhe {
   custo: number;
   data_inicio: string;
   data_fim: string;
-}
+} 
 
 export const ManutencaoDetalhe: React.FC = () => {
   const { id } = useParams<{ id: string }>();
