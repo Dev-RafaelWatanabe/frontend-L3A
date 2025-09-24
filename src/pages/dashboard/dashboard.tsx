@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import Api from '../../services/api/api'; // importa o serviço
 import estilosDashboard from './dashboard-styles';
 
 // Define o tipo dos dados que vêm do backend
@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
   const [dataFim, setDataFim] = useState<string>('');
 
   useEffect(() => {
-    axios.get('http://localhost:8000/relatorio/resumo')
+    Api.getDashboardResumo()
       .then(response => {
         setResumo(response.data);
       })

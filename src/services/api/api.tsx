@@ -209,6 +209,8 @@ export const Api = {
   
   createPlanejamento: (data: PlanejamentoCreate) => 
     api.post('/planejamento/', data),
+
+  getDashboardResumo: () => api.get('/relatorio/resumo')
 };
 
 export default Api;
