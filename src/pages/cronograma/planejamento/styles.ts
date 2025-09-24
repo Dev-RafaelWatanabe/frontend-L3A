@@ -25,6 +25,7 @@ export const SelectGroup = styled.div`
 
 export const FormField = styled.div`
   margin-bottom: 15px;
+  margin-top: 25px;
   
   label {
     display: block;
@@ -43,7 +44,7 @@ export const FormField = styled.div`
       outline: none;
       border-color: rgba(8, 1, 104, 0.94);
     }
-  }
+  } 
 `;
 
 export const ButtonGroup = styled.div`
@@ -68,6 +69,7 @@ export const ButtonGroup = styled.div`
 
     &:hover {
       background-color: rgba(8, 1, 104, 0.8);
+      transition: background-color 0.3s ease;
     }
 
     &:disabled {
@@ -94,13 +96,13 @@ export const DayCell = styled.div<{ isSelected?: boolean; isWeekend?: boolean }>
   border-radius: 4px;
   cursor: pointer;
   background-color: ${props => {
-    if (props.isSelected) return 'rgba(8, 1, 104, 0.94)';
-    if (props.isWeekend) return '#f5f5f5';
+    if (props.isSelected) return '#e9e9e9';
+    if (props.isWeekend) return '#cfcfcfff';
     return 'white';
   }};
   color: ${props => {
-    if (props.isSelected) return 'white';
-    if (props.isWeekend) return '#999';
+    if (props.isSelected) return '#000000ff';
+    if (props.isWeekend) return '#000000ff';
     return '#333';
   }};
   text-align: center;
@@ -109,6 +111,7 @@ export const DayCell = styled.div<{ isSelected?: boolean; isWeekend?: boolean }>
     background-color: ${props => 
       props.isWeekend ? '#e9e9e9' : 'rgba(8, 1, 104, 0.05)'
     };
+    transition: background-color 0.5s ease;
   }
 
   .weekday {

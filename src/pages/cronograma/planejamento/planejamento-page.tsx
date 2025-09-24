@@ -314,7 +314,7 @@ export function CronogramaPlanejamento() {
 
         <ButtonGroup>
           <button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? 'Registrando...' : `Registrar Planejamento (${selectedFuncionarios.length} funcionário${selectedFuncionarios.length !== 1 ? 's' : ''}, ${selectedDates.length} dia${selectedDates.length !== 1 ? 's' : ''})`}
+            {isLoading ? 'Criando...' : `Criar Planejamento`}
           </button>
         </ButtonGroup>
       </FormContainer>
