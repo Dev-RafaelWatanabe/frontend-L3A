@@ -134,10 +134,67 @@ export function CronogramaPlanejamento() {
     )
   }
 
+  const handleCancelar = () => {
+    setSelectedFuncionarios([])
+    setSelectedObra(null)
+    setSelectedDates([])
+    setHoraInicio('08:00')
+    setFuncionarioSearch('')
+    setObraSearch('')
+    setError(null)
+  }
+
+  const handleDeletePlanejamento = async (id: number) => {
+    if (confirm('Tem certeza que deseja excluir este planejamento?')) {
+      try {
+        await Api.deletePlanejamento(id)
+        const response = await Api.getPlanejamentos()
+        setPlanejamentos(response.data)
+      } catch (err: any) {
+        console.error('Erro ao excluir planejamento:', err)
+        setError(err.response?.data?.detail || 'Erro ao excluir planejamento')
+      }
+    }
+  }
+
+  const handleCopyPlanejamento = (grupo: PlanejamentoGroup) => {
+    const date = new Date(grupo.data_trabalho + 'T00:00:00')
+    const diasSemana = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado']
+    const diaSemana = diasSemana[date.getDay()]
+    const dia = date.getDate().toString().padStart(2, '0')
+    const mes = (date.getMonth() + 1).toString().padStart(2, '0')
+    
+    let mensagem = `*Planejamento diário ${diaSemana} ${dia}/${mes}*\n\n`
+    
+    grupo.horarios.forEach(horario => {
+      const obraNomeLimpo = grupo.obra.nome.includes('-') ? grupo.obra.nome.split('-').slice(1).join('-').trim() : grupo.obra.nome
+      const horarioFormatado = horario.horario_inicio.substring(0, 5) + 'hrs'
+      const centroCusto = grupo.obra.nome.includes('-') ? grupo.obra.nome.split('-')[0].trim().substring(0, 4) : grupo.obra.nome.substring(0, 4)
+      
+      mensagem += `*${obraNomeLimpo} ${horarioFormatado} CC ${centroCusto}*\n`
+      horario.funcionarios.forEach(funcionario => {
+        mensagem += `${funcionario.nome}\n`
+      })
+      mensagem += '\n'
+    })
+    
+    // Copiar para clipboard
+    navigator.clipboard.writeText(mensagem).then(() => {
+      alert('Planejamento copiado para a área de transferência!')
+    }).catch(() => {
+      alert('Erro ao copiar planejamento')
+    })
+  }
+
   // Função para formatar o título da obra
   const formatObraTitle = (obraNome: string, horario: string) => {
-    const obraPrefix = obraNome.includes('-') ? obraNome.split('-')[0].trim().substring(0, 4) : obraNome.substring(0, 4)
-    return `${obraNome} (${horario}) CC ${obraPrefix}`
+    // Remover os 4 primeiros dígitos e o "-" se existir
+    const obraNomeLimpo = obraNome.includes('-') ? obraNome.split('-').slice(1).join('-').trim() : obraNome
+    // Formatar horário apenas com horas e minutos + "hrs"
+    const horarioFormatado = horario.substring(0, 5) + 'hrs'
+    // Extrair código do centro de custo (primeiros 4 dígitos)
+    const centroCusto = obraNome.includes('-') ? obraNome.split('-')[0].trim().substring(0, 4) : obraNome.substring(0, 4)
+    return `${obraNomeLimpo} ${horarioFormatado} CC ${centroCusto}`
   }
 
   // Função para formatar o título do planejamento
@@ -342,7 +399,17 @@ export function CronogramaPlanejamento() {
 
         <ButtonGroup>
           <button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? 'Criando...' : `Criar Planejamento`}
+            {isLoading ? 'Criando...' : 'Criar Planejamento'}
+          </button>
+          <button 
+            onClick={handleCancelar} 
+            disabled={isLoading}
+            style={{ 
+              backgroundColor: '#dc3545', 
+              marginLeft: '10px' 
+            }}
+          >
+            Desmarcar
           </button>
         </ButtonGroup>
       </FormContainer>
@@ -350,7 +417,38 @@ export function CronogramaPlanejamento() {
       <PlanningCardContainer>
         {Object.values(groupedPlanejamentos).map((grupo: PlanejamentoGroup, index) => (
           <PlanningCard key={`${grupo.data_trabalho}-${grupo.obra.id}-${index}`}>
-            <h3>{formatPlanejamentoTitle(grupo.data_trabalho)}</h3>
+            <div className="card-header">
+              <h3>{formatPlanejamentoTitle(grupo.data_trabalho)}</h3>
+              <div className="card-actions">
+                <button 
+                  className="action-btn copy-btn"
+                  onClick={() => handleCopyPlanejamento(grupo)}
+                  title="Copiar Planejamento"
+                >
+                  📋
+                </button>
+                <button 
+                  className="action-btn edit-btn"
+                  onClick={() => alert('Funcionalidade de edição em desenvolvimento')}
+                  title="Editar Planejamento"
+                >
+                  ✏️
+                </button>
+                <button 
+                  className="action-btn delete-btn"
+                  onClick={() => {
+                    // Para excluir, precisamos dos IDs individuais dos planejamentos
+                    const planejamentosDoGrupo = planejamentos.filter(p => 
+                      p.data_trabalho === grupo.data_trabalho && p.obra.id === grupo.obra.id
+                    )
+                    planejamentosDoGrupo.forEach(p => handleDeletePlanejamento(p.id))
+                  }}
+                  title="Excluir Planejamento"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
             <div className="planejamento-grupo">
               {grupo.horarios.map((horario: HorarioGroup, horarioIndex: number) => (
                 <div key={horarioIndex} className="obra-header">

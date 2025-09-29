@@ -225,6 +225,60 @@ export const PlanningCard = styled.div`
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   border-left: 4px solid rgba(8, 1, 104, 0.94);
 
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    h3 {
+      margin: 0;
+      color: rgba(8, 1, 104, 0.94);
+      font-size: 16px;
+      flex: 1;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+
+      .action-btn {
+        background: none;
+        border: none;
+        padding: 6px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        &.copy-btn {
+          color: #28a745;
+          &:hover {
+            background-color: rgba(40, 167, 69, 0.1);
+          }
+        }
+
+        &.edit-btn {
+          color: #ffc107;
+          &:hover {
+            background-color: rgba(255, 193, 7, 0.1);
+          }
+        }
+
+        &.delete-btn {
+          color: #dc3545;
+          &:hover {
+            background-color: rgba(220, 53, 69, 0.1);
+          }
+        }
+      }
+    }
+  }
+
   h3 {
     margin: 0 0 15px 0;
     color: rgba(8, 1, 104, 0.94);

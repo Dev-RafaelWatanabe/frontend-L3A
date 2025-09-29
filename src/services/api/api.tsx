@@ -209,6 +209,9 @@ export const Api = {
   
   createPlanejamento: (data: PlanejamentoCreate) => 
     api.post('/planejamento/', data),
+    
+  deletePlanejamento: (id: number) => 
+    api.delete(`/planejamento/${id}`),
 };
 
 export default Api;
