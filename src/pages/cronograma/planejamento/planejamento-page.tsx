@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
+import { FaCopy, FaRegEdit } from 'react-icons/fa'
+import { MdDelete } from 'react-icons/md'
+import { IoIosSend } from 'react-icons/io'
 import {
   Container,
   FormContainer,
@@ -26,7 +29,7 @@ export function CronogramaPlanejamento() {
   const [selectedFuncionarios, setSelectedFuncionarios] = useState<number[]>([])
   const [selectedObra, setSelectedObra] = useState<number | null>(null)
   const [selectedDates, setSelectedDates] = useState<string[]>([])
-  const [horaInicio, setHoraInicio] = useState<string>('08:00')
+  const [horaInicio, setHoraInicio] = useState<string>('07:00')
   const [funcionarioSearch, setFuncionarioSearch] = useState('')
   const [obraSearch, setObraSearch] = useState('')
   const [isFuncionarioDropdownOpen, setIsFuncionarioDropdownOpen] = useState(false)
@@ -157,8 +160,8 @@ export function CronogramaPlanejamento() {
     }
   }
 
-  const handleCopyPlanejamento = (grupo: PlanejamentoGroup) => {
-    const date = new Date(grupo.data_trabalho + 'T00:00:00')
+  const handleCopyPlanejamento = (dayGroup: DayPlanejamentoGroup) => {
+    const date = new Date(dayGroup.data_trabalho + 'T00:00:00')
     const diasSemana = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado']
     const diaSemana = diasSemana[date.getDay()]
     const dia = date.getDate().toString().padStart(2, '0')
@@ -166,13 +169,13 @@ export function CronogramaPlanejamento() {
     
     let mensagem = `*Planejamento diário ${diaSemana} ${dia}/${mes}*\n\n`
     
-    grupo.horarios.forEach(horario => {
-      const obraNomeLimpo = grupo.obra.nome.includes('-') ? grupo.obra.nome.split('-').slice(1).join('-').trim() : grupo.obra.nome
-      const horarioFormatado = horario.horario_inicio.substring(0, 5) + 'hrs'
-      const centroCusto = grupo.obra.nome.includes('-') ? grupo.obra.nome.split('-')[0].trim().substring(0, 4) : grupo.obra.nome.substring(0, 4)
+    dayGroup.obras.forEach(obraHorario => {
+      const obraNomeLimpo = obraHorario.obra.nome.includes('-') ? obraHorario.obra.nome.split('-').slice(1).join('-').trim() : obraHorario.obra.nome
+      const horarioFormatado = obraHorario.horario_inicio.substring(0, 5) + 'hrs'
+      const centroCusto = obraHorario.obra.nome.includes('-') ? obraHorario.obra.nome.split('-')[0].trim().substring(0, 4) : obraHorario.obra.nome.substring(0, 4)
       
-      mensagem += `*${obraNomeLimpo} ${horarioFormatado} CC ${centroCusto}*\n`
-      horario.funcionarios.forEach(funcionario => {
+      mensagem += `*${obraNomeLimpo} (${horarioFormatado}) - CC ${centroCusto}*\n`
+      obraHorario.funcionarios.forEach(funcionario => {
         mensagem += `${funcionario.nome}\n`
       })
       mensagem += '\n'
@@ -185,6 +188,30 @@ export function CronogramaPlanejamento() {
       alert('Erro ao copiar planejamento')
     })
   }
+
+  // =============================================================================
+  // HANDLERS DOS BOTÕES DE AÇÃO DOS CARDS
+  // =============================================================================
+
+  /**
+   * Função para editar um planejamento
+   * @param _dayGroup - Grupo de planejamentos do dia (não utilizado ainda)
+   */
+  const handleEditPlanejamento = (_dayGroup: DayPlanejamentoGroup) => {
+    alert('Funcionalidades em desenvolvimento...')
+  }
+
+  /**
+   * Função para publicar um planejamento
+   * @param _dayGroup - Grupo de planejamentos do dia (não utilizado ainda)
+   */
+  const handlePublishPlanejamento = (_dayGroup: DayPlanejamentoGroup) => {
+    alert('Funcionalidades em desenvolvimento...')
+  }
+
+  // =============================================================================
+  // FUNÇÕES DE FORMATAÇÃO
+  // =============================================================================
 
   // Função para formatar o título da obra
   const formatObraTitle = (obraNome: string, horario: string) => {
@@ -206,42 +233,49 @@ export function CronogramaPlanejamento() {
     return `Planejamento diário ${diaSemana} (${dataFormatada})`
   }
 
-  // Tipos para agrupamento
-  interface HorarioGroup {
+
+
+
+
+  // Tipos para agrupamento por dia
+  interface ObraHorarioGroup {
+    obra: { id: number; nome: string; };
     horario_inicio: string;
     funcionarios: { id: number; nome: string; }[];
   }
 
-  interface PlanejamentoGroup {
+  interface DayPlanejamentoGroup {
     data_trabalho: string;
-    obra: { id: number; nome: string; };
-    horarios: HorarioGroup[];
+    obras: ObraHorarioGroup[];
   }
 
-  // Agrupar planejamentos por data e obra
+  // Agrupar planejamentos por data (unificar cards do mesmo dia)
   const groupedPlanejamentos = planejamentos.reduce((groups, plano) => {
-    const key = `${plano.data_trabalho}-${plano.obra.id}`
+    const key = plano.data_trabalho
     if (!groups[key]) {
       groups[key] = {
         data_trabalho: plano.data_trabalho,
-        obra: plano.obra,
-        horarios: []
+        obras: []
       }
     }
     
-    // Verificar se já existe um horário igual
-    const existingHorario = groups[key].horarios.find((h: HorarioGroup) => h.horario_inicio === plano.horario_inicio)
-    if (existingHorario) {
-      existingHorario.funcionarios.push(plano.funcionario)
+    // Verificar se já existe uma combinação obra+horário
+    const existingObraHorario = groups[key].obras.find(
+      (oh: ObraHorarioGroup) => oh.obra.id === plano.obra.id && oh.horario_inicio === plano.horario_inicio
+    )
+    
+    if (existingObraHorario) {
+      existingObraHorario.funcionarios.push(plano.funcionario)
     } else {
-      groups[key].horarios.push({
+      groups[key].obras.push({
+        obra: plano.obra,
         horario_inicio: plano.horario_inicio,
         funcionarios: [plano.funcionario]
       })
     }
     
     return groups
-  }, {} as Record<string, PlanejamentoGroup>)
+  }, {} as Record<string, DayPlanejamentoGroup>)
 
   const handleSubmit = async () => {
     if (selectedFuncionarios.length === 0 || !selectedObra || selectedDates.length === 0 || !horaInicio) {
@@ -260,11 +294,16 @@ export function CronogramaPlanejamento() {
           const obra = obras.find(o => o.id === selectedObra)
           
           if (funcionario && obra) {
+            // Extrair apenas os 4 primeiros dígitos da obra (Centro de Custo)
+            const centroCusto = obra.nome.includes('-') 
+              ? obra.nome.split('-')[0].trim().substring(0, 4) 
+              : obra.nome.substring(0, 4)
+            
             const novoPlanejamento: PlanejamentoCreate = {
               data_trabalho: date,
               horario_inicio: horaInicio,
               funcionario_nome: funcionario.nome,
-              obra_nome: obra.nome,
+              obra_nome: centroCusto,
             }
 
             await Api.createPlanejamento(novoPlanejamento)
@@ -276,13 +315,16 @@ export function CronogramaPlanejamento() {
       setSelectedFuncionarios([])
       setSelectedObra(null)
       setSelectedDates([])
-      setHoraInicio('08:00')
+      setHoraInicio('07:00')
       setFuncionarioSearch('')
       setObraSearch('')
       
       // Recarregar planejamentos
       const response = await Api.getPlanejamentos()
       setPlanejamentos(response.data)
+      
+      // Recarregar a página após sucesso
+      window.location.reload()
       
     } catch (err: any) {
       console.error('Erro ao criar planejamento:', err)
@@ -415,55 +457,78 @@ export function CronogramaPlanejamento() {
       </FormContainer>
 
       <PlanningCardContainer>
-        {Object.values(groupedPlanejamentos).map((grupo: PlanejamentoGroup, index) => (
-          <PlanningCard key={`${grupo.data_trabalho}-${grupo.obra.id}-${index}`}>
+        {Object.values(groupedPlanejamentos).map((dayGroup: DayPlanejamentoGroup, index) => (
+          <PlanningCard key={`${dayGroup.data_trabalho}-${index}`}>
+            {/* =========================== CABEÇALHO DO CARD =========================== */}
             <div className="card-header">
-              <h3>{formatPlanejamentoTitle(grupo.data_trabalho)}</h3>
-              <div className="card-actions">
-                <button 
-                  className="action-btn copy-btn"
-                  onClick={() => handleCopyPlanejamento(grupo)}
-                  title="Copiar Planejamento"
-                >
-                  📋
-                </button>
+              <div className="card-title">
+                <h3>{formatPlanejamentoTitle(dayGroup.data_trabalho)}</h3>
+              </div>
+              <div className="card-header-actions">
                 <button 
                   className="action-btn edit-btn"
-                  onClick={() => alert('Funcionalidade de edição em desenvolvimento')}
+                  onClick={() => handleEditPlanejamento(dayGroup)}
                   title="Editar Planejamento"
                 >
-                  ✏️
-                </button>
-                <button 
-                  className="action-btn delete-btn"
-                  onClick={() => {
-                    // Para excluir, precisamos dos IDs individuais dos planejamentos
-                    const planejamentosDoGrupo = planejamentos.filter(p => 
-                      p.data_trabalho === grupo.data_trabalho && p.obra.id === grupo.obra.id
-                    )
-                    planejamentosDoGrupo.forEach(p => handleDeletePlanejamento(p.id))
-                  }}
-                  title="Excluir Planejamento"
-                >
-                  🗑️
+                  <FaRegEdit />
                 </button>
               </div>
             </div>
+
+            {/* =========================== CONTEÚDO DO CARD =========================== */}
             <div className="planejamento-grupo">
-              {grupo.horarios.map((horario: HorarioGroup, horarioIndex: number) => (
-                <div key={horarioIndex} className="obra-header">
+              {dayGroup.obras.map((obraHorario: ObraHorarioGroup, obraIndex: number) => (
+                <div key={obraIndex} className="obra-header">
                   <div className="obra-info">
                     <div className="obra">
-                      {formatObraTitle(grupo.obra.nome, horario.horario_inicio)}
+                      {formatObraTitle(obraHorario.obra.nome, obraHorario.horario_inicio)}
                     </div>
                   </div>
                   <ul className="funcionarios">
-                    {horario.funcionarios.map((funcionario: { id: number; nome: string; }, funcIndex: number) => (
+                    {obraHorario.funcionarios.map((funcionario: { id: number; nome: string; }, funcIndex: number) => (
                       <li key={funcIndex}>{funcionario.nome}</li>
                     ))}
                   </ul>
                 </div>
               ))}
+            </div>
+
+            {/* =========================== RODAPÉ DO CARD =========================== */}
+            <div className="card-footer">
+              <div className="card-actions">
+                {/* Botão Copiar */}
+                <button 
+                  className="action-btn copy-btn"
+                  onClick={() => handleCopyPlanejamento(dayGroup)}
+                  title="Copiar Planejamento"
+                >
+                  <FaCopy />
+                </button>
+                
+                {/* Botão Publicar */}
+                <button 
+                  className="action-btn publish-btn"
+                  onClick={() => handlePublishPlanejamento(dayGroup)}
+                  title="Publicar Planejamento"
+                >
+                  <IoIosSend />
+                </button>
+                
+                {/* Botão Excluir */}
+                <button 
+                  className="action-btn delete-btn"
+                  onClick={() => {
+                    // Para excluir, precisamos dos IDs individuais dos planejamentos do dia
+                    const planejamentosDoGrupo = planejamentos.filter(p => 
+                      p.data_trabalho === dayGroup.data_trabalho
+                    )
+                    planejamentosDoGrupo.forEach(p => handleDeletePlanejamento(p.id))
+                  }}
+                  title="Excluir Planejamento"
+                >
+                  <MdDelete />
+                </button>
+              </div>
             </div>
           </PlanningCard>
         ))}
