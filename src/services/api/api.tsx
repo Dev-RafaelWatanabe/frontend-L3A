@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { PaginacaoParams } from './types';
-import type { PlanejamentoCreate } from './types';
+import type { PlanejamentoCreate, LancamentoCreate } from './types';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000/api',
@@ -54,11 +54,18 @@ export const Api = {
   return api.get('/lancamento/');
 },
 
-  createLancamento: (data: any) => {
+  createLancamento: (data: LancamentoCreate) => {
+    console.log('📤 Enviando lançamento:', data);
     return api.post('/lancamento/', data, {
       headers: {
         'Content-Type': 'application/json'
       }
+    }).then(response => {
+      console.log('✅ Lançamento criado:', response.data);
+      return response;
+    }).catch(error => {
+      console.error('❌ Erro ao criar lançamento:', error.response?.data || error.message);
+      throw error;
     });
   },
 

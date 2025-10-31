@@ -114,6 +114,14 @@ export interface LancamentoPage {
   turno: string[];
 }
 
+export interface LancamentoCreate {
+  data_trabalho: string;
+  funcionario_nome: string;
+  obra_nome: string;
+  restaurante_nome?: string;
+  turno_nome: string;
+}
+
 export interface PatrimonioFormData {
   nome: string;
   serie?: string;
