@@ -18,6 +18,17 @@ import { ManutencaoPatrimonio } from './pages/patrimonio/manutencao/manutencao-p
 import { ManutencaoDetalhe } from './pages/patrimonio/manutencao/manutencao-detalhe';
 import { useRouteRefresh } from './services/hooks/use-route-refresh';
 
+// Novas páginas
+import { Indicadores } from './pages/engenharia/indicadores/indicadores-page';
+import { GestaoObra } from './pages/engenharia/gestao-obra/gestao-obra-page';
+import { CronogramaPage } from './pages/central-servico/cronograma/cronograma-page';
+import { BancoDados } from './pages/central-servico/banco-dados/banco-dados-page';
+import { PerfilPersonalidade } from './pages/rh/perfil-personalidade/perfil-personalidade-page';
+import { PatrimonioPage } from './pages/suprimentos/patrimonio/patrimonio-page';
+import { Estoque } from './pages/suprimentos/estoque/estoque-page';
+import { Leads } from './pages/comercial/leads/leads-page';
+import { ControleCustos } from './pages/financeiro/controle-custos/controle-custos-page';
+
 // Componente wrapper para aplicar o hook
 const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useRouteRefresh();
@@ -28,45 +39,48 @@ function App() {
   const menuItems = [
     {
       id: 1,
-      label: 'Dashboard',
+      label: 'Engenharia',
       subItems: [
-        { id: 'dash1', label: 'Visão Geral', path: '/dashboard/overview' },
-        { id: 'dash2', label: 'Relatórios', path: '/dashboard/reports' }
+        { id: 'eng1', label: 'Indicadores', path: '/engenharia/indicadores' },
+        { id: 'eng2', label: 'Gestão de Obra', path: '/engenharia/gestao-obra' }
       ]
     },
     {
       id: 2,
-      label: 'Automações',
+      label: 'Central de Serviço',
       subItems: [
-        { id: 'auto1', label: 'Configurações', path: '/automations/settings' },
-        { id: 'auto2', label: 'Histórico', path: '/automations/history' }
+        { id: 'cs1', label: 'Cronograma', path: '/central-servico/cronograma' },
+        { id: 'cs2', label: 'Banco de Dados', path: '/central-servico/banco-dados' }
       ]
     },
     {
       id: 3,
-      label: 'Banco de Dados',
+      label: 'RH',
       subItems: [
-        { id: 'db1', label: 'Restaurantes', path: 'database/restaurantes' },
-        { id: 'db2', label: 'Obras', path: '/database/obras' },
-        { id: 'db3', label: 'Funcionários', path: '/database/funcionarios' },
-        { id: 'db4', label: 'Lançamentos', path: '/database/lancamentos' },
+        { id: 'rh1', label: 'Funcionários', path: '/rh/funcionarios' },
+        { id: 'rh2', label: 'Perfil de Personalidade', path: '/rh/perfil-personalidade' }
       ]
     },
     {
       id: 4,
-      label: 'Cronograma',
+      label: 'Suprimentos',
       subItems: [
-        { id: 'crono1', label: 'Lançamento', path: '/cronograma/lancamento' },
-        { id: 'crono2', label: 'Planejamento', path: '/cronograma/planejamento' }
+        { id: 'sup1', label: 'Patrimônio', path: '/suprimentos/patrimonio' },
+        { id: 'sup2', label: 'Estoque', path: '/suprimentos/estoque' }
       ]
     },
     {
       id: 5,
-      label: 'Patrimônio',
+      label: 'Comercial',
       subItems: [
-        { id: 'patri2', label: 'Cadastros', path: '/patrimonio/cadastros' },
-        { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocacao' },
-        { id: 'patri4', label: 'Manutenção', path: '/patrimonio/manutencao' }
+        { id: 'com1', label: 'Leads', path: '/comercial/leads' }
+      ]
+    },
+    {
+      id: 6,
+      label: 'Financeiro',
+      subItems: [
+        { id: 'fin1', label: 'Controle de Custos', path: '/financeiro/controle-custos' }
       ]
     },
     {
@@ -83,6 +97,29 @@ function App() {
       <Sidebar items={menuItems} />
       <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>
         <Routes>
+          {/* Engenharia */}
+          <Route path="/engenharia/indicadores" element={<Indicadores />} />
+          <Route path="/engenharia/gestao-obra" element={<GestaoObra />} />
+          
+          {/* Central de Serviço */}
+          <Route path="/central-servico/cronograma" element={<CronogramaPage />} />
+          <Route path="/central-servico/banco-dados" element={<BancoDados />} />
+          
+          {/* RH */}
+          <Route path="/rh/funcionarios" element={<Funcionarios />} />
+          <Route path="/rh/perfil-personalidade" element={<PerfilPersonalidade />} />
+          
+          {/* Suprimentos */}
+          <Route path="/suprimentos/patrimonio" element={<PatrimonioPage />} />
+          <Route path="/suprimentos/estoque" element={<Estoque />} />
+          
+          {/* Comercial */}
+          <Route path="/comercial/leads" element={<Leads />} />
+          
+          {/* Financeiro */}
+          <Route path="/financeiro/controle-custos" element={<ControleCustos />} />
+
+          {/* Rotas antigas mantidas para compatibilidade */}
           <Route path="/dashboard/overview" element={<Dashboard />} />
           <Route path="/dashboard/reports" element={<Dashboard />} />
           <Route path="/automations/settings" element={<Automations />} />
@@ -99,7 +136,6 @@ function App() {
           <Route path="/patrimonio/alocacao/detalhe/:id" element={<AlocacaoDetalhe />} />
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
-          {/* NOVA ROTA PARA DETALHES DA MANUTENÇÃO */}
           <Route path="/patrimonio/manutencao/detalhe/:id" element={<ManutencaoDetalhe />} />
           <Route path="/" element={<Dashboard />} />
         </Routes>

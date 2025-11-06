@@ -1,9 +1,9 @@
 import axios from 'axios';
 import type { PaginacaoParams } from './types';
-import type { PlanejamentoCreate } from './types';
+import type { PlanejamentoCreate, LancamentoCreate } from './types';
 
 const api = axios.create({
-  baseURL: '/api/'
+  baseURL: 'http://localhost:8000/api',
 });
 
 // Adicionar interceptors para debug
@@ -54,11 +54,18 @@ export const Api = {
   return api.get('/lancamento/');
 },
 
-  createLancamento: (data: any) => {
+  createLancamento: (data: LancamentoCreate) => {
+    console.log('📤 Enviando lançamento:', data);
     return api.post('/lancamento/', data, {
       headers: {
         'Content-Type': 'application/json'
       }
+    }).then(response => {
+      console.log('✅ Lançamento criado:', response.data);
+      return response;
+    }).catch(error => {
+      console.error('❌ Erro ao criar lançamento:', error.response?.data || error.message);
+      throw error;
     });
   },
 
@@ -209,9 +216,12 @@ export const Api = {
   
   createPlanejamento: (data: PlanejamentoCreate) => 
     api.post('/planejamento/', data),
+    
+  deletePlanejamento: (id: number) => 
+    api.delete(`/planejamento/${id}`),
 
   getDashboardResumo: (params?: { pagina?: number; tamanho_pagina?: number; centro_custo?: string; data_inicio?: string; data_fim?: string }) =>
-    axios.get('/api/relatorio/resumo', { params }),
+    api.get('/api/relatorio/resumo', { params }),
 };
 
 export default Api;
