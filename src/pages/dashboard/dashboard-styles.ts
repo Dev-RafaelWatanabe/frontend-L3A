@@ -43,6 +43,47 @@ const estilosDashboard = {
     padding: '6px 10px',
     marginBottom: 4,
     boxShadow: '0 1px 4px #0001'
+  } as React.CSSProperties,
+  // novos estilos para os cards de métricas
+  metricCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+    padding: '12px 16px',
+    borderRadius: 10,
+    background: '#f4f7fb',
+    minWidth: 180,
+    boxShadow: '0 4px 10px rgba(0,0,0,0.04)',
+    alignItems: 'flex-start',
+    justifyContent: 'center'
+  } as React.CSSProperties,
+  metricLabel: {
+    fontSize: 13,
+    color: '#55606a',
+    fontWeight: 600
+  } as React.CSSProperties,
+  metricValue: {
+    fontSize: 18,
+    color: '#1976d2',
+    fontWeight: 700
+  } as React.CSSProperties,
+  actionButton: {
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: 14,
+    color: '#1976d2',
+    padding: 4
+  } as React.CSSProperties,
+  detailRow: {
+    background: '#fcfeff'
+  } as React.CSSProperties,
+  detailGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: 6,
+    fontSize: 13,
+    color: '#333'
   } as React.CSSProperties
 };
 
