@@ -210,7 +210,8 @@ export const Api = {
   createPlanejamento: (data: PlanejamentoCreate) => 
     api.post('/planejamento/', data),
 
-  getDashboardResumo: () => api.get('/relatorio/resumo')
+  getDashboardResumo: (params?: { pagina?: number; tamanho_pagina?: number; centro_custo?: string; data_inicio?: string; data_fim?: string }) =>
+    axios.get('/api/relatorio/resumo', { params }),
 };
 
 export default Api;

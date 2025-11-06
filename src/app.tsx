@@ -68,6 +68,13 @@ function App() {
         { id: 'patri3', label: 'Alocação', path: '/patrimonio/alocacao' },
         { id: 'patri4', label: 'Manutenção', path: '/patrimonio/manutencao' }
       ]
+    },
+    {
+      id: 6,
+      label: 'Orçamento',
+      subItems: [
+        { id: 'orc1', label: 'Obra', path: '/orcamento/obra' },
+      ]
     }
   ];
 
