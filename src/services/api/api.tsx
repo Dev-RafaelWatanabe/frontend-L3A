@@ -219,6 +219,9 @@ export const Api = {
     
   deletePlanejamento: (id: number) => 
     api.delete(`/planejamento/${id}`),
+
+  getDashboardResumo: (params?: { pagina?: number; tamanho_pagina?: number; centro_custo?: string; data_inicio?: string; data_fim?: string }) =>
+    api.get('/api/relatorio/resumo', { params }),
 };
 
 export default Api;

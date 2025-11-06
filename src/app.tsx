@@ -82,6 +82,13 @@ function App() {
       subItems: [
         { id: 'fin1', label: 'Controle de Custos', path: '/financeiro/controle-custos' }
       ]
+    },
+    {
+      id: 6,
+      label: 'Orçamento',
+      subItems: [
+        { id: 'orc1', label: 'Obra', path: '/orcamento/obra' },
+      ]
     }
   ];
 
