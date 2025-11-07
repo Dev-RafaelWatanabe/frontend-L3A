@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './style/components/sidebar/index';
-import Dashboard from './pages/dashboard/dashboard';
 import { Automations } from './pages/automation/Automations';
 import { Restaurantes } from './pages/database/restaurantes/restaurante-page';
 import { Obras } from './pages/database/obras/obras-page';
@@ -83,13 +82,6 @@ function App() {
         { id: 'fin1', label: 'Controle de Custos', path: '/financeiro/controle-custos' }
       ]
     },
-    {
-      id: 6,
-      label: 'Orçamento',
-      subItems: [
-        { id: 'orc1', label: 'Obra', path: '/orcamento/obra' },
-      ]
-    }
   ];
 
   return (
@@ -120,8 +112,9 @@ function App() {
           <Route path="/financeiro/controle-custos" element={<ControleCustos />} />
 
           {/* Rotas antigas mantidas para compatibilidade */}
-          <Route path="/dashboard/overview" element={<Dashboard />} />
-          <Route path="/dashboard/reports" element={<Dashboard />} />
+          <Route path="/dashboard/overview" element={<ControleCustos />} />
+          <Route path="/dashboard/reports" element={<ControleCustos />} />
+          <Route path="/dashboard/dashboard" element={<ControleCustos />} />
           <Route path="/automations/settings" element={<Automations />} />
           <Route path="/automations/history" element={<Automations />} />
           <Route path="/database/restaurantes" element={<Restaurantes />} />
@@ -137,7 +130,7 @@ function App() {
           <Route path="/patrimonio/:id" element={<PatrimonioDetalhe />} />
           <Route path="/patrimonio/manutencao" element={<ManutencaoPatrimonio />} />
           <Route path="/patrimonio/manutencao/detalhe/:id" element={<ManutencaoDetalhe />} />
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<ControleCustos />} />
         </Routes>
       </div>
     </div>
