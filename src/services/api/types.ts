@@ -18,6 +18,11 @@ export interface Restaurante {
   valor: number;
 }
 
+export interface Regime {
+  id: number;
+  nome: string;
+}
+
 export interface Funcionario {
   id: number;
   nome: string;
@@ -63,7 +68,11 @@ export interface Lancamento {
   turno: {
     nome: string;
   };
-  restaurante: {
+  restaurante?: {
+    id: number;
+    nome: string;
+  };
+  regime: {
     id: number;
     nome: string;
   };
@@ -120,6 +129,7 @@ export interface LancamentoCreate {
   obra_nome: string;
   restaurante_nome?: string;
   turno_nome: string;
+  regime_id: number;
 }
 
 export interface PatrimonioFormData {

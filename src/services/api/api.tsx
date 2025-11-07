@@ -33,6 +33,8 @@ export const Api = {
       return response;
     }),
 
+  getRegimes: () => api.get('/regime/'),
+
   getFuncionarios: () => api.get('/funcionario/'),
   getObras: () => api.get('/obras/'),
   createObra: async (data: {
@@ -217,8 +219,10 @@ export const Api = {
   createPlanejamento: (data: PlanejamentoCreate) => 
     api.post('/planejamento/', data),
     
-  deletePlanejamento: (id: number) => 
-    api.delete(`/planejamento/${id}`),
+  deletePlanejamento: (id: number) => {
+    console.log(`🗑️ Deletando planejamento ID: ${id}`);
+    return api.delete(`/planejamento/${id}`);
+  },
 
   getDashboardResumo: (params?: { 
     pagina?: number; 
