@@ -52,9 +52,18 @@ export const Api = {
     return response;
   },
 
-  getLancamentos: () => {
-  return api.get('/lancamento/');
-},
+  getLancamentos: (params?: {
+    skip?: number;
+    limit?: number;
+    nome_obra?: string;
+    nome_funcionario?: string;
+    nome_restaurante?: string;
+    nome_regime?: string;
+    data_inicio?: string;
+    data_fim?: string;
+  }) => {
+    return api.get('/lancamento/', { params });
+  },
 
   createLancamento: (data: LancamentoCreate) => {
     console.log('📤 Enviando lançamento:', data);
@@ -67,6 +76,32 @@ export const Api = {
       return response;
     }).catch(error => {
       console.error('❌ Erro ao criar lançamento:', error.response?.data || error.message);
+      throw error;
+    });
+  },
+
+  updateLancamento: (id: number, data: LancamentoCreate) => {
+    console.log('📤 Atualizando lançamento:', id, data);
+    return api.put(`/lancamento/${id}`, data, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log('✅ Lançamento atualizado:', response.data);
+      return response;
+    }).catch(error => {
+      console.error('❌ Erro ao atualizar lançamento:', error.response?.data || error.message);
+      throw error;
+    });
+  },
+
+  deleteLancamento: (id: number) => {
+    console.log('🗑️ Deletando lançamento:', id);
+    return api.delete(`/lancamento/${id}`).then(response => {
+      console.log('✅ Lançamento deletado:', response.data);
+      return response;
+    }).catch(error => {
+      console.error('❌ Erro ao deletar lançamento:', error.response?.data || error.message);
       throw error;
     });
   },

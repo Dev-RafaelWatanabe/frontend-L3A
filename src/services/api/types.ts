@@ -132,6 +132,22 @@ export interface LancamentoCreate {
   regime_id: number;
 }
 
+export interface LancamentoFilters {
+  nome_obra?: string;
+  nome_funcionario?: string;
+  nome_restaurante?: string;
+  nome_regime?: string;
+  data_inicio?: string;
+  data_fim?: string;
+}
+
+export interface LancamentoResponse {
+  data: Lancamento[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
 export interface PatrimonioFormData {
   nome: string;
   serie?: string;
