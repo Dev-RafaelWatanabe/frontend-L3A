@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Api } from '../../../services/api/api';
 import { Button } from '../../../style/components/buttons';
 import { DataTable } from '../../database/components/data-table';
-import type { Funcionario, Obra, Restaurante, Lancamento, LancamentoCreate } from '../../../services/api/types';
+import type { Funcionario, Obra, Restaurante, Lancamento, LancamentoCreate, Regime } from '../../../services/api/types';
 import {
   Container,
   FormContainer,
@@ -82,12 +82,14 @@ export const CronogramaLancamento: React.FC = () => {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [obras, setObras] = useState<Obra[]>([]);
   const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
+  const [regimes, setRegimes] = useState<Regime[]>([]);
   
   const [selectedFuncionario, setSelectedFuncionario] = useState('');
   const [selectedObra, setSelectedObra] = useState('');
   const [selectedRestaurante, setSelectedRestaurante] = useState('');
   const [selectedTurnos, setSelectedTurnos] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState('');
+  const [selectedRegime, setSelectedRegime] = useState('Hora');
 
   const [funcionarioSearch, setFuncionarioSearch] = useState('');
   const [obraSearch, setObraSearch] = useState('');
@@ -103,14 +105,16 @@ export const CronogramaLancamento: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [funcionariosRes, obrasRes, restaurantesRes] = await Promise.all([
+        const [funcionariosRes, obrasRes, restaurantesRes, regimesRes] = await Promise.all([
           Api.getFuncionarios(),
           Api.getObras(),
-          Api.getRestaurantes()
+          Api.getRestaurantes(),
+          Api.getRegimes()
         ]);
         setFuncionarios(funcionariosRes.data);
         setObras(obrasRes.data);
         setRestaurantes(restaurantesRes.data);
+        setRegimes(regimesRes.data);
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
       }
@@ -120,7 +124,6 @@ export const CronogramaLancamento: React.FC = () => {
       try {
         setLoadingHistorico(true);
         const response = await Api.getLancamentos();
-        console.log('Histórico de lançamentos:', response.data);
         setHistorico(response.data);
       } catch (error) {
         console.error('Erro ao carregar histórico:', error);
@@ -168,11 +171,13 @@ export const CronogramaLancamento: React.FC = () => {
 
       // Criar um lançamento para cada turno selecionado
       const promessasLancamentos = selectedTurnos.map(async (turno) => {
+        const regimeSelecionado = regimes.find(r => r.nome === selectedRegime);
         const lancamentoData: LancamentoCreate = {
           data_trabalho: selectedDate,
           funcionario_nome: funcionarioSelecionado.nome,
           obra_nome: obraSelecionada.nome,
-          turno_nome: turno.toUpperCase() // Converter para maiúscula como no exemplo
+          turno_nome: turno.toUpperCase(), // Converter para maiúscula como no exemplo
+          regime_id: regimeSelecionado?.id || 1
         };
 
         // Adicionar restaurante apenas se for turno da manhã e estiver selecionado
@@ -194,6 +199,7 @@ export const CronogramaLancamento: React.FC = () => {
       setSelectedDate('');
       setSelectedTurnos([]);
       setSelectedRestaurante('');
+      setSelectedRegime('Hora');
       setFuncionarioSearch('');
       setObraSearch('');
       
@@ -259,6 +265,11 @@ export const CronogramaLancamento: React.FC = () => {
       key: 'turno', 
       label: 'Turno',
       render: (value: { nome: string } | null) => value?.nome || 'N/A'
+    },
+    { 
+      key: 'regime', 
+      label: 'Regime',
+      render: (value: { id: number; nome: string } | null) => value?.nome || 'N/A'
     }
   ];
 
@@ -438,6 +449,21 @@ export const CronogramaLancamento: React.FC = () => {
                     </small>
                   </FormField>
                 )}
+
+                <FormField>
+                  <label>Regime: *</label>
+                  <select
+                    value={selectedRegime}
+                    onChange={(e) => setSelectedRegime(e.target.value)}
+                    required
+                  >
+                    {regimes.map((regime) => (
+                      <option key={regime.id} value={regime.nome}>
+                        {regime.nome}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
 
                 <ButtonGroup>
                   <Button type="submit">

@@ -21,6 +21,8 @@ import {
 } from './styles'
 import { Api } from '../../../services/api/api'
 import type { Planejamento, PlanejamentoCreate, Funcionario, Obra } from '../../../services/api/types'
+import { EditarPlanejamentoModal } from './editar-planejamento-modal'
+import { PublicarPlanejamentoModal } from './publicar-planejamento-modal'
 
 export function CronogramaPlanejamento() {
   const [planejamentos, setPlanejamentos] = useState<Planejamento[]>([])
@@ -36,6 +38,11 @@ export function CronogramaPlanejamento() {
   const [isObraDropdownOpen, setIsObraDropdownOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Estados para os modais
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showPublishModal, setShowPublishModal] = useState(false)
+  const [selectedDayGroup, setSelectedDayGroup] = useState<DayPlanejamentoGroup | null>(null)
 
   // Refs para detectar cliques fora dos dropdowns
   const funcionarioRef = useRef<HTMLDivElement>(null)
@@ -147,16 +154,80 @@ export function CronogramaPlanejamento() {
     setError(null)
   }
 
-  const handleDeletePlanejamento = async (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este planejamento?')) {
-      try {
-        await Api.deletePlanejamento(id)
-        const response = await Api.getPlanejamentos()
-        setPlanejamentos(response.data)
-      } catch (err: any) {
-        console.error('Erro ao excluir planejamento:', err)
-        setError(err.response?.data?.detail || 'Erro ao excluir planejamento')
+  const handleDeleteDayPlanejamento = async (dayGroup: DayPlanejamentoGroup) => {
+    console.log('🔍 DayGroup recebido:', dayGroup);
+    
+    if (!confirm('Tem certeza que deseja excluir todo o planejamento deste dia?')) {
+      return
+    }
+
+    try {
+      console.log('🗑️ Iniciando exclusão do planejamento do dia:', dayGroup.data_trabalho);
+      console.log('📋 Total de planejamentos disponíveis:', planejamentos.length);
+      
+      // Buscar todos os planejamentos do dia
+      const planejamentosDoGrupo = planejamentos.filter(p => 
+        p.data_trabalho === dayGroup.data_trabalho
+      )
+
+      console.log('📋 Planejamentos encontrados para este dia:', planejamentosDoGrupo.length);
+      console.log('📋 Detalhes dos planejamentos:', planejamentosDoGrupo.map(p => ({ 
+        id: p.id, 
+        funcionario: p.funcionario.nome,
+        obra: p.obra.nome,
+        data: p.data_trabalho 
+      })));
+
+      if (planejamentosDoGrupo.length === 0) {
+        alert('Nenhum planejamento encontrado para excluir.');
+        return;
       }
+
+      // Excluir cada planejamento individualmente
+      let sucessos = 0;
+      let erros = 0;
+      
+      for (const planejamento of planejamentosDoGrupo) {
+        try {
+          console.log(`🗑️ Tentando excluir planejamento ID: ${planejamento.id}`);
+          const response = await Api.deletePlanejamento(planejamento.id);
+          console.log(`✅ Resposta da API para ID ${planejamento.id}:`, response);
+          sucessos++;
+        } catch (deleteErr: any) {
+          console.error(`❌ Erro ao excluir planejamento ${planejamento.id}:`, deleteErr);
+          console.error(`❌ Detalhes do erro:`, {
+            message: deleteErr.message,
+            response: deleteErr.response?.data,
+            status: deleteErr.response?.status,
+            url: deleteErr.config?.url
+          });
+          erros++;
+        }
+      }
+
+      console.log(`📊 Resultado: ${sucessos} sucessos, ${erros} erros`);
+
+      // Recarregar planejamentos
+      console.log('🔄 Recarregando lista de planejamentos...');
+      const response = await Api.getPlanejamentos()
+      setPlanejamentos(response.data)
+      console.log('✅ Lista recarregada com sucesso');
+      
+      if (erros === 0) {
+        alert(`✅ ${sucessos} planejamento(s) excluído(s) com sucesso!`);
+      } else {
+        alert(`⚠️ Exclusão parcial: ${sucessos} sucessos, ${erros} erros. Verifique o console.`);
+      }
+    } catch (err: any) {
+      console.error('❌ Erro geral ao excluir planejamento:', err)
+      console.error('❌ Detalhes completos do erro:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        stack: err.stack
+      })
+      setError(err.response?.data?.detail || 'Erro ao excluir planejamento')
+      alert('❌ Erro ao excluir planejamento. Verifique o console para mais detalhes.')
     }
   }
 
@@ -195,18 +266,38 @@ export function CronogramaPlanejamento() {
 
   /**
    * Função para editar um planejamento
-   * @param _dayGroup - Grupo de planejamentos do dia (não utilizado ainda)
+   * @param dayGroup - Grupo de planejamentos do dia
    */
-  const handleEditPlanejamento = (_dayGroup: DayPlanejamentoGroup) => {
-    alert('Funcionalidades em desenvolvimento...')
+  const handleEditPlanejamento = (dayGroup: DayPlanejamentoGroup) => {
+    setSelectedDayGroup(dayGroup)
+    setShowEditModal(true)
   }
 
   /**
    * Função para publicar um planejamento
-   * @param _dayGroup - Grupo de planejamentos do dia (não utilizado ainda)
+   * @param dayGroup - Grupo de planejamentos do dia
    */
-  const handlePublishPlanejamento = (_dayGroup: DayPlanejamentoGroup) => {
-    alert('Funcionalidades em desenvolvimento...')
+  const handlePublishPlanejamento = (dayGroup: DayPlanejamentoGroup) => {
+    setSelectedDayGroup(dayGroup)
+    setShowPublishModal(true)
+  }
+
+  /**
+   * Callback após salvar edições
+   */
+  const handleSaveEdit = async () => {
+    // Recarregar planejamentos
+    const response = await Api.getPlanejamentos()
+    setPlanejamentos(response.data)
+  }
+
+  /**
+   * Callback após publicar planejamento
+   */
+  const handlePublishSuccess = async () => {
+    // Recarregar planejamentos
+    const response = await Api.getPlanejamentos()
+    setPlanejamentos(response.data)
   }
 
   // =============================================================================
@@ -457,7 +548,44 @@ export function CronogramaPlanejamento() {
       </FormContainer>
 
       <PlanningCardContainer>
-        {Object.values(groupedPlanejamentos).map((dayGroup: DayPlanejamentoGroup, index) => (
+        {Object.keys(groupedPlanejamentos).length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '3rem',
+            background: '#f8f9fa',
+            borderRadius: '12px',
+            border: '2px dashed #dee2e6'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📅</div>
+            <h3 style={{ color: '#6c757d', marginBottom: '0.5rem' }}>Nenhum planejamento criado</h3>
+            <p style={{ color: '#adb5bd', marginBottom: '1.5rem' }}>
+              Crie seu primeiro planejamento selecionando funcionários, obra, datas e horário acima.
+            </p>
+            <button
+              onClick={() => {
+                // Scroll suave até o topo do formulário
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              style={{
+                padding: '0.75rem 2rem',
+                background: '#080168',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: 600,
+                transition: 'all 0.3s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#060150'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#080168'}
+            >
+              Criar Primeiro Planejamento
+            </button>
+          </div>
+        ) : (
+          <>
+            {Object.values(groupedPlanejamentos).map((dayGroup: DayPlanejamentoGroup, index) => (
           <PlanningCard key={`${dayGroup.data_trabalho}-${index}`}>
             {/* =========================== CABEÇALHO DO CARD =========================== */}
             <div className="card-header">
@@ -517,13 +645,7 @@ export function CronogramaPlanejamento() {
                 {/* Botão Excluir */}
                 <button 
                   className="action-btn delete-btn"
-                  onClick={() => {
-                    // Para excluir, precisamos dos IDs individuais dos planejamentos do dia
-                    const planejamentosDoGrupo = planejamentos.filter(p => 
-                      p.data_trabalho === dayGroup.data_trabalho
-                    )
-                    planejamentosDoGrupo.forEach(p => handleDeletePlanejamento(p.id))
-                  }}
+                  onClick={() => handleDeleteDayPlanejamento(dayGroup)}
                   title="Excluir Planejamento"
                 >
                   <MdDelete />
@@ -532,7 +654,26 @@ export function CronogramaPlanejamento() {
             </div>
           </PlanningCard>
         ))}
+          </>
+        )}
       </PlanningCardContainer>
+
+      {/* Modais */}
+      {showEditModal && selectedDayGroup && (
+        <EditarPlanejamentoModal
+          dayGroup={selectedDayGroup}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleSaveEdit}
+        />
+      )}
+
+      {showPublishModal && selectedDayGroup && (
+        <PublicarPlanejamentoModal
+          dayGroup={selectedDayGroup}
+          onClose={() => setShowPublishModal(false)}
+          onPublish={handlePublishSuccess}
+        />
+      )}
     </Container>
   )
 }
