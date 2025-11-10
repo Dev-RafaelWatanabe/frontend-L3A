@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
 import { Api } from '../../../services/api/api';
+import { LancamentoHistorico } from './lancamento-historico';
 
 import type { 
   Lancamento
@@ -98,22 +99,14 @@ export const CronogramaLancamento: React.FC = () => {
   return (
     <Container>
       <HeaderContainer>
-        <h1>Cronograma de Lançamentos</h1>
+        <h1>Histórico de Lançamentos</h1>
         <Button>
           <FaPlus /> Novo Lançamento
         </Button>
       </HeaderContainer>
 
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        {loading ? (
-          <p>Carregando lançamentos...</p>
-        ) : (
-          <>
-            <p>Exibindo todos os {lancamentos.length} registros</p>
-            {lancamentos.length === 0 && <p>Nenhum registro encontrado</p>}
-          </>
-        )}
-      </div>
+      {/* Componente de Histórico com Filtros e Tabela */}
+      <LancamentoHistorico />
     </Container>
   );
 };

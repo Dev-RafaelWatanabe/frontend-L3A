@@ -403,7 +403,6 @@ export const LancamentoHistorico: React.FC<Props> = () => {
   return (
     <>
       <Container>
-        <h1>Histórico de Lançamentos</h1>
 
         {/* Filtros */}
         <FiltersContainer>
