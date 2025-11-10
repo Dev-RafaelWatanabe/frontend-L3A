@@ -27,6 +27,7 @@ import { PatrimonioPage } from './pages/suprimentos/patrimonio/patrimonio-page';
 import { Estoque } from './pages/suprimentos/estoque/estoque-page';
 import { Leads } from './pages/comercial/leads/leads-page';
 import { ControleCustos } from './pages/financeiro/controle-custos/controle-custos-page';
+import { OrcamentoPage } from './pages/financeiro/orcamento/orcamento-page';
 
 // Componente wrapper para aplicar o hook
 const AppWithRouteRefresh: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -79,7 +80,8 @@ function App() {
       id: 6,
       label: 'Financeiro',
       subItems: [
-        { id: 'fin1', label: 'Controle de Custos', path: '/financeiro/controle-custos' }
+        { id: 'fin1', label: 'Controle de Custos', path: '/financeiro/controle-custos' },
+        { id: 'fin2', label: 'Orçamento', path: '/financeiro/orcamento' }
       ]
     },
   ];
@@ -110,6 +112,7 @@ function App() {
           
           {/* Financeiro */}
           <Route path="/financeiro/controle-custos" element={<ControleCustos />} />
+          <Route path="/financeiro/orcamento" element={<OrcamentoPage />} />
 
           {/* Rotas antigas mantidas para compatibilidade */}
           <Route path="/dashboard/overview" element={<ControleCustos />} />
