@@ -129,11 +129,28 @@ export function ControleCustos() {
   const [filtroCentroCusto, setFiltroCentroCusto] = useState<string>('');
   const [dataInicio, setDataInicio] = useState<string>('');
   const [dataFim, setDataFim] = useState<string>('');
-  const [transferOpen, setTransferOpen] = useState<boolean>(true);
-  const [adiantamentoOpen, setAdiantamentoOpen] = useState<boolean>(true);
+  const [transferOpen, setTransferOpen] = useState<boolean>(false);
+  const [adiantamentoOpen, setAdiantamentoOpen] = useState<boolean>(false);
   const [expandedTransfers, setExpandedTransfers] = useState<number[]>([]);
   const [expandedAdiantamentos, setExpandedAdiantamentos] = useState<number[]>([]);
-  
+  // Detalhes de orçamentos por centro de custo
+  type Orcamento = {
+    id: number;
+    obra_id?: number;
+    valor_material?: number;
+    valor_deslocamento?: number;
+    valor_hospedagem?: number;
+    valor_servico?: number;
+    valor_total?: number;
+    descricao?: string;
+  };
+  const [centroDetalhesNome, setCentroDetalhesNome] = useState<string | null>(null);
+  const [centroOrcamentos, setCentroOrcamentos] = useState<Orcamento[]>([]);
+  const [loadingCentroOrcamentos, setLoadingCentroOrcamentos] = useState(false);
+  const [obraIdSelecionada, setObraIdSelecionada] = useState<number | null>(null);
+  const [realizadosPorObra, setRealizadosPorObra] = useState<ResumoFinanceiro[] | null>(null);
+  const [loadingRealizadosPorObra, setLoadingRealizadosPorObra] = useState(false);
+
   // carrega do backend com filtros como na sua curl
   const loadResumo = async (params?: { pagina?: number; tamanho_pagina?: number; centro_custo?: string; data_inicio?: string; data_fim?: string }) => {
     try {
@@ -263,6 +280,82 @@ export function ControleCustos() {
   const toggleExpandedAdiant = (idx: number) => {
     setExpandedAdiantamentos(prev => (prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]));
   };
+
+  // Busca orçamentos relacionados a um centro de custo (nome)
+  const fetchOrcamentosPorCentro = async (centroNome: string) => {
+    setCentroDetalhesNome(centroNome);
+    setLoadingCentroOrcamentos(true);
+    try {
+      // Primeiro tente resolver o nome do centro para um obra_id chamando /obras
+      let obraId: number | null = null;
+      try {
+        const respObras = await Api.getObras();
+        const obrasList = respObras?.data ?? [];
+        const found = Array.isArray(obrasList)
+          ? obrasList.find((o: any) => {
+              // compara nome e/ou centro_custo com normalização
+              return normalizeExact(o.nome) === normalizeExact(centroNome)
+                || normalizeExact(String(o.centro_custo || '')) === normalizeExact(centroNome);
+            })
+          : undefined;
+        if (found && found.id != null) obraId = Number(found.id);
+      } catch (e) {
+        console.warn('Falha ao buscar obras para resolver obra_id por centro:', e);
+      }
+
+      // Se encontramos obraId, use getOrcamentosByObra com esse ID
+      let orcamentos: any[] = [];
+      if (obraId != null && (Api as any).getOrcamentosByObra) {
+        const respByObra = await (Api as any).getOrcamentosByObra(obraId, { skip: 0, limit: 500 });
+        orcamentos = Array.isArray(respByObra?.data) ? respByObra.data : [];
+        setObraIdSelecionada(obraId);
+      } else {
+        // fallback: buscar por centro_custo (API genérica)
+        const resp = await Api.getOrcamentos({ skip: 0, limit: 200 } as any);
+        const list = resp?.data ?? [];
+        orcamentos = Array.isArray(list) ? list : [];
+        setObraIdSelecionada(null);
+      }
+
+      setCentroOrcamentos(orcamentos);
+
+      // Se obraId foi detectado, tentar buscar realizado por obra (se endpoint existir)
+      if (obraId != null && (Api as any).getResumoPorObra) {
+        setLoadingRealizadosPorObra(true);
+        try {
+          const respReal = await (Api as any).getResumoPorObra(obraId, { skip: 0, limit: 1000 });
+          setRealizadosPorObra(respReal?.data ?? []);
+        } catch (e) {
+          console.warn('Falha ao buscar realizado por obra (getResumoPorObra):', e);
+          setRealizadosPorObra(null);
+        } finally {
+          setLoadingRealizadosPorObra(false);
+        }
+      } else {
+        setRealizadosPorObra(null);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar orçamentos por centro:', err);
+      setCentroOrcamentos([]);
+      setObraIdSelecionada(null);
+      setRealizadosPorObra(null);
+    } finally {
+      setLoadingCentroOrcamentos(false);
+    }
+  };
+
+  // Dados para comparativo (Realizado x Orçado) para o centro selecionado
+  // Se conseguimos realizadosPorObra via API, usa-o; caso contrário, usa filtro pelo nome do centro
+  const realizadosParaCentro = obraIdSelecionada
+    ? (realizadosPorObra ?? resumoFiltrado.filter(r => normalizeExact(r.nome_centro_custo) === normalizeExact(centroDetalhesNome || '')))
+    : (centroDetalhesNome ? resumoFiltrado.filter(r => normalizeExact(r.nome_centro_custo) === normalizeExact(centroDetalhesNome)) : []);
+  const totalRealizadoCentro = realizadosParaCentro.reduce((s, i) => s + Math.abs(Number(i.valor_reais) || 0), 0);
+
+  // Orçamentos apenas da obra detectada (se obraIdSelecionada disponível) — garante comparação obra x obra
+  const centroOrcamentosFiltrados = obraIdSelecionada
+    ? centroOrcamentos.filter(o => Number(o.obra_id) === Number(obraIdSelecionada))
+    : centroOrcamentos;
+  const totalOrcadoCentro = centroOrcamentosFiltrados.reduce((s, o) => s + Math.abs(Number(o.valor_total) || 0), 0);
 
   return (
     <div style={{ ...estilosDashboard.container, boxSizing: 'border-box', maxWidth: 1200, margin: '0 auto', padding: 16, overflowX: 'hidden' }}>
@@ -412,12 +505,24 @@ export function ControleCustos() {
                           <td style={estilosDashboard.td}></td>
                           <td style={estilosDashboard.td}>
                             <div style={estilosDashboard.detalhe}>
-                              <div><b>Centro de Custo:</b> {item.nome_centro_custo}</div>
-                              <div><b>Complemento:</b> {item.complemento}</div>
-                              <div><b>Descrição:</b> {item.descricao || item.descricao_financeira}</div>
-                              <div><b>Data:</b> {item.data}</div>
-                              <div><b>Observação:</b> {item.observacao}</div>
-                              <div><b>Lançamento:</b> {item.lancamento}</div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                                <div>
+                                  <div><b>Centro de Custo:</b> {item.nome_centro_custo}</div>
+                                  <div><b>Complemento:</b> {item.complemento}</div>
+                                  <div><b>Descrição:</b> {item.descricao || item.descricao_financeira}</div>
+                                  <div><b>Data:</b> {item.data}</div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
+                                  <button
+                                    onClick={() => fetchOrcamentosPorCentro(item.nome_centro_custo)}
+                                    style={{ padding: '6px 10px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}
+                                  >
+                                    Ver orçamentos
+                                  </button>
+                                  <div style={{ fontSize: 12, color: '#666' }}>{item.lancamento}</div>
+                                </div>
+                              </div>
+                              <div style={{ marginTop: 8 }}><b>Observação:</b> {item.observacao}</div>
                             </div>
                           </td>
                           <td style={estilosDashboard.td}>
@@ -556,6 +661,116 @@ export function ControleCustos() {
           </div>
         </div>
       </div>
+
+      {/* Comparativo inline: Realizado x Orçado na tela principal */}
+      {centroDetalhesNome && (
+        <div style={{ marginTop: 20, padding: 12, border: '1px solid #e6e6e6', borderRadius: 8, background: '#fff' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <strong>Comparativo - {centroDetalhesNome}</strong>
+            <button onClick={() => { setCentroDetalhesNome(null); setCentroOrcamentos([]); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>Fechar</button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {/* Realizado */}
+            <div style={{ padding: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <h4 style={{ margin: 0 }}>Realizado</h4>
+                <div style={{ fontWeight: 700 }}>{formatCurrency(totalRealizadoCentro)}</div>
+              </div>
+              <div style={{ maxHeight: 340, overflowY: 'auto' }}>
+                {loadingRealizadosPorObra ? (
+                  <div>Carregando realizado por obra...</div>
+                ) : realizadosParaCentro.length === 0 ? (
+                  <div style={{ color: '#666' }}>Nenhum lançamento encontrado.</div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                     <thead>
+                       <tr>
+                         <th style={{ textAlign: 'left', padding: 6 }}>Data</th>
+                         <th style={{ textAlign: 'left', padding: 6 }}>Descrição</th>
+                         <th style={{ textAlign: 'right', padding: 6 }}>Valor</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {realizadosParaCentro.map((r, i) => (
+                         <tr key={`real-${i}`}>
+                           <td style={{ padding: 6 }}>{r.data}</td>
+                           <td style={{ padding: 6 }}>{r.descricao || r.descricao_financeira}</td>
+                           <td style={{ padding: 6, textAlign: 'right' }}>{formatCurrency(r.valor_reais)}</td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                 )}
+               </div>
+            </div>
+
+            {/* Orçado */}
+            <div style={{ padding: 8 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                <h4 style={{ margin: 0 }}>Orçado</h4>
+                <div style={{ fontWeight: 700 }}>{formatCurrency(totalOrcadoCentro)}</div>
+              </div>
+              <div style={{ maxHeight: 340, overflowY: 'auto' }}>
+                {loadingCentroOrcamentos ? (
+                  <div>Carregando orçamentos...</div>
+                ) : centroOrcamentos.length === 0 ? (
+                  <div style={{ color: '#666' }}>Nenhum orçamento encontrado para este centro.</div>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: 'left', padding: 6 }}>ID</th>
+                        <th style={{ textAlign: 'left', padding: 6 }}>Obra ID</th>
+                        <th style={{ textAlign: 'left', padding: 6 }}>Descrição</th>
+                        <th style={{ textAlign: 'right', padding: 6 }}>Valor Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {centroOrcamentosFiltrados.map((o: Orcamento) => (
+                        <React.Fragment key={`orc-${o.id}`}>
+                          <tr>
+                            <td style={{ padding: 6 }}>{o.id}</td>
+                            <td style={{ padding: 6 }}>{o.obra_id}</td>
+                            <td style={{ padding: 6 }}>{o.descricao}</td>
+                            <td style={{ padding: 6, textAlign: 'right' }}>{formatCurrency(o.valor_total ?? 0)}</td>
+                          </tr>
+                          <tr style={{ background: '#fafafa' }}>
+                            <td colSpan={4} style={{ padding: 8 }}>
+                              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                                <div style={{ minWidth: 140 }}>
+                                  <div style={{ fontSize: 12, color: '#666' }}>Material</div>
+                                  <div style={{ fontWeight: 700 }}>{formatCurrency(o.valor_material ?? 0)}</div>
+                                </div>
+                                <div style={{ minWidth: 140 }}>
+                                  <div style={{ fontSize: 12, color: '#666' }}>Deslocamento</div>
+                                  <div style={{ fontWeight: 700 }}>{formatCurrency(o.valor_deslocamento ?? 0)}</div>
+                                </div>
+                                <div style={{ minWidth: 140 }}>
+                                  <div style={{ fontSize: 12, color: '#666' }}>Hospedagem</div>
+                                  <div style={{ fontWeight: 700 }}>{formatCurrency(o.valor_hospedagem ?? 0)}</div>
+                                </div>
+                                <div style={{ minWidth: 140 }}>
+                                  <div style={{ fontSize: 12, color: '#666' }}>Serviço</div>
+                                  <div style={{ fontWeight: 700 }}>{formatCurrency(o.valor_servico ?? 0)}</div>
+                                </div>
+                                <div style={{ minWidth: 140, textAlign: 'right' }}>
+                                  <div style={{ fontSize: 12, color: '#666' }}>Total</div>
+                                  <div style={{ fontWeight: 900, color: '#1976d2' }}>{formatCurrency(o.valor_total ?? 0)}</div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      ))}
+                    </tbody>
+                 </table>
+               )}
+             </div>
+           </div>
+         </div>
+       </div>
+     )}
     </div>
   );
 }
