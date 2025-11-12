@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
-import { Api } from '../../../services/api/api';
 import { LancamentoHistorico } from './lancamento-historico';
-
-import type { 
-  Lancamento
-} from '../../../services/api/types';
 
 const Container = styled.div`
   padding: 2rem;
@@ -46,56 +41,6 @@ const Button = styled.button`
 `;
 
 export const CronogramaLancamento: React.FC = () => {
-  const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchLancamentos = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const params = {
-        skip: 0,
-        limit: 999999,
-      };
-
-      const response = await Api.getLancamentos(params);
-      
-      if (response?.data) {
-        if (response.data.data && Array.isArray(response.data.data)) {
-          setLancamentos(response.data.data);
-        } else if (Array.isArray(response.data)) {
-          setLancamentos(response.data);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar lançamentos:', error);
-      setError('Erro ao carregar os lançamentos.');
-      setLancamentos([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLancamentos();
-  }, []);
-
-  if (error) {
-    return (
-      <Container>
-        <div style={{ padding: '2rem', textAlign: 'center', color: '#dc3545' }}>
-          <h2>Erro ao carregar página</h2>
-          <p>{error}</p>
-          <Button onClick={() => { setError(null); fetchLancamentos(); }}>
-            Tentar Novamente
-          </Button>
-        </div>
-      </Container>
-    );
-  }
-
   return (
     <Container>
       <HeaderContainer>
