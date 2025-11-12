@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import Api from '../../../services/api/api';
 import { ListWrapper, Row, Field, Label, Input, TextArea, Actions, Button } from './styles';
 
+// Formatação de moeda BRL
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 type Orcamento = {
   id: number;
   obra_id: number;
@@ -28,6 +34,10 @@ export function OrcamentoDetalhes({ id, onDeleted, onUpdated }: { id: number; on
   // obra nome para melhor visualização
   const [obraName, setObraName] = useState<string | null>(null);
 
+  // orçamentos relacionados (mesma obra / centro de custo)
+  const [relatedOrcamentos, setRelatedOrcamentos] = useState<Orcamento[]>([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+
   async function loadObraName(obraId: number) {
     try {
       const resp = await Api.getObras();
@@ -36,6 +46,25 @@ export function OrcamentoDetalhes({ id, onDeleted, onUpdated }: { id: number; on
       setObraName(found?.nome ?? String(obraId));
     } catch {
       setObraName(String(obraId));
+    }
+  }
+
+  async function fetchRelatedOrcamentos(obraId?: number) {
+    if (!obraId) {
+      setRelatedOrcamentos([]);
+      return;
+    }
+    setLoadingRelated(true);
+    try {
+      const resp = await Api.getOrcamentosByObra(obraId, { skip: 0, limit: 100 });
+      const list = resp.data || [];
+      // remover o próprio orçamento da lista
+      setRelatedOrcamentos(Array.isArray(list) ? list.filter((o: any) => o.id !== id) : []);
+    } catch (err) {
+      console.error('Erro ao buscar orçamentos relacionados:', err);
+      setRelatedOrcamentos([]);
+    } finally {
+      setLoadingRelated(false);
     }
   }
 
@@ -53,8 +82,11 @@ export function OrcamentoDetalhes({ id, onDeleted, onUpdated }: { id: number; on
       // buscar o nome da obra após carregar o orçamento
       if (resp.data && resp.data.obra_id != null) {
         loadObraName(resp.data.obra_id);
+        // buscar orçamentos relacionados da mesma obra
+        fetchRelatedOrcamentos(resp.data.obra_id);
       } else {
         setObraName(null);
+        setRelatedOrcamentos([]);
       }
     } finally {
       setLoading(false);
@@ -112,11 +144,44 @@ export function OrcamentoDetalhes({ id, onDeleted, onUpdated }: { id: number; on
         <>
           <p><strong>Obra:</strong> {obraName ?? item.obra_id}</p>
           <p><strong>Descrição:</strong> {item.descricao}</p>
-          <p><strong>Valor material:</strong> {item.valor_material.toFixed(2)}</p>
-          <p><strong>Valor deslocamento:</strong> {item.valor_deslocamento.toFixed(2)}</p>
-          <p><strong>Valor hospedagem:</strong> {item.valor_hospedagem.toFixed(2)}</p>
-          <p><strong>Valor serviço:</strong> {item.valor_servico.toFixed(2)}</p>
-          <p><strong>Valor total:</strong> {item.valor_total.toFixed(2)}</p>
+          <p><strong>Valor material:</strong> {currencyFormatter.format(item.valor_material)}</p>
+          <p><strong>Valor deslocamento:</strong> {currencyFormatter.format(item.valor_deslocamento)}</p>
+          <p><strong>Valor hospedagem:</strong> {currencyFormatter.format(item.valor_hospedagem)}</p>
+          <p><strong>Valor serviço:</strong> {currencyFormatter.format(item.valor_servico)}</p>
+          <p><strong>Valor total:</strong> {currencyFormatter.format(item.valor_total)}</p>
+
+          {/* Lista comparativa: orçamentos da mesma obra (exclui o atual) */}
+          <div style={{ marginTop: 18 }}>
+            <h4 style={{ marginBottom: 8 }}>Orçamentos da mesma obra / centro de custo</h4>
+            {loadingRelated ? (
+              <div>Carregando orçamentos relacionados...</div>
+            ) : relatedOrcamentos.length === 0 ? (
+              <div style={{ color: '#666' }}>Nenhum outro orçamento encontrado para esta obra.</div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: 6 }}>ID</th>
+                    <th style={{ textAlign: 'left', padding: 6 }}>Descrição</th>
+                    <th style={{ textAlign: 'right', padding: 6 }}>Valor Total</th>
+                    <th style={{ textAlign: 'center', padding: 6 }}>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {relatedOrcamentos.map(r => (
+                    <tr key={r.id}>
+                      <td style={{ padding: 6 }}>{r.id}</td>
+                      <td style={{ padding: 6 }}>{r.descricao}</td>
+                      <td style={{ padding: 6, textAlign: 'right' }}>{currencyFormatter.format(r.valor_total)}</td>
+                      <td style={{ padding: 6, textAlign: 'center' }}>
+                        <Button onClick={() => window.location.assign(`#orcamento/${r.id}`)}>Ver</Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
 
           <Actions>
             <Button onClick={() => setEditing(true)}>Editar</Button>

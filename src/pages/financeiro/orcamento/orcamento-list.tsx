@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import Api from '../../../services/api/api';
 import { ListWrapper, Table, Thead, Tbody, Tr, Th, Td, Button } from './styles';
 
+// Formatação de moeda BRL
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 type Orcamento = {
   id: number;
   obra_id: number;
@@ -82,7 +88,7 @@ export function OrcamentoList({ onOpenDetails }: { onOpenDetails: (id: number) =
                 <Td>{it.id}</Td>
                 <Td>{obrasMap[it.obra_id] ?? it.obra_id}</Td>
                 <Td>{it.descricao}</Td>
-                <Td>{it.valor_total.toFixed(2)}</Td>
+                <Td>{currencyFormatter.format(it.valor_total)}</Td>
                 <Td>
                   <Button onClick={() => onOpenDetails(it.id)}>Ver</Button>
                 </Td>

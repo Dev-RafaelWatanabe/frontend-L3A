@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
 import { Api } from '../../../services/api/api';
-import { LancamentoHistorico } from './lancamento-historico';
+import {LancamentoHistorico} from './lancamento-historico';
 
 import type { 
   Lancamento
@@ -62,12 +62,12 @@ export const CronogramaLancamento: React.FC = () => {
 
       const response = await Api.getLancamentos(params);
       
-      if (response?.data) {
-        if (response.data.data && Array.isArray(response.data.data)) {
-          setLancamentos(response.data.data);
-        } else if (Array.isArray(response.data)) {
-          setLancamentos(response.data);
-        }
+      // Normaliza diferentes formatos de resposta (data.data ou data)
+      const items = response?.data?.data ?? response?.data ?? [];
+      if (Array.isArray(items)) {
+        setLancamentos(items);
+      } else {
+        setLancamentos([]);
       }
     } catch (error) {
       console.error('Erro ao carregar lançamentos:', error);
@@ -96,6 +96,10 @@ export const CronogramaLancamento: React.FC = () => {
     );
   }
 
+  if (loading) {
+    return <Container><p>Carregando...</p></Container>;
+  }
+
   return (
     <Container>
       <HeaderContainer>
@@ -106,7 +110,11 @@ export const CronogramaLancamento: React.FC = () => {
       </HeaderContainer>
 
       {/* Componente de Histórico com Filtros e Tabela */}
-      <LancamentoHistorico />
+      <LancamentoHistorico
+        lancamentos={lancamentos}
+        loading={loading}
+        onRefresh={fetchLancamentos}
+      />
     </Container>
   );
 };
