@@ -1,12 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
 import { Api } from '../../../services/api/api';
 import {LancamentoHistorico} from './lancamento-historico';
-
-import type { 
-  Lancamento
-} from '../../../services/api/types';
 
 const Container = styled.div`
   padding: 2rem;
