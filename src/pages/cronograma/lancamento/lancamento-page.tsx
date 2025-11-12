@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
-import { LancamentoHistorico } from './lancamento-historico';
+import { Api } from '../../../services/api/api';
+import {LancamentoHistorico} from './lancamento-historico';
 
 const Container = styled.div`
   padding: 2rem;
@@ -41,6 +42,60 @@ const Button = styled.button`
 `;
 
 export const CronogramaLancamento: React.FC = () => {
+  const [lancamentos, setLancamentos] = useState<Lancamento[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchLancamentos = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = {
+        skip: 0,
+        limit: 999999,
+      };
+
+      const response = await Api.getLancamentos(params);
+      
+      // Normaliza diferentes formatos de resposta (data.data ou data)
+      const items = response?.data?.data ?? response?.data ?? [];
+      if (Array.isArray(items)) {
+        setLancamentos(items);
+      } else {
+        setLancamentos([]);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar lançamentos:', error);
+      setError('Erro ao carregar os lançamentos.');
+      setLancamentos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchLancamentos();
+  }, []);
+
+  if (error) {
+    return (
+      <Container>
+        <div style={{ padding: '2rem', textAlign: 'center', color: '#dc3545' }}>
+          <h2>Erro ao carregar página</h2>
+          <p>{error}</p>
+          <Button onClick={() => { setError(null); fetchLancamentos(); }}>
+            Tentar Novamente
+          </Button>
+        </div>
+      </Container>
+    );
+  }
+
+  if (loading) {
+    return <Container><p>Carregando...</p></Container>;
+  }
+
   return (
     <Container>
       <HeaderContainer>
@@ -51,7 +106,11 @@ export const CronogramaLancamento: React.FC = () => {
       </HeaderContainer>
 
       {/* Componente de Histórico com Filtros e Tabela */}
-      <LancamentoHistorico />
+      <LancamentoHistorico
+        lancamentos={lancamentos}
+        loading={loading}
+        onRefresh={fetchLancamentos}
+      />
     </Container>
   );
 };

@@ -3,7 +3,7 @@ import type { PaginacaoParams } from './types';
 import type { PlanejamentoCreate, LancamentoCreate } from './types';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: '/api',
 });
 
 // Adicionar interceptors para debug
@@ -267,6 +267,37 @@ export const Api = {
     data_fim?: string 
   }) =>
     api.get('/relatorio/resumo', { params }),
+
+  // ORÇAMENTOS
+  getOrcamentos: (params?: { skip?: number; limit?: number }) =>
+    api.get('/orcamentos/', { params: { skip: params?.skip ?? 0, limit: params?.limit ?? 100 } }),
+
+  getOrcamentosByObra: (obraId: number, params?: { skip?: number; limit?: number }) =>
+    api.get(`/orcamentos/obra/${obraId}`, { params: { skip: params?.skip ?? 0, limit: params?.limit ?? 100 } }),
+
+  getOrcamentoById: (id: number) => api.get(`/orcamentos/${id}`),
+
+  createOrcamento: (data: {
+    obra_id: number;
+    valor_material: number;
+    valor_deslocamento: number;
+    valor_hospedagem: number;
+    valor_servico: number;
+    valor_total: number;
+    descricao: string;
+  }) => api.post('/orcamentos/', data),
+
+  updateOrcamento: (id: number, data: Partial<{
+    obra_id: number;
+    valor_material: number;
+    valor_deslocamento: number;
+    valor_hospedagem: number;
+    valor_servico: number;
+    valor_total: number;
+    descricao: string;
+  }>) => api.put(`/orcamentos/${id}`, data),
+
+  deleteOrcamento: (id: number) => api.delete(`/orcamentos/${id}`),
 };
 
 export default Api;

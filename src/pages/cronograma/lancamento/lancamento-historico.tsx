@@ -246,11 +246,15 @@ const ButtonGroup = styled.div`
   margin-top: 30px;
 `;
 
-interface Props {}
+interface Props {
+  lancamentos: Lancamento[];
+  loading?: boolean;
+  onRefresh?: () => Promise<void> | void;
+}
 
-export const LancamentoHistorico: React.FC<Props> = () => {
+export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onRefresh }) => {
   const [historico, setHistorico] = useState<Lancamento[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [localLoading, setLocalLoading] = useState(false);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
@@ -309,7 +313,7 @@ export const LancamentoHistorico: React.FC<Props> = () => {
   // Carregar histórico com filtros e paginação
   const fetchHistorico = async () => {
     try {
-      setLoading(true);
+      setLocalLoading(true);
       const skip = (currentPage - 1) * itemsPerPage;
       
       const response = await Api.getLancamentos({
@@ -326,7 +330,7 @@ export const LancamentoHistorico: React.FC<Props> = () => {
       setHistorico([]);
       setTotal(0);
     } finally {
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
@@ -334,6 +338,13 @@ export const LancamentoHistorico: React.FC<Props> = () => {
   useEffect(() => {
     fetchHistorico();
   }, [currentPage, filters]);
+  
+  // Se o pai passar lancamentos, sincroniza para exibir imediatamente
+  useEffect(() => {
+    if (Array.isArray(lancamentos) && lancamentos.length > 0) {
+      setHistorico(lancamentos);
+    }
+  }, [lancamentos]);
 
   // Aplicar filtros
   const handleSearch = () => {
@@ -369,7 +380,8 @@ export const LancamentoHistorico: React.FC<Props> = () => {
       await Api.updateLancamento(editingLancamento.id, formData);
       setShowEditModal(false);
       setEditingLancamento(null);
-      fetchHistorico();
+      await fetchHistorico();
+      if (onRefresh) await onRefresh();
       alert('Lançamento atualizado com sucesso!');
     } catch (error: any) {
       console.error('Erro ao atualizar lançamento:', error);
@@ -386,7 +398,8 @@ export const LancamentoHistorico: React.FC<Props> = () => {
 
     try {
       await Api.deleteLancamento(lancamento.id);
-      fetchHistorico();
+      await fetchHistorico();
+      if (onRefresh) await onRefresh();
       alert('Lançamento deletado com sucesso!');
     } catch (error: any) {
       console.error('Erro ao deletar lançamento:', error);
@@ -489,7 +502,7 @@ export const LancamentoHistorico: React.FC<Props> = () => {
 
         {/* Tabela */}
         <TableContainer>
-          {loading ? (
+          {(localLoading || loading) ? (
             <div style={{ padding: '40px', textAlign: 'center' }}>
               Carregando histórico...
             </div>
