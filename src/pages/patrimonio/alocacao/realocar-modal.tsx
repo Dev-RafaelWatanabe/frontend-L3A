@@ -41,7 +41,9 @@ export const RealocarModal: React.FC<RealocarModalProps> = ({ isOpen, alocacao, 
         });
         
         setObras(obrasRes.data || []);
-        setFuncionarios(funcionariosRes.data || []);
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+        setFuncionarios(funcionariosAtivos || []);
         setSituacoes(situacoesRes.data || []);
       }).catch(err => {
         console.error('❌ Erro ao carregar dados iniciais:', err);

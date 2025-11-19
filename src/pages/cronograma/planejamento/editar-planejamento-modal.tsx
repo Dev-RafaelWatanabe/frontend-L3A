@@ -53,7 +53,9 @@ export function EditarPlanejamentoModal({ dayGroup, onClose, onSave }: EditarPla
           Api.getFuncionarios(),
           Api.getObras(),
         ]);
-        setFuncionarios(funcionariosRes.data);
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+        setFuncionarios(funcionariosAtivos);
         setObras(obrasRes.data);
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -61,9 +63,7 @@ export function EditarPlanejamentoModal({ dayGroup, onClose, onSave }: EditarPla
       }
     };
     fetchData();
-  }, []);
-
-  const handleRemoveFuncionario = (obraIndex: number, funcionarioId: number) => {
+  }, []);  const handleRemoveFuncionario = (obraIndex: number, funcionarioId: number) => {
     const newGroups = [...editedGroups];
     newGroups[obraIndex].funcionarios = newGroups[obraIndex].funcionarios.filter(
       (f) => f.id !== funcionarioId

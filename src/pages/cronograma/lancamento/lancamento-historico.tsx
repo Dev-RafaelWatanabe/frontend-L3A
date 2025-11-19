@@ -256,7 +256,9 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
           Api.getRegimes()
         ]);
         
-        setFuncionarios(funcionariosRes.data);
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+        setFuncionarios(funcionariosAtivos);
         setObras(obrasRes.data);
         setRestaurantes(restaurantesRes.data);
         setRegimes(regimesRes.data);

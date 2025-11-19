@@ -35,7 +35,25 @@ export const Api = {
 
   getRegimes: () => api.get('/regime/'),
 
+  // ========== FUNCIONÁRIOS ==========
   getFuncionarios: () => api.get('/funcionario/'),
+  createFuncionario: (data: {
+    nome: string;
+    ativo?: boolean;
+    gestor?: boolean;
+    tipo_contrato?: 'L3A' | 'TERCEIRO';
+    tipos_empregabilidade_nome: string[];
+  }) => api.post('/funcionario/', data),
+  updateFuncionario: (id: number, data: {
+    nome?: string;
+    ativo?: boolean;
+    gestor?: boolean;
+    tipo_contrato?: 'L3A' | 'TERCEIRO';
+    tipos_empregabilidade_nome?: string[];
+  }) => api.put(`/funcionario/${id}`, data),
+  ativarDesativarFuncionario: (id: number, ativar: boolean) => 
+    api.patch(`/funcionario/${id}/ativar?ativar=${ativar}`),
+
   getObras: () => api.get('/obras/'),
   createObra: async (data: {
     atividade: string;

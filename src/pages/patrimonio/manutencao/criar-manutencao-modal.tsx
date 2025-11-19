@@ -42,7 +42,9 @@ export const CriarManutencaoModal: React.FC<{ onClose: () => void; onSubmit: (da
   const buscarFuncionarios = async () => {
     try {
       const resp = await Api.getFuncionarios();
-      setFuncionarios(resp.data || []);
+      // Filtrar apenas funcionários ativos
+      const funcionariosAtivos = resp.data.filter((f: any) => f.ativo === true);
+      setFuncionarios(funcionariosAtivos || []);
     } catch {
       setFuncionarios([]);
     }

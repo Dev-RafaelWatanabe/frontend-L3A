@@ -69,7 +69,9 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
         ]);
         
         setRestaurantes(restaurantesRes.data);
-        setFuncionarios(funcionariosRes.data);
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+        setFuncionarios(funcionariosAtivos);
         setObras(obrasRes.data);
         setRegimes(regimesRes.data);
 

@@ -100,7 +100,9 @@ export function CronogramaPlanejamento() {
           Api.getPlanejamentos()
         ])
         
-        setFuncionarios(funcionariosRes.data)
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true)
+        setFuncionarios(funcionariosAtivos)
         setObras(obrasRes.data)
         setPlanejamentos(planejamentosRes.data)
       } catch (err) {
@@ -112,7 +114,7 @@ export function CronogramaPlanejamento() {
     fetchData()
   }, [])
 
-  // Filtrar funcionários
+  // Filtrar funcionários (já vem apenas ativos)
   const filteredFuncionarios = funcionarios.filter(func =>
     func.nome.toLowerCase().includes(funcionarioSearch.toLowerCase())
   )

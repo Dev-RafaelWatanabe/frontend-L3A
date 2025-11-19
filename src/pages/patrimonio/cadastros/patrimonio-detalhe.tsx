@@ -122,7 +122,9 @@ export const PatrimonioDetalhe: React.FC = () => {
           Api.getFuncionarios()
         ]);
 
-        const funcionarios: Array<{ id: number; nome: string }> = funcRes.data || [];
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcRes.data.filter((f: any) => f.ativo === true);
+        const funcionarios: Array<{ id: number; nome: string }> = funcionariosAtivos || [];
         const mapFuncionario = new Map<number, string>(
           funcionarios.map((f) => [f.id, f.nome])
         );
