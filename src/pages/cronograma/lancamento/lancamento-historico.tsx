@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaEdit, FaTrash, FaTimes, FaEraser, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash, FaTimes, FaEraser } from 'react-icons/fa';
 import styled from 'styled-components';
 import { Api } from '../../../services/api/api';
 import { Button } from '../../../style/components/buttons';
@@ -10,7 +10,7 @@ import type {
   Lancamento, 
   LancamentoCreate, 
   LancamentoFilters,
-  LancamentoResponse,
+  // LancamentoResponse,
   Regime
 } from '../../../services/api/types';
 
@@ -134,45 +134,6 @@ const ActionButton = styled.button<{ variant?: 'edit' | 'delete' }>`
   `}
 `;
 
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
-`;
-
-const PaginationInfo = styled.div`
-  color: #6c757d;
-  font-size: 14px;
-`;
-
-const PaginationButtons = styled.div`
-  display: flex;
-  gap: 5px;
-`;
-
-const PaginationButton = styled.button<{ active?: boolean }>`
-  padding: 8px 12px;
-  border: 1px solid #dee2e6;
-  background: ${props => props.active ? '#007bff' : 'white'};
-  color: ${props => props.active ? 'white' : '#495057'};
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  
-  &:hover {
-    background: ${props => props.active ? '#0056b3' : '#e9ecef'};
-  }
-  
-  &:disabled {
-    background: #f8f9fa;
-    color: #6c757d;
-    cursor: not-allowed;
-  }
-`;
-
 // Modal Components
 const ModalOverlay = styled.div`
   position: fixed;
@@ -254,10 +215,7 @@ interface Props {
 
 export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onRefresh }) => {
   const [historico, setHistorico] = useState<Lancamento[]>([]);
-  const [localLoading, setLocalLoading] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 50;
+  const [localLoading] = useState(false);
   
   // Estados para filtros
   const [filters, setFilters] = useState<LancamentoFilters>({});
@@ -310,52 +268,25 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
     fetchInitialData();
   }, []);
 
-  // Carregar histórico com filtros e paginação
-  const fetchHistorico = async () => {
-    try {
-      setLocalLoading(true);
-      const skip = (currentPage - 1) * itemsPerPage;
-      
-      const response = await Api.getLancamentos({
-        skip,
-        limit: itemsPerPage,
-        ...filters
-      });
-      
-      const data = response.data as LancamentoResponse;
-      setHistorico(data.data);
-      setTotal(data.total);
-    } catch (error) {
-      console.error('Erro ao carregar histórico:', error);
-      setHistorico([]);
-      setTotal(0);
-    } finally {
-      setLocalLoading(false);
-    }
-  };
-
-  // Recarregar dados quando filtros ou página mudam
+  // Usar lancamentos do pai
   useEffect(() => {
-    fetchHistorico();
-  }, [currentPage, filters]);
-  
-  // Se o pai passar lancamentos, sincroniza para exibir imediatamente
-  useEffect(() => {
-    if (Array.isArray(lancamentos) && lancamentos.length > 0) {
-      setHistorico(lancamentos);
-    }
+    console.log('📊 Lançamentos recebidos do pai:', lancamentos);
+    setHistorico(lancamentos || []);
   }, [lancamentos]);
 
   // Aplicar filtros
   const handleSearch = () => {
-    setCurrentPage(1);
-    fetchHistorico();
+    if (onRefresh) {
+      onRefresh();
+    }
   };
 
   // Limpar filtros
   const handleClearFilters = () => {
     setFilters({});
-    setCurrentPage(1);
+    if (onRefresh) {
+      onRefresh();
+    }
   };
 
   // Abrir modal de edição
@@ -380,7 +311,7 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
       await Api.updateLancamento(editingLancamento.id, formData);
       setShowEditModal(false);
       setEditingLancamento(null);
-      await fetchHistorico();
+      // await fetchHistorico();
       if (onRefresh) await onRefresh();
       alert('Lançamento atualizado com sucesso!');
     } catch (error: any) {
@@ -398,7 +329,7 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
 
     try {
       await Api.deleteLancamento(lancamento.id);
-      await fetchHistorico();
+      // await fetchHistorico();
       if (onRefresh) await onRefresh();
       alert('Lançamento deletado com sucesso!');
     } catch (error: any) {
@@ -407,11 +338,6 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
       alert(`Erro: ${errorMessage}`);
     }
   };
-
-  // Calcular paginação
-  const totalPages = Math.ceil(total / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, total);
 
   return (
     <>
@@ -423,32 +349,47 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
           <FiltersGrid>
             <FilterField>
               <label>Funcionário:</label>
-              <input
-                type="text"
-                placeholder="Nome do funcionário"
+              <select
                 value={filters.nome_funcionario || ''}
                 onChange={(e) => setFilters(prev => ({...prev, nome_funcionario: e.target.value}))}
-              />
+              >
+                <option value="">Todos os funcionários</option>
+                {funcionarios.map(funcionario => (
+                  <option key={funcionario.id} value={funcionario.nome}>
+                    {funcionario.nome}
+                  </option>
+                ))}
+              </select>
             </FilterField>
 
             <FilterField>
               <label>Obra:</label>
-              <input
-                type="text"
-                placeholder="Nome da obra"
+              <select
                 value={filters.nome_obra || ''}
                 onChange={(e) => setFilters(prev => ({...prev, nome_obra: e.target.value}))}
-              />
+              >
+                <option value="">Todas as obras</option>
+                {obras.map(obra => (
+                  <option key={obra.id} value={obra.nome}>
+                    {obra.nome}
+                  </option>
+                ))}
+              </select>
             </FilterField>
 
             <FilterField>
               <label>Restaurante:</label>
-              <input
-                type="text"
-                placeholder="Nome do restaurante"
+              <select
                 value={filters.nome_restaurante || ''}
                 onChange={(e) => setFilters(prev => ({...prev, nome_restaurante: e.target.value}))}
-              />
+              >
+                <option value="">Todos os restaurantes</option>
+                {restaurantes.map(restaurante => (
+                  <option key={restaurante.id} value={restaurante.nome}>
+                    {restaurante.nome}
+                  </option>
+                ))}
+              </select>
             </FilterField>
 
             <FilterField>
@@ -549,61 +490,6 @@ export const LancamentoHistorico: React.FC<Props> = ({ lancamentos, loading, onR
                   ))}
                 </tbody>
               </Table>
-
-              <PaginationContainer>
-                <PaginationInfo>
-                  Mostrando {startItem} a {endItem} de {total} registros
-                </PaginationInfo>
-
-                <PaginationButtons>
-                  <PaginationButton
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(1)}
-                  >
-                    Primeira
-                  </PaginationButton>
-                  
-                  <PaginationButton
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                  >
-                    <FaChevronLeft style={{ marginRight: '4px' }} />
-                    Anterior
-                  </PaginationButton>
-
-                  {/* Páginas próximas */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const startPage = Math.max(1, currentPage - 2);
-                    const pageNum = startPage + i;
-                    if (pageNum > totalPages) return null;
-                    
-                    return (
-                      <PaginationButton
-                        key={pageNum}
-                        active={pageNum === currentPage}
-                        onClick={() => setCurrentPage(pageNum)}
-                      >
-                        {pageNum}
-                      </PaginationButton>
-                    );
-                  })}
-
-                  <PaginationButton
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                  >
-                    Próximo
-                    <FaChevronRight style={{ marginLeft: '4px' }} />
-                  </PaginationButton>
-                  
-                  <PaginationButton
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(totalPages)}
-                  >
-                    Última
-                  </PaginationButton>
-                </PaginationButtons>
-              </PaginationContainer>
             </>
           ) : (
             <div style={{ padding: '40px', textAlign: 'center' }}>

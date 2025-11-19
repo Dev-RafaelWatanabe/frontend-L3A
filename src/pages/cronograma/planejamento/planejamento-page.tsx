@@ -32,6 +32,7 @@ export function CronogramaPlanejamento() {
   const [selectedObra, setSelectedObra] = useState<number | null>(null)
   const [selectedDates, setSelectedDates] = useState<string[]>([])
   const [horaInicio, setHoraInicio] = useState<string>('07:00')
+  const [selectedResponsavel, setSelectedResponsavel] = useState<string>('')
   const [funcionarioSearch, setFuncionarioSearch] = useState('')
   const [obraSearch, setObraSearch] = useState('')
   const [isFuncionarioDropdownOpen, setIsFuncionarioDropdownOpen] = useState(false)
@@ -233,30 +234,101 @@ export function CronogramaPlanejamento() {
 
   const handleCopyPlanejamento = (dayGroup: DayPlanejamentoGroup) => {
     const date = new Date(dayGroup.data_trabalho + 'T00:00:00')
-    const diasSemana = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira', 'quinta-feira', 'sexta-feira', 'sábado']
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
     const diaSemana = diasSemana[date.getDay()]
     const dia = date.getDate().toString().padStart(2, '0')
     const mes = (date.getMonth() + 1).toString().padStart(2, '0')
     
-    let mensagem = `*Planejamento diário ${diaSemana} ${dia}/${mes}*\n\n`
+    // Calcular efetivos totais do dia
+    let totalL3A = 0
+    let totalTerceiro = 0
     
     dayGroup.obras.forEach(obraHorario => {
-      const obraNomeLimpo = obraHorario.obra.nome.includes('-') ? obraHorario.obra.nome.split('-').slice(1).join('-').trim() : obraHorario.obra.nome
-      const horarioFormatado = obraHorario.horario_inicio.substring(0, 5) + 'hrs'
-      const centroCusto = obraHorario.obra.nome.includes('-') ? obraHorario.obra.nome.split('-')[0].trim().substring(0, 4) : obraHorario.obra.nome.substring(0, 4)
-      
-      mensagem += `*${obraNomeLimpo} (${horarioFormatado}) - CC ${centroCusto}*\n`
       obraHorario.funcionarios.forEach(funcionario => {
-        mensagem += `${funcionario.nome}\n`
+        if (funcionario.tipo_contrato === 'TERCEIRO') {
+          totalTerceiro++
+        } else {
+          totalL3A++
+        }
       })
+    })
+    
+    const totalGeral = totalL3A + totalTerceiro
+    
+    let mensagem = `Planejamento diário ${diaSemana} (${dia}/${mes})\n`
+    mensagem += `Efetivo L3A: ${totalL3A}\n`
+    mensagem += `Efetivo terceiro: ${totalTerceiro}\n`
+    mensagem += `Efetivo total: ${totalGeral}\n\n`
+    
+    dayGroup.obras.forEach(obraHorario => {
+      // Extrair nome da obra (remove código se existir)
+      const obraNomeLimpo = obraHorario.obra.nome.includes('-') 
+        ? obraHorario.obra.nome.split('-').slice(1).join('-').trim() 
+        : obraHorario.obra.nome
+        
+      // Formatar horário
+      const horarioFormatado = obraHorario.horario_inicio.substring(0, 5)
+      
+      // Extrair centro de custo
+      const centroCusto = (obraHorario.obra.nome.includes('-') 
+        ? obraHorario.obra.nome.split('-')[0].trim() 
+        : obraHorario.obra.nome.substring(0, 4))
+      
+      // Buscar responsável/gestor da obra
+      const responsavel = obraHorario.responsavel?.nome || 'N/A'
+      
+      // Calcular efetivos da obra
+      let obraL3A = 0
+      let obraTerceiro = 0
+      const funcionariosL3A: string[] = []
+      const funcionariosTerceiros: string[] = []
+      
+      obraHorario.funcionarios.forEach(funcionario => {
+        if (funcionario.tipo_contrato === 'TERCEIRO') {
+          obraTerceiro++
+          // Agrupar terceiros por equipe se o nome contiver "Equipe do"
+          if (funcionario.nome.toLowerCase().includes('equipe')) {
+            funcionariosTerceiros.push(funcionario.nome)
+          } else {
+            funcionariosTerceiros.push(funcionario.nome)
+          }
+        } else {
+          obraL3A++
+          funcionariosL3A.push(funcionario.nome)
+        }
+      })
+      
+      // Linha do título da obra
+      mensagem += `${obraNomeLimpo} (${horarioFormatado}) CC ${centroCusto} (${responsavel})\n`
+      
+      // Linha de efetivo da obra
+      if (obraL3A > 0 && obraTerceiro > 0) {
+        mensagem += `Efetivo L3A: ${obraL3A} / Efetivo terceiro: ${obraTerceiro}\n`
+      } else if (obraL3A > 0) {
+        mensagem += `Efetivo L3A: ${obraL3A}\n`
+      } else if (obraTerceiro > 0) {
+        mensagem += `Efetivo terceiro: ${obraTerceiro}\n`
+      }
+      
+      // Listar funcionários L3A primeiro
+      funcionariosL3A.forEach(nome => {
+        mensagem += `${nome}\n`
+      })
+      
+      // Depois listar terceiros
+      funcionariosTerceiros.forEach(nome => {
+        mensagem += `${nome}\n`
+      })
+      
       mensagem += '\n'
     })
     
     // Copiar para clipboard
     navigator.clipboard.writeText(mensagem).then(() => {
-      alert('Planejamento copiado para a área de transferência!')
-    }).catch(() => {
-      alert('Erro ao copiar planejamento')
+      alert('✅ Planejamento copiado para a área de transferência!')
+    }).catch(err => {
+      console.error('Erro ao copiar:', err)
+      alert('❌ Erro ao copiar planejamento')
     })
   }
 
@@ -332,7 +404,8 @@ export function CronogramaPlanejamento() {
   interface ObraHorarioGroup {
     obra: { id: number; nome: string; };
     horario_inicio: string;
-    funcionarios: { id: number; nome: string; }[];
+    funcionarios: { id: number; nome: string; tipo_contrato?: string }[];
+    responsavel?: { id: number; nome: string };
   }
 
   interface DayPlanejamentoGroup {
@@ -356,12 +429,21 @@ export function CronogramaPlanejamento() {
     )
     
     if (existingObraHorario) {
-      existingObraHorario.funcionarios.push(plano.funcionario)
+      existingObraHorario.funcionarios.push({
+        id: plano.funcionario.id,
+        nome: plano.funcionario.nome,
+        tipo_contrato: plano.funcionario.tipo_contrato
+      })
     } else {
       groups[key].obras.push({
         obra: plano.obra,
         horario_inicio: plano.horario_inicio,
-        funcionarios: [plano.funcionario]
+        funcionarios: [{
+          id: plano.funcionario.id,
+          nome: plano.funcionario.nome,
+          tipo_contrato: plano.funcionario.tipo_contrato
+        }],
+        responsavel: plano.responsavel
       })
     }
     
@@ -395,6 +477,7 @@ export function CronogramaPlanejamento() {
               horario_inicio: horaInicio,
               funcionario_nome: funcionario.nome,
               obra_nome: centroCusto,
+              responsavel_nome: selectedResponsavel || undefined,
             }
 
             await Api.createPlanejamento(novoPlanejamento)
@@ -407,6 +490,7 @@ export function CronogramaPlanejamento() {
       setSelectedObra(null)
       setSelectedDates([])
       setHoraInicio('07:00')
+      setSelectedResponsavel('')
       setFuncionarioSearch('')
       setObraSearch('')
       
@@ -506,6 +590,35 @@ export function CronogramaPlanejamento() {
             onChange={(e) => setHoraInicio(e.target.value)}
             style={{ width: '150px' }}
           />
+        </FormField>
+
+        <FormField>
+          <label>Responsável (Gestor):</label>
+          <select
+            value={selectedResponsavel}
+            onChange={(e) => setSelectedResponsavel(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px',
+              borderRadius: '8px',
+              border: '1px solid #ddd',
+              fontSize: '14px',
+              backgroundColor: 'white',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">Selecione o gestor responsável</option>
+            {funcionarios
+              .filter(func => func.gestor === true)
+              .map(gestor => (
+                <option key={gestor.id} value={gestor.nome}>
+                  {gestor.nome}
+                </option>
+              ))}
+          </select>
+          <small style={{ color: '#666', fontSize: '12px' }}>
+            {selectedResponsavel ? `Gestor selecionado: ${selectedResponsavel}` : 'Opcional - Selecione o gestor responsável pela obra'}
+          </small>
         </FormField>
 
         <CalendarContainer>
