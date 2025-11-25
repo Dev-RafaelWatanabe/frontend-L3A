@@ -28,6 +28,8 @@ export interface Funcionario {
   nome: string;
   tipos_empregabilidade: string[];
   ativo: boolean;
+  gestor?: boolean;
+  tipo_contrato?: 'L3A' | 'TERCEIRO';
 }
 
 export interface Obra {
@@ -102,9 +104,17 @@ export interface Planejamento {
   funcionario: {
     id: number;
     nome: string;
+    tipo_contrato?: 'L3A' | 'TERCEIRO';
   };
   obra: {
     id: number;
+    nome: string;
+  };
+  responsavel?: {
+    id: number;
+    nome: string;
+  };
+  turno?: {
     nome: string;
   };
 }
@@ -114,6 +124,7 @@ export interface PlanejamentoCreate {
   horario_inicio: string;
   funcionario_nome: string;
   obra_nome: string;
+  responsavel_nome?: string;
 }
 
 export interface LancamentoPage {

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
 import { Api } from '../../../services/api/api';
-import {LancamentoHistorico} from './lancamento-historico';
+import type { Lancamento } from '../../../services/api/types';
+import { LancamentoHistorico } from './lancamento-historico';
 
 const Container = styled.div`
   padding: 2rem;
@@ -48,6 +49,7 @@ export const CronogramaLancamento: React.FC = () => {
 
   const fetchLancamentos = async () => {
     try {
+      console.log('🔄 Iniciando busca de lançamentos...');
       setLoading(true);
       setError(null);
 
@@ -57,20 +59,28 @@ export const CronogramaLancamento: React.FC = () => {
       };
 
       const response = await Api.getLancamentos(params);
+      console.log('📦 Resposta completa da API:', response);
+      console.log('📊 response.data:', response?.data);
       
       // Normaliza diferentes formatos de resposta (data.data ou data)
       const items = response?.data?.data ?? response?.data ?? [];
+      console.log('✅ Items extraídos:', items);
+      console.log('📏 Quantidade de items:', Array.isArray(items) ? items.length : 'não é array');
+      
       if (Array.isArray(items)) {
         setLancamentos(items);
+        console.log('✅ Lançamentos setados no estado:', items.length, 'registros');
       } else {
+        console.warn('⚠️ Items não é um array, setando array vazio');
         setLancamentos([]);
       }
     } catch (error) {
-      console.error('Erro ao carregar lançamentos:', error);
+      console.error('❌ Erro ao carregar lançamentos:', error);
       setError('Erro ao carregar os lançamentos.');
       setLancamentos([]);
     } finally {
       setLoading(false);
+      console.log('🏁 Busca finalizada');
     }
   };
 

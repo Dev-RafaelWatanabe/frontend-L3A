@@ -40,13 +40,21 @@ interface PublicarPlanejamentoModalProps {
   onPublish: () => void;
 }
 
+// Turnos disponíveis para seleção (ordem importante para exibição)
 const TURNOS_DISPONIVEIS = [
-  'Manhã/Tarde',
   'Manhã',
   'Tarde',
   'Noite',
   'Madrugada'
 ];
+
+// Ordem dos turnos para criação de lançamentos no backend
+const ORDEM_TURNOS: Record<string, number> = {
+  'Manhã': 1,
+  'Tarde': 2,
+  'Noite': 3,
+  'Madrugada': 4
+};
 
 export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: PublicarPlanejamentoModalProps) {
   const [restaurantes, setRestaurantes] = useState<Restaurante[]>([]);
@@ -69,11 +77,14 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
         ]);
         
         setRestaurantes(restaurantesRes.data);
-        setFuncionarios(funcionariosRes.data);
+        // Filtrar apenas funcionários ativos
+        const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+        setFuncionarios(funcionariosAtivos);
         setObras(obrasRes.data);
         setRegimes(regimesRes.data);
 
         // Inicializar lançamentos a partir do planejamento
+        // Por padrão, Manhã e Tarde são selecionados
         const initialLancamentos: FuncionarioLancamento[] = [];
         dayGroup.obras.forEach((obraGroup) => {
           obraGroup.funcionarios.forEach((func) => {
@@ -82,7 +93,7 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
               funcionario_nome: func.nome,
               obra_id: obraGroup.obra.id,
               obra_nome: obraGroup.obra.nome,
-              turnos: ['Manhã'], // Turno padrão
+              turnos: ['Manhã', 'Tarde'], // Turnos padrão selecionados
               restaurante_id: null,
               regime_id: 1, // Valor padrão (ID do regime "Hora")
             });
@@ -145,8 +156,9 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
       }
     }
 
-    // Se não tem Manhã ou Manhã/Tarde, limpa o restaurante
-    if (!newLancamentos[index].turnos.includes('Manhã') && !newLancamentos[index].turnos.includes('Manhã/Tarde')) {
+    // Limpa o restaurante se não tem o turno da Manhã selecionado
+    // (restaurante só é válido no turno da Manhã)
+    if (!newLancamentos[index].turnos.includes('Manhã')) {
       newLancamentos[index].restaurante_id = null;
     }
 
@@ -172,61 +184,33 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
         return;
       }
 
-      // Criar lançamentos
+      // Criar lançamentos: um lançamento para cada turno selecionado
+      // Restaurante só é incluído no turno da Manhã
       for (const lanc of lancamentos) {
-        // Se o turno é Manhã/Tarde, criar dois lançamentos
-        if (lanc.turnos.includes('Manhã/Tarde')) {
-          // Lançamento de Manhã (com restaurante)
-          const restaurante = lanc.restaurante_id
-            ? restaurantes.find((r) => r.id === lanc.restaurante_id)
-            : null;
+        // Ordenar turnos antes de criar lançamentos (Manhã, Tarde, Noite, Madrugada)
+        const turnosOrdenados = [...lanc.turnos].sort((a, b) => 
+          ORDEM_TURNOS[a] - ORDEM_TURNOS[b]
+        );
 
-          const lancamentoManha: LancamentoCreate = {
+        for (const turno of turnosOrdenados) {
+          // Restaurante só é válido no turno da Manhã
+          const restaurante =
+            turno === 'Manhã' && lanc.restaurante_id
+              ? restaurantes.find((r) => r.id === lanc.restaurante_id)
+              : null;
+
+          const lancamento: LancamentoCreate = {
             data_trabalho: dayGroup.data_trabalho,
             funcionario_nome: lanc.funcionario_nome,
             obra_nome: lanc.obra_nome.includes('-')
               ? lanc.obra_nome.split('-')[0].trim().substring(0, 4)
               : lanc.obra_nome.substring(0, 4),
-            turno_nome: 'Manhã',
+            turno_nome: turno,
             restaurante_nome: restaurante?.nome,
             regime_id: lanc.regime_id,
           };
 
-          await Api.createLancamento(lancamentoManha);
-
-          // Lançamento de Tarde (sem restaurante)
-          const lancamentoTarde: LancamentoCreate = {
-            data_trabalho: dayGroup.data_trabalho,
-            funcionario_nome: lanc.funcionario_nome,
-            obra_nome: lanc.obra_nome.includes('-')
-              ? lanc.obra_nome.split('-')[0].trim().substring(0, 4)
-              : lanc.obra_nome.substring(0, 4),
-            turno_nome: 'Tarde',
-            regime_id: lanc.regime_id,
-          };
-
-          await Api.createLancamento(lancamentoTarde);
-        } else {
-          // Criar lançamentos individuais para cada turno
-          for (const turno of lanc.turnos) {
-            const restaurante =
-              turno === 'Manhã' && lanc.restaurante_id
-                ? restaurantes.find((r) => r.id === lanc.restaurante_id)
-                : null;
-
-            const lancamento: LancamentoCreate = {
-              data_trabalho: dayGroup.data_trabalho,
-              funcionario_nome: lanc.funcionario_nome,
-              obra_nome: lanc.obra_nome.includes('-')
-                ? lanc.obra_nome.split('-')[0].trim().substring(0, 4)
-                : lanc.obra_nome.substring(0, 4),
-              turno_nome: turno,
-              restaurante_nome: restaurante?.nome,
-              regime_id: lanc.regime_id,
-            };
-
-            await Api.createLancamento(lancamento);
-          }
+          await Api.createLancamento(lancamento);
         }
       }
 
@@ -241,8 +225,9 @@ export function PublicarPlanejamentoModal({ dayGroup, onClose, onPublish }: Publ
     }
   };
 
+  // Verifica se o turno da Manhã está selecionado (para exibir campo de restaurante)
   const temTurnoManha = (turnos: string[]) => {
-    return turnos.includes('Manhã') || turnos.includes('Manhã/Tarde');
+    return turnos.includes('Manhã');
   };
 
   return (

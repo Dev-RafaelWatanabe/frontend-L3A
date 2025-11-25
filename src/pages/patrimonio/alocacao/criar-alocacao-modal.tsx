@@ -60,7 +60,9 @@ export const CriarAlocacaoModal: React.FC<CriarAlocacaoModalProps> = ({
 
       setFerramentas(ferramentasRes.data || []);
       setObras(obrasRes.data || []);
-      setFuncionarios(funcionariosRes.data || []);
+      // Filtrar apenas funcionários ativos
+      const funcionariosAtivos = funcionariosRes.data.filter((f: any) => f.ativo === true);
+      setFuncionarios(funcionariosAtivos || []);
       setSituacoes(situacoesRes.data || []);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
